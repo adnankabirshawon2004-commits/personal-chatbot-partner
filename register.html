@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Create Account - Personal Chatbot Partner</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     * {
@@ -39,7 +42,7 @@
     .subtitle {
       text-align: center;
       color: #d1d5db;
-      margin-bottom: 30px;
+      margin-bottom: 25px;
     }
 
     label {
@@ -73,6 +76,11 @@
       background: #7c3aed;
     }
 
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
     .login {
       text-align: center;
       margin-top: 20px;
@@ -81,6 +89,12 @@
 
     a {
       color: #c4b5fd;
+    }
+
+    #message {
+      margin-top: 18px;
+      text-align: center;
+      line-height: 1.5;
     }
   </style>
 </head>
@@ -95,34 +109,43 @@
       Create your account to get started
     </div>
 
-    <form>
+    <form id="registerForm">
 
       <label>Name</label>
+
       <input
+        id="name"
         type="text"
         placeholder="Enter your name"
         required
       >
 
       <label>Email</label>
+
       <input
+        id="email"
         type="email"
         placeholder="Enter your email"
         required
       >
 
       <label>Password</label>
+
       <input
+        id="password"
         type="password"
         placeholder="Create a password"
+        minlength="6"
         required
       >
 
-      <button type="submit">
+      <button id="registerButton" type="submit">
         Create Account
       </button>
 
     </form>
+
+    <div id="message"></div>
 
     <div class="login">
       Already have an account?
@@ -130,6 +153,116 @@
     </div>
 
   </div>
+
+
+<script>
+
+const SUPABASE_URL =
+  "https://bnagfjhghlncqqnenejn.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_CEOgfj8n1K6CeIqizGVhTw_8oPlWuKk";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+document
+  .getElementById("registerForm")
+  .addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const name =
+      document.getElementById("name").value.trim();
+
+    const email =
+      document.getElementById("email").value.trim();
+
+    const password =
+      document.getElementById("password").value;
+
+    const button =
+      document.getElementById("registerButton");
+
+    const message =
+      document.getElementById("message");
+
+
+    button.disabled = true;
+
+    button.textContent = "Creating account...";
+
+    message.textContent = "";
+
+
+    try {
+
+      const { data, error } =
+        await supabaseClient.auth.signUp({
+          email: email,
+          password: password
+        });
+
+
+      if (error) {
+        throw error;
+      }
+
+
+      if (!data.user) {
+        throw new Error("Account could not be created.");
+      }
+
+
+      const { error: profileError } =
+        await supabaseClient
+          .from("profiles")
+          .insert({
+            id: data.user.id,
+            name: name,
+            email: email,
+            role: "user",
+            status: "pending"
+          });
+
+
+      if (profileError) {
+        throw profileError;
+      }
+
+
+      message.style.color = "#86efac";
+
+      message.innerHTML =
+        "Account created successfully!<br>" +
+        "Your account is waiting for admin approval.";
+
+
+      document.getElementById("registerForm").reset();
+
+    }
+
+    catch (error) {
+
+      message.style.color = "#fca5a5";
+
+      message.textContent =
+        error.message || "Something went wrong.";
+
+    }
+
+
+    button.disabled = false;
+
+    button.textContent = "Create Account";
+
+  });
+
+</script>
 
 </body>
 </html>
