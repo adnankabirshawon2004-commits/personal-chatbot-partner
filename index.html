@@ -1,267 +1,424 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Login - Personal Chatbot Partner</title>
+<title>Personal Chatbot Partner</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<style>
+* {
+    box-sizing: border-box;
+}
 
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+}
+
+body {
+    min-height: 100vh;
+    font-family: Inter, Arial, sans-serif;
+    color: white;
+    background:
+        radial-gradient(circle at 15% 20%, rgba(124, 58, 237, 0.35), transparent 30%),
+        radial-gradient(circle at 85% 80%, rgba(37, 99, 235, 0.3), transparent 30%),
+        linear-gradient(135deg, #050816, #0b1026 45%, #111936);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow-x: hidden;
+}
+
+/* Background glow */
+
+body::before,
+body::after {
+    content: "";
+    position: fixed;
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.25;
+    pointer-events: none;
+}
+
+body::before {
+    background: #7c3aed;
+    top: -120px;
+    left: -100px;
+}
+
+body::after {
+    background: #2563eb;
+    bottom: -120px;
+    right: -100px;
+}
+
+/* Main card */
+
+.box {
+    position: relative;
+    width: 100%;
+    max-width: 430px;
+    padding: 38px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 28px;
+    background: rgba(15, 23, 42, 0.72);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    box-shadow:
+        0 30px 80px rgba(0, 0, 0, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    z-index: 1;
+}
+
+/* Logo */
+
+.logo {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 20px;
+    border-radius: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+    box-shadow:
+        0 12px 35px rgba(99, 102, 241, 0.35),
+        inset 0 1px 0 rgba(255,255,255,0.25);
+}
+
+h1 {
+    margin: 0;
+    text-align: center;
+    font-size: 28px;
+    letter-spacing: -0.5px;
+}
+
+.subtitle {
+    margin: 10px 0 30px;
+    text-align: center;
+    color: #aeb8d0;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* Form */
+
+label {
+    display: block;
+    margin: 18px 0 8px;
+    color: #dbe4ff;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.input-wrap {
+    position: relative;
+}
+
+.input-wrap span {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.55;
+    font-size: 16px;
+}
+
+input {
+    width: 100%;
+    padding: 14px 15px 14px 44px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    outline: none;
+    background: rgba(255,255,255,0.055);
+    color: white;
+    font-size: 15px;
+    transition: 0.2s ease;
+}
+
+input::placeholder {
+    color: #75809b;
+}
+
+input:focus {
+    border-color: rgba(139, 92, 246, 0.8);
+    background: rgba(255,255,255,0.08);
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+}
+
+/* Button */
+
+button {
+    width: 100%;
+    margin-top: 26px;
+    padding: 15px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #8b5cf6, #6366f1);
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 12px 30px rgba(99, 102, 241, 0.25);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 35px rgba(99, 102, 241, 0.35);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Message */
+
+#message {
+    margin-top: 18px;
+    min-height: 22px;
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* Register */
+
+.register {
+    margin-top: 24px;
+    padding-top: 22px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    text-align: center;
+    color: #8e9ab5;
+    font-size: 13px;
+}
+
+.register a {
+    color: #b9a4ff;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.register a:hover {
+    color: #d2c5ff;
+}
+
+/* Footer */
+
+.footer {
+    margin-top: 22px;
+    text-align: center;
+    color: #59657f;
+    font-size: 11px;
+}
+
+/* Mobile */
+
+@media (max-width: 480px) {
     body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #111827, #312e81, #701a75);
-      color: white;
+        padding: 16px;
     }
 
     .box {
-      width: 90%;
-      max-width: 420px;
-      padding: 35px;
-      border-radius: 20px;
-      background: rgba(255,255,255,0.1);
-      backdrop-filter: blur(15px);
-      box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+        padding: 30px 22px;
+        border-radius: 24px;
     }
 
     h1 {
-      text-align: center;
-      margin-bottom: 8px;
+        font-size: 24px;
     }
 
-    .subtitle {
-      text-align: center;
-      color: #d1d5db;
-      margin-bottom: 30px;
+    .logo {
+        width: 64px;
+        height: 64px;
+        font-size: 28px;
     }
-
-    label {
-      display: block;
-      margin: 15px 0 7px;
-    }
-
-    input {
-      width: 100%;
-      padding: 13px;
-      border: none;
-      border-radius: 10px;
-      font-size: 15px;
-      outline: none;
-    }
-
-    button {
-      width: 100%;
-      padding: 14px;
-      margin-top: 25px;
-      border: none;
-      border-radius: 10px;
-      background: #8b5cf6;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #7c3aed;
-    }
-
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .register {
-      text-align: center;
-      margin-top: 20px;
-      color: #d1d5db;
-    }
-
-    a {
-      color: #c4b5fd;
-    }
-
-    #message {
-      margin-top: 18px;
-      text-align: center;
-      line-height: 1.5;
-    }
-  </style>
+}
+</style>
 </head>
 
 <body>
 
-  <div class="box">
+<div class="box">
+
+    <div class="logo">✦</div>
 
     <h1>Personal Chatbot Partner</h1>
 
     <div class="subtitle">
-      Sign in to continue
+        Sign in to continue your personal chat experience.
     </div>
 
     <form id="loginForm">
 
-      <label>Email</label>
+        <label for="email">Email</label>
 
-      <input
-        id="email"
-        type="email"
-        placeholder="Enter your email"
-        required
-      >
+        <div class="input-wrap">
+            <span>✉</span>
+            <input
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                autocomplete="email"
+                required
+            >
+        </div>
 
-      <label>Password</label>
+        <label for="password">Password</label>
 
-      <input
-        id="password"
-        type="password"
-        placeholder="Enter your password"
-        required
-      >
+        <div class="input-wrap">
+            <span>●</span>
+            <input
+                id="password"
+                type="password"
+                placeholder="Enter your password"
+                autocomplete="current-password"
+                required
+            >
+        </div>
 
-      <button id="loginButton" type="submit">
-        Login
-      </button>
+        <button id="loginButton" type="submit">
+            Login
+        </button>
 
     </form>
 
     <div id="message"></div>
 
     <div class="register">
-      Don't have an account?
-      <a href="register.html">Create Account</a>
+        Don't have an account?
+        <a href="register.html">Create Account</a>
     </div>
 
-  </div>
+    <div class="footer">
+        Personal Chatbot Partner
+    </div>
 
+</div>
 
 <script>
 
 const SUPABASE_URL =
-  "https://bnagfjhghlncqqnenejn.supabase.co";
+"https://bnagfjhghlncqqnenejn.supabase.co";
 
 const SUPABASE_KEY =
-  "sb_publishable_CEOgfj8n1K6CeIqizGVhTw_8oPlWuKk";
+"sb_publishable_CEOgfj8n1K6CeIqizGVhTw_8oPlWuKk";
 
 const supabaseClient =
-  window.supabase.createClient(
+window.supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
-  );
-
+);
 
 document
-  .getElementById("loginForm")
-  .addEventListener("submit", async function(event) {
+.getElementById("loginForm")
+.addEventListener("submit", async function(event) {
 
     event.preventDefault();
 
     const email =
-      document.getElementById("email").value.trim();
+        document.getElementById("email").value.trim();
 
     const password =
-      document.getElementById("password").value;
+        document.getElementById("password").value;
 
     const button =
-      document.getElementById("loginButton");
+        document.getElementById("loginButton");
 
     const message =
-      document.getElementById("message");
-
+        document.getElementById("message");
 
     button.disabled = true;
-
     button.textContent = "Logging in...";
 
     message.textContent = "";
 
-
     try {
 
-      const { data, error } =
-        await supabaseClient.auth.signInWithPassword({
-          email: email,
-          password: password
-        });
+        const { data, error } =
+            await supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
 
+        if (error) {
+            throw error;
+        }
 
-      if (error) {
-        throw error;
-      }
+        if (!data.user) {
+            throw new Error("Login failed.");
+        }
 
+        const { data: profile, error: profileError } =
+            await supabaseClient
+            .from("profiles")
+            .select("name, role, status")
+            .eq("id", data.user.id)
+            .single();
 
-      if (!data.user) {
-        throw new Error("Login failed.");
-      }
+        if (profileError) {
+            throw profileError;
+        }
 
+        if (profile.status !== "approved") {
 
-      const { data: profile, error: profileError } =
-        await supabaseClient
-          .from("profiles")
-          .select("name, role, status")
-          .eq("id", data.user.id)
-          .single();
+            await supabaseClient.auth.signOut();
 
+            message.style.color = "#fbbf24";
 
-      if (profileError) {
-        throw profileError;
-      }
+            message.textContent =
+                "Your account is waiting for admin approval.";
 
+            button.disabled = false;
+            button.textContent = "Login";
 
-      if (profile.status !== "approved") {
+            return;
+        }
 
-        await supabaseClient.auth.signOut();
+        if (profile.role === "admin") {
 
-        message.style.color = "#fbbf24";
+            window.location.href = "admin.html";
 
-        message.textContent =
-          "Your account is waiting for admin approval.";
+        } else {
 
-        button.disabled = false;
-        button.textContent = "Login";
+            window.location.href = "dashboard.html";
 
-        return;
-      }
-
-
-      if (profile.role === "admin") {
-
-        window.location.href = "admin.html";
-
-      } else {
-
-        window.location.href = "dashboard.html";
-
-      }
+        }
 
     }
 
     catch (error) {
 
-      message.style.color = "#fca5a5";
+        message.style.color = "#fca5a5";
 
-      message.textContent =
-        error.message || "Invalid email or password.";
+        message.textContent =
+            error.message ||
+            "Invalid email or password.";
 
-      button.disabled = false;
-
-      button.textContent = "Login";
-
+        button.disabled = false;
+        button.textContent = "Login";
     }
 
-  });
+});
 
 </script>
 
 </body>
 </html>
+```
