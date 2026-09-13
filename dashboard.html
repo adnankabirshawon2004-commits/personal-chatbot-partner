@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Create Your Partner</title>
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+  </script>
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+
+      margin: 0;
+
+      min-height: 100vh;
+
+      font-family: Arial, sans-serif;
+
+      background:
+        linear-gradient(
+          135deg,
+          #111827,
+          #312e81,
+          #701a75
+        );
+
+      color: white;
+
+    }
+
+    .container {
+
+      width: 92%;
+
+      max-width: 650px;
+
+      margin: auto;
+
+      padding: 35px 0 60px;
+
+    }
+
+    .top {
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      margin-bottom: 30px;
+
+    }
+
+    .top h1 {
+
+      margin: 0;
+
+      font-size: 28px;
+
+    }
+
+    .logout {
+
+      border: none;
+
+      background: #ef4444;
+
+      color: white;
+
+      padding: 10px 16px;
+
+      border-radius: 9px;
+
+      cursor: pointer;
+
+      font-weight: bold;
+
+    }
+
+    .card {
+
+      background:
+        rgba(255,255,255,0.10);
+
+      border:
+        1px solid rgba(255,255,255,0.15);
+
+      border-radius: 20px;
+
+      padding: 28px;
+
+      backdrop-filter: blur(15px);
+
+      box-shadow:
+        0 20px 50px rgba(0,0,0,0.3);
+
+    }
+
+    .intro {
+
+      text-align: center;
+
+      margin-bottom: 30px;
+
+    }
+
+    .intro h2 {
+
+      margin-bottom: 8px;
+
+    }
+
+    .intro p {
+
+      color: #d1d5db;
+
+      margin: 0;
+
+      line-height: 1.5;
+
+    }
+
+    .section {
+
+      margin-top: 25px;
+
+    }
+
+    .section-title {
+
+      font-size: 17px;
+
+      font-weight: bold;
+
+      margin-bottom: 12px;
+
+    }
+
+    .options {
+
+      display: grid;
+
+      grid-template-columns:
+        repeat(2, 1fr);
+
+      gap: 10px;
+
+    }
+
+    .option {
+
+      padding: 14px;
+
+      border-radius: 12px;
+
+      background:
+        rgba(255,255,255,0.08);
+
+      border:
+        1px solid rgba(255,255,255,0.15);
+
+      cursor: pointer;
+
+      text-align: center;
+
+      transition: 0.2s;
+
+    }
+
+    .option:hover {
+
+      background:
+        rgba(255,255,255,0.15);
+
+    }
+
+    .option.selected {
+
+      background: #8b5cf6;
+
+      border-color: #a78bfa;
+
+    }
+
+    .option input {
+
+      display: none;
+
+    }
+
+    #customCharacterBox {
+
+      display: none;
+
+      margin-top: 12px;
+
+    }
+
+    #customCharacter {
+
+      width: 100%;
+
+      padding: 13px;
+
+      border: none;
+
+      border-radius: 10px;
+
+      font-size: 15px;
+
+      outline: none;
+
+    }
+
+    #createButton {
+
+      width: 100%;
+
+      padding: 15px;
+
+      margin-top: 30px;
+
+      border: none;
+
+      border-radius: 12px;
+
+      background: #8b5cf6;
+
+      color: white;
+
+      font-size: 16px;
+
+      font-weight: bold;
+
+      cursor: pointer;
+
+    }
+
+    #createButton:hover {
+
+      background: #7c3aed;
+
+    }
+
+    #createButton:disabled {
+
+      opacity: 0.6;
+
+      cursor: not-allowed;
+
+    }
+
+    #message {
+
+      text-align: center;
+
+      margin-top: 18px;
+
+      line-height: 1.5;
+
+    }
+
+    @media (max-width: 550px) {
+
+      .options {
+
+        grid-template-columns: 1fr;
+
+      }
+
+      .card {
+
+        padding: 20px;
+
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+  <div class="top">
+
+    <h1>Personal Chatbot Partner</h1>
+
+    <button
+      class="logout"
+      onclick="logout()"
+    >
+      Logout
+    </button>
+
+  </div>
+
+
+  <div class="card">
+
+
+    <div class="intro">
+
+      <h2>Create Your Partner</h2>
+
+      <p>
+        Choose how you want your chat experience.
+      </p>
+
+    </div>
+
+
+    <!-- LANGUAGE -->
+
+    <div class="section">
+
+      <div class="section-title">
+        Choose Language
+      </div>
+
+
+      <div class="options">
+
+
+        <label class="option">
+
+          <input
+            type="radio"
+            name="language"
+            value="English"
+          >
+
+          🇬🇧 English
+
+        </label>
+
+
+        <label class="option">
+
+          <input
+            type="radio"
+            name="language"
+            value="Bangla"
+          >
+
+          🇧🇩 Bangla
+
+        </label>
+
+
+      </div>
+
+    </div>
+
+
+    <!-- CHARACTER -->
+
+    <div class="section">
+
+      <div class="section-title">
+        Choose Character
+      </div>
+
+
+      <div class="options">
+
+
+        <label class="option">
+
+          <input
+            type="radio"
+            name="character"
+            value="Father"
+          >
+
+          👨 Father
+
+        </label>
+
+
+        <label class="option">
+
+          <input
+            type="radio"
+            name="character"
+            value="Mother"
+          >
+
+          👩 Mother
+
+        </label>
+
+
+        <label class="option">
+
+          <input
+            type="radio"
+            name="character"
+            value="Boyfriend"
+          >
+
+          💙 Boyfriend
+
+        </label>
+
+
+        <label class="option">
+
+          <input
+            type="radio"
+            name="character"
+            value="Girlfriend"
+          >
+
+          💜 Girlfriend
+
+        </label>
+
+
+        <label class="option">
+
+          <input
+            type="radio"
+            name="character"
+            value="Male Teacher"
+          >
+
+          👨‍🏫 Male Teacher
+
+        </label>
+
+
+        <label class="option">
+
+          <input
+            type="radio"
+            name="character"
+            value="Female Teacher"
+          >
+
+          👩‍🏫 Female Teacher
+
+        </label>
+
+
+        <label class="option">
+
+          <input
+            type="radio"
+            name="character"
+            value="Other"
+          >
+
+          ✨ Other
+
+        </label>
+
+
+      </div>
+
+
+      <div id="customCharacterBox">
+
+        <input
+          id="customCharacter"
+          type="text"
+          placeholder="Enter your character name"
+        >
+
+      </div>
+
+    </div>
+
+
+    <!-- CHAT EXPERIENCE -->
+
+    <div class="section">
+
+      <div class="section-title">
+        Choose Chat Experience
+      </div>
+
+
+      <div class="options">
+
+
+        <label class="option">
+
+          <input
+            type="radio"
+            name="experience"
+            value="Romantic"
+          >
+
+          ❤️ Romantic
+
+        </label>
+
+
+        <label class="option">
+
+          <input
+            type="radio"
+            name="experience"
+            value="Normal"
+          >
+
+          💬 Normal
+
+        </label>
+
+
+        <label class="option">
+
+          <input
+            type="radio"
+            name="experience"
+            value="Calm"
+          >
+
+          🌿 Calm
+
+        </label>
+
+
+      </div>
+
+    </div>
+
+
+    <button
+      id="createButton"
+      onclick="createCharacter()"
+    >
+      Create Character
+    </button>
+
+
+    <div id="message"></div>
+
+
+  </div>
+
+
+</div>
+
+
+<script>
+
+
+const SUPABASE_URL =
+  "https://bnagfjhghlncqqnenejn.supabase.co";
+
+
+const SUPABASE_KEY =
+  "sb_publishable_CEOgfj8n1K6CeIqizGVhTw_8oPlWuKk";
+
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+const optionElements =
+  document.querySelectorAll(".option");
+
+
+optionElements.forEach(option => {
+
+  option.addEventListener(
+    "click",
+    function() {
+
+      const group =
+        this.querySelector("input").name;
+
+
+      document
+        .querySelectorAll(
+          `input[name="${group}"]`
+        )
+        .forEach(input => {
+
+          input
+            .closest(".option")
+            .classList.remove(
+              "selected"
+            );
+
+        });
+
+
+      this.classList.add("selected");
+
+
+      if (
+        group === "character"
+      ) {
+
+        const value =
+          this.querySelector(
+            "input"
+          ).value;
+
+
+        const customBox =
+          document.getElementById(
+            "customCharacterBox"
+          );
+
+
+        if (value === "Other") {
+
+          customBox.style.display =
+            "block";
+
+        } else {
+
+          customBox.style.display =
+            "none";
+
+          document.getElementById(
+            "customCharacter"
+          ).value = "";
+
+        }
+
+      }
+
+    }
+  );
+
+});
+
+
+async function createCharacter() {
+
+
+  const message =
+    document.getElementById(
+      "message"
+    );
+
+
+  const button =
+    document.getElementById(
+      "createButton"
+    );
+
+
+  message.textContent = "";
+
+
+  const {
+    data: {
+      user
+    }
+  } =
+    await supabaseClient.auth.getUser();
+
+
+  if (!user) {
+
+    window.location.href =
+      "index.html";
+
+    return;
+
+  }
+
+
+  const language =
+    document.querySelector(
+      'input[name="language"]:checked'
+    );
+
+
+  const character =
+    document.querySelector(
+      'input[name="character"]:checked'
+    );
+
+
+  const experience =
+    document.querySelector(
+      'input[name="experience"]:checked'
+    );
+
+
+  if (!language) {
+
+    message.style.color =
+      "#fca5a5";
+
+    message.textContent =
+      "Please choose a language.";
+
+    return;
+
+  }
+
+
+  if (!character) {
+
+    message.style.color =
+      "#fca5a5";
+
+    message.textContent =
+      "Please choose a character.";
+
+    return;
+
+  }
+
+
+  if (!experience) {
+
+    message.style.color =
+      "#fca5a5";
+
+    message.textContent =
+      "Please choose a chat experience.";
+
+    return;
+
+  }
+
+
+  let customCharacter = null;
+
+
+  if (
+    character.value === "Other"
+  ) {
+
+    customCharacter =
+      document
+        .getElementById(
+          "customCharacter"
+        )
+        .value
+        .trim();
+
+
+    if (!customCharacter) {
+
+      message.style.color =
+        "#fca5a5";
+
+      message.textContent =
+        "Please enter your character.";
+
+      return;
+
+    }
+
+  }
+
+
+  button.disabled = true;
+
+  button.textContent =
+    "Creating...";
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+
+      .from("characters")
+
+      .insert({
+
+        user_id: user.id,
+
+        language:
+          language.value,
+
+        character_type:
+          character.value,
+
+        custom_character:
+          customCharacter,
+
+        chat_experience:
+          experience.value
+
+      })
+
+      .select()
+
+      .single();
+
+
+  if (error) {
+
+    message.style.color =
+      "#fca5a5";
+
+    message.textContent =
+      error.message;
+
+    button.disabled = false;
+
+    button.textContent =
+      "Create Character";
+
+    return;
+
+  }
+
+
+  message.style.color =
+    "#86efac";
+
+  message.textContent =
+    "Character created successfully!";
+
+
+  setTimeout(
+    function() {
+
+      window.location.href =
+        "chat.html?id=" +
+        data.id;
+
+    },
+    700
+  );
+
+
+}
+
+
+async function logout() {
+
+  await supabaseClient.auth.signOut();
+
+  window.location.href =
+    "index.html";
+
+}
+
+
+async function checkUser() {
+
+
+  const {
+    data: {
+      user
+    }
+  } =
+    await supabaseClient.auth.getUser();
+
+
+  if (!user) {
+
+    window.location.href =
+      "index.html";
+
+    return;
+
+  }
+
+
+  const {
+    data: profile
+  } =
+    await supabaseClient
+
+      .from("profiles")
+
+      .select("status")
+
+      .eq("id", user.id)
+
+      .single();
+
+
+  if (
+    !profile ||
+    profile.status !== "approved"
+  ) {
+
+    await supabaseClient.auth.signOut();
+
+    window.location.href =
+      "index.html";
+
+  }
+
+}
+
+
+checkUser();
+
+
+</script>
+
+
+</body>
+
+</html>
