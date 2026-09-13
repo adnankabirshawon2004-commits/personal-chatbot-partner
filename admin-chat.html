@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Admin Chat - Personal Chatbot Partner</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #111827, #312e81, #701a75);
+      color: white;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      height: 65px;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(15px);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .logout {
+      border: none;
+      background: #ef4444;
+      color: white;
+      padding: 9px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .layout {
+      flex: 1;
+      display: flex;
+      min-height: 0;
+    }
+
+    .users {
+      width: 300px;
+      background: rgba(0,0,0,0.20);
+      border-right: 1px solid rgba(255,255,255,0.1);
+      overflow-y: auto;
+    }
+
+    .users-title {
+      padding: 18px;
+      font-weight: bold;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .user-card {
+      padding: 15px;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .user-card:hover {
+      background: rgba(255,255,255,0.08);
+    }
+
+    .user-card.selected {
+      background: #6d28d9;
+    }
+
+    .user-name {
+      font-weight: bold;
+    }
+
+    .user-email {
+      color: #d1d5db;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    .chat {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .chat-header {
+      padding: 15px 20px;
+      background: rgba(255,255,255,0.06);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .chat-name {
+      font-weight: bold;
+      font-size: 17px;
+    }
+
+    .chat-details {
+      color: #d1d5db;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .message-list {
+      max-width: 850px;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .message {
+      max-width: 75%;
+      padding: 11px 15px;
+      border-radius: 16px;
+      line-height: 1.45;
+      word-wrap: break-word;
+    }
+
+    .message.user {
+      align-self: flex-start;
+      background: rgba(255,255,255,0.12);
+      border-bottom-left-radius: 4px;
+    }
+
+    .message.admin {
+      align-self: flex-end;
+      background: #8b5cf6;
+      border-bottom-right-radius: 4px;
+    }
+
+    .message-time {
+      display: block;
+      font-size: 10px;
+      color: #d1d5db;
+      margin-top: 5px;
+    }
+
+    .empty {
+      text-align: center;
+      color: #d1d5db;
+      margin-top: 80px;
+    }
+
+    .input-area {
+      padding: 12px 15px;
+      background: rgba(0,0,0,0.25);
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .input-box {
+      max-width: 850px;
+      margin: auto;
+      display: flex;
+      gap: 10px;
+    }
+
+    #messageInput {
+      flex: 1;
+      padding: 13px 15px;
+      border: none;
+      outline: none;
+      border-radius: 12px;
+      font-size: 15px;
+    }
+
+    #sendButton {
+      border: none;
+      padding: 0 20px;
+      border-radius: 12px;
+      background: #8b5cf6;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #sendButton:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    #errorMessage {
+      text-align: center;
+      color: #fca5a5;
+      font-size: 13px;
+      margin-top: 7px;
+    }
+
+    @media (max-width: 700px) {
+
+      .users {
+        width: 220px;
+      }
+
+      .message {
+        max-width: 85%;
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+<header class="header">
+
+  <h1>Admin Chat</h1>
+
+  <button
+    class="logout"
+    onclick="logout()"
+  >
+    Logout
+  </button>
+
+</header>
+
+
+<div class="layout">
+
+
+  <aside class="users">
+
+    <div class="users-title">
+      Users
+    </div>
+
+    <div id="usersList"></div>
+
+  </aside>
+
+
+  <main class="chat">
+
+
+    <div class="chat-header">
+
+      <div
+        id="chatName"
+        class="chat-name"
+      >
+        Select a user
+      </div>
+
+      <div
+        id="chatDetails"
+        class="chat-details"
+      >
+        Choose a user from the list
+      </div>
+
+    </div>
+
+
+    <div class="messages">
+
+      <div
+        id="messageList"
+        class="message-list"
+      >
+
+        <div
+          id="emptyMessage"
+          class="empty"
+        >
+          Select a user to open the chat.
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="input-area">
+
+      <div class="input-box">
+
+        <input
+          id="messageInput"
+          type="text"
+          placeholder="Type a reply..."
+          autocomplete="off"
+          disabled
+        >
+
+        <button
+          id="sendButton"
+          onclick="sendMessage()"
+          disabled
+        >
+          Send
+        </button>
+
+      </div>
+
+      <div id="errorMessage"></div>
+
+    </div>
+
+
+  </main>
+
+
+</div>
+
+
+<script>
+
+
+const SUPABASE_URL =
+  "https://bnagfjhghlncqqnenejn.supabase.co";
+
+
+const SUPABASE_KEY =
+  "sb_publishable_CEOgfj8n1K6CeIqizGVhTw_8oPlWuKk";
+
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+let currentAdmin = null;
+
+let selectedUser = null;
+
+let selectedConversation = null;
+
+let realtimeChannel = null;
+
+
+const usersList =
+  document.getElementById(
+    "usersList"
+  );
+
+
+const messageList =
+  document.getElementById(
+    "messageList"
+  );
+
+
+const messageInput =
+  document.getElementById(
+    "messageInput"
+  );
+
+
+const sendButton =
+  document.getElementById(
+    "sendButton"
+  );
+
+
+const errorMessage =
+  document.getElementById(
+    "errorMessage"
+  );
+
+
+messageInput.addEventListener(
+  "keydown",
+  function(event) {
+
+    if (
+      event.key === "Enter" &&
+      !event.shiftKey
+    ) {
+
+      event.preventDefault();
+
+      sendMessage();
+
+    }
+
+  }
+);
+
+
+/* START */
+
+startAdmin();
+
+
+async function startAdmin() {
+
+  try {
+
+    const {
+      data: {
+        user
+      },
+      error
+    } =
+      await supabaseClient.auth.getUser();
+
+
+    if (error) {
+
+      throw error;
+
+    }
+
+
+    if (!user) {
+
+      window.location.href =
+        "index.html";
+
+      return;
+
+    }
+
+
+    currentAdmin = user;
+
+
+    const {
+      data: profile,
+      error: profileError
+    } =
+      await supabaseClient
+
+        .from("profiles")
+
+        .select(
+          "name, role, status"
+        )
+
+        .eq(
+          "id",
+          user.id
+        )
+
+        .single();
+
+
+    if (profileError) {
+
+      throw profileError;
+
+    }
+
+
+    if (
+      !profile ||
+      profile.role !== "admin" ||
+      profile.status !== "approved"
+    ) {
+
+      await supabaseClient.auth.signOut();
+
+      window.location.href =
+        "index.html";
+
+      return;
+
+    }
+
+
+    await loadUsers();
+
+  } catch (error) {
+
+    console.error(error);
+
+    errorMessage.textContent =
+      error.message;
+
+  }
+
+}
+
+
+/* LOAD USERS */
+
+async function loadUsers() {
+
+  const {
+    data: users,
+    error
+  } =
+    await supabaseClient
+
+      .from("profiles")
+
+      .select(
+        "id, name, email, role, status"
+      )
+
+      .eq(
+        "status",
+        "approved"
+      )
+
+      .neq(
+        "role",
+        "admin"
+      )
+
+      .order(
+        "created_at",
+        {
+          ascending: true
+        }
+      );
+
+
+  if (error) {
+
+    throw error;
+
+  }
+
+
+  usersList.innerHTML = "";
+
+
+  if (
+    !users ||
+    users.length === 0
+  ) {
+
+    usersList.innerHTML =
+      '<div style="padding:18px;color:#d1d5db;">No users found.</div>';
+
+    return;
+
+  }
+
+
+  users.forEach(
+    user => {
+
+      const div =
+        document.createElement(
+          "div"
+        );
+
+
+      div.className =
+        "user-card";
+
+
+      div.dataset.userId =
+        user.id;
+
+
+      div.innerHTML = `
+        <div class="user-name">
+          ${escapeHtml(user.name)}
+        </div>
+
+        <div class="user-email">
+          ${escapeHtml(user.email || "")}
+        </div>
+      `;
+
+
+      div.addEventListener(
+        "click",
+        function() {
+
+          selectUser(
+            user
+          );
+
+        }
+      );
+
+
+      usersList.appendChild(
+        div
+      );
+
+    }
+  );
+
+}
+
+
+/* SELECT USER */
+
+async function selectUser(
+  user
+) {
+
+  selectedUser =
+    user;
+
+
+  document
+    .querySelectorAll(
+      ".user-card"
+    )
+    .forEach(
+      card => {
+
+        card.classList.remove(
+          "selected"
+        );
+
+      }
+    );
+
+
+  const selectedCard =
+    document.querySelector(
+      `[data-user-id="${user.id}"]`
+    );
+
+
+  if (selectedCard) {
+
+    selectedCard.classList.add(
+      "selected"
+    );
+
+  }
+
+
+  document.getElementById(
+    "chatName"
+  ).textContent =
+    user.name;
+
+
+  document.getElementById(
+    "chatDetails"
+  ).textContent =
+    "Loading conversation...";
+
+
+  messageInput.disabled =
+    true;
+
+  sendButton.disabled =
+    true;
+
+
+  messageList.innerHTML =
+    '<div class="empty">Loading...</div>';
+
+
+  try {
+
+    const {
+      data: character,
+      error: characterError
+    } =
+      await supabaseClient
+
+        .from("characters")
+
+        .select("*")
+
+        .eq(
+          "user_id",
+          user.id
+        )
+
+        .order(
+          "created_at",
+          {
+            ascending: false
+          }
+        )
+
+        .limit(1)
+        .maybeSingle();
+
+
+    if (characterError) {
+
+      throw characterError;
+
+    }
+
+
+    if (!character) {
+
+      document.getElementById(
+        "chatDetails"
+      ).textContent =
+        "No character created yet.";
+
+      messageList.innerHTML =
+        '<div class="empty">This user has not created a character yet.</div>';
+
+      return;
+
+    }
+
+
+    let characterName =
+      character.character_type;
+
+
+    if (
+      character.character_type ===
+      "Other" &&
+      character.custom_character
+    ) {
+
+      characterName =
+        character.custom_character;
+
+    }
+
+
+    document.getElementById(
+      "chatDetails"
+    ).textContent =
+      characterName +
+      " • " +
+      character.language +
+      " • " +
+      character.chat_experience;
+
+
+    const {
+      data: conversation,
+      error: conversationError
+    } =
+      await supabaseClient
+
+        .from("conversations")
+
+        .select("*")
+
+        .eq(
+          "user_id",
+          user.id
+        )
+
+        .eq(
+          "character_id",
+          character.id
+        )
+
+        .limit(1)
+        .maybeSingle();
+
+
+    if (conversationError) {
+
+      throw conversationError;
+
+    }
+
+
+    if (!conversation) {
+
+      selectedConversation =
+        null;
+
+      messageList.innerHTML =
+        '<div class="empty">No conversation yet.</div>';
+
+      messageInput.disabled =
+        true;
+
+      sendButton.disabled =
+        true;
+
+      return;
+
+    }
+
+
+    selectedConversation =
+      conversation;
+
+
+    messageInput.disabled =
+      false;
+
+    sendButton.disabled =
+      false;
+
+
+    await loadMessages();
+
+
+    setupRealtime();
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    errorMessage.textContent =
+      error.message;
+
+  }
+
+}
+
+
+/* LOAD MESSAGES */
+
+async function loadMessages() {
+
+  if (!selectedConversation) {
+
+    return;
+
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+
+      .from("messages")
+
+      .select("*")
+
+      .eq(
+        "conversation_id",
+        selectedConversation.id
+      )
+
+      .order(
+        "created_at",
+        {
+          ascending: true
+        }
+      );
+
+
+  if (error) {
+
+    throw error;
+
+  }
+
+
+  messageList.innerHTML = "";
+
+
+  if (
+    !data ||
+    data.length === 0
+  ) {
+
+    messageList.innerHTML =
+      '<div class="empty">No messages yet.</div>';
+
+    return;
+
+  }
+
+
+  data.forEach(
+    message => {
+
+      displayMessage(
+        message
+      );
+
+    }
+  );
+
+
+  scrollToBottom();
+
+}
+
+
+/* DISPLAY MESSAGE */
+
+function displayMessage(
+  message
+) {
+
+  const div =
+    document.createElement(
+      "div"
+    );
+
+
+  const isAdmin =
+    message.sender_id ===
+    currentAdmin.id;
+
+
+  div.className =
+    "message " +
+    (
+      isAdmin
+        ? "admin"
+        : "user"
+    );
+
+
+  const text =
+    document.createElement(
+      "div"
+    );
+
+
+  text.textContent =
+    message.content;
+
+
+  const time =
+    document.createElement(
+      "span"
+    );
+
+
+  time.className =
+    "message-time";
+
+
+  time.textContent =
+    new Date(
+      message.created_at
+    ).toLocaleTimeString(
+      [],
+      {
+        hour: "2-digit",
+        minute: "2-digit"
+      }
+    );
+
+
+  div.appendChild(
+    text
+  );
+
+  div.appendChild(
+    time
+  );
+
+
+  messageList.appendChild(
+    div
+  );
+
+
+  scrollToBottom();
+
+}
+
+
+/* SEND ADMIN REPLY */
+
+async function sendMessage() {
+
+  if (
+    !selectedConversation
+  ) {
+
+    return;
+
+  }
+
+
+  const content =
+    messageInput.value.trim();
+
+
+  if (!content) {
+
+    return;
+
+  }
+
+
+  sendButton.disabled =
+    true;
+
+  messageInput.disabled =
+    true;
+
+
+  errorMessage.textContent =
+    "";
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+
+      .from("messages")
+
+      .insert({
+
+        conversation_id:
+          selectedConversation.id,
+
+        sender_id:
+          currentAdmin.id,
+
+        content:
+          content
+
+      });
+
+
+  if (error) {
+
+    console.error(error);
+
+    errorMessage.textContent =
+      error.message;
+
+  } else {
+
+    messageInput.value =
+      "";
+
+  }
+
+
+  messageInput.disabled =
+    false;
+
+  sendButton.disabled =
+    false;
+
+  messageInput.focus();
+
+}
+
+
+/* REALTIME */
+
+function setupRealtime() {
+
+  if (
+    !selectedConversation
+  ) {
+
+    return;
+
+  }
+
+
+  if (realtimeChannel) {
+
+    supabaseClient
+      .removeChannel(
+        realtimeChannel
+      );
+
+  }
+
+
+  realtimeChannel =
+    supabaseClient
+
+      .channel(
+        "admin-chat-" +
+        selectedConversation.id
+      )
+
+      .on(
+
+        "postgres_changes",
+
+        {
+
+          event: "INSERT",
+
+          schema: "public",
+
+          table: "messages",
+
+          filter:
+            "conversation_id=eq." +
+            selectedConversation.id
+
+        },
+
+        payload => {
+
+          displayMessage(
+            payload.new
+          );
+
+        }
+
+      )
+
+      .subscribe(
+
+        status => {
+
+          console.log(
+            "Admin realtime:",
+            status
+          );
+
+        }
+
+      );
+
+}
+
+
+/* SCROLL */
+
+function scrollToBottom() {
+
+  setTimeout(
+    function() {
+
+      const area =
+        document.querySelector(
+          ".messages"
+        );
+
+
+      area.scrollTop =
+        area.scrollHeight;
+
+    },
+    50
+  );
+
+}
+
+
+/* LOGOUT */
+
+async function logout() {
+
+  if (realtimeChannel) {
+
+    await supabaseClient
+      .removeChannel(
+        realtimeChannel
+      );
+
+  }
+
+
+  await supabaseClient.auth.signOut();
+
+
+  window.location.href =
+    "index.html";
+
+}
+
+
+/* ESCAPE HTML */
+
+function escapeHtml(
+  value
+) {
+
+  return String(value)
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+</script>
+
+</body>
+
+</html>
