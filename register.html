@@ -111,7 +111,7 @@
 
     <form id="registerForm">
 
-      <label>Name</label>
+      <label for="name">Name</label>
 
       <input
         id="name"
@@ -120,7 +120,7 @@
         required
       >
 
-      <label>Email</label>
+      <label for="email">Email</label>
 
       <input
         id="email"
@@ -129,7 +129,7 @@
         required
       >
 
-      <label>Password</label>
+      <label for="password">Password</label>
 
       <input
         id="password"
@@ -154,7 +154,6 @@
 
   </div>
 
-
 <script>
 
 const SUPABASE_URL =
@@ -170,9 +169,19 @@ const supabaseClient =
   );
 
 
-document
-  .getElementById("registerForm")
-  .addEventListener("submit", async function(event) {
+const registerForm =
+  document.getElementById("registerForm");
+
+const registerButton =
+  document.getElementById("registerButton");
+
+const message =
+  document.getElementById("message");
+
+
+registerForm.addEventListener(
+  "submit",
+  async function(event) {
 
     event.preventDefault();
 
@@ -185,16 +194,11 @@ document
     const password =
       document.getElementById("password").value;
 
-    const button =
-      document.getElementById("registerButton");
 
-    const message =
-      document.getElementById("message");
+    registerButton.disabled = true;
 
-
-    button.disabled = true;
-
-    button.textContent = "Creating account...";
+    registerButton.textContent =
+      "Creating account...";
 
     message.textContent = "";
 
@@ -203,8 +207,17 @@ document
 
       const { data, error } =
         await supabaseClient.auth.signUp({
+
           email: email,
-          password: password
+
+          password: password,
+
+          options: {
+            data: {
+              name: name
+            }
+          }
+
         });
 
 
@@ -214,53 +227,42 @@ document
 
 
       if (!data.user) {
-        throw new Error("Account could not be created.");
+        throw new Error(
+          "Account could not be created."
+        );
       }
 
 
-      const { error: profileError } =
-        await supabaseClient
-          .from("profiles")
-          .insert({
-            id: data.user.id,
-            name: name,
-            email: email,
-            role: "user",
-            status: "pending"
-          });
-
-
-      if (profileError) {
-        throw profileError;
-      }
-
-
-      message.style.color = "#86efac";
+      message.style.color =
+        "#86efac";
 
       message.innerHTML =
         "Account created successfully!<br>" +
         "Your account is waiting for admin approval.";
 
 
-      document.getElementById("registerForm").reset();
+      registerForm.reset();
 
-    }
 
-    catch (error) {
+    } catch (error) {
 
-      message.style.color = "#fca5a5";
+      message.style.color =
+        "#fca5a5";
 
       message.textContent =
-        error.message || "Something went wrong.";
+        error.message ||
+        "Something went wrong.";
 
     }
 
 
-    button.disabled = false;
+    registerButton.disabled = false;
 
-    button.textContent = "Create Account";
+    registerButton.textContent =
+      "Create Account";
 
-  });
+  }
+);
 
 </script>
 
