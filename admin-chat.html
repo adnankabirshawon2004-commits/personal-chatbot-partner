@@ -338,14 +338,11 @@
 
 <script>
 
-
 const SUPABASE_URL =
   "https://bnagfjhghlncqqnenejn.supabase.co";
 
-
 const SUPABASE_KEY =
   "sb_publishable_CEOgfj8n1K6CeIqizGVhTw_8oPlWuKk";
-
 
 const supabaseClient =
   window.supabase.createClient(
@@ -355,56 +352,163 @@ const supabaseClient =
 
 
 let currentAdmin = null;
-
 let selectedUser = null;
-
 let selectedConversation = null;
-
 let realtimeChannel = null;
 
 
 const usersList =
-  document.getElementById(
-    "usersList"
-  );
-
+  document.getElementById("usersList");
 
 const messageList =
-  document.getElementById(
-    "messageList"
-  );
-
+  document.getElementById("messageList");
 
 const messageInput =
-  document.getElementById(
-    "messageInput"
-  );
-
+  document.getElementById("messageInput");
 
 const sendButton =
-  document.getElementById(
-    "sendButton"
-  );
-
+  document.getElementById("sendButton");
 
 const errorMessage =
-  document.getElementById(
-    "errorMessage"
-  );
+  document.getElementById("errorMessage");
 
 
-messageInput.addEventListener(
-  "keydown",
-  function(event) {
+/* --------------------------------
+   AUTH CHECK
+-------------------------------- */
+
+async function checkAdmin() {
+
+  const {
+    data: sessionData
+  } =
+    await supabaseClient.auth.getSession();
+
+
+  const session =
+    sessionData.session;
+
+
+  if (!session) {
+
+    window.location.replace(
+      "index.html"
+    );
+
+    return false;
+
+  }
+
+
+  const {
+    data: {
+      user
+    },
+    error: userError
+  } =
+    await supabaseClient.auth.getUser();
+
+
+  if (
+    userError ||
+    !user
+  ) {
+
+    await supabaseClient.auth.signOut();
+
+    window.location.replace(
+      "index.html"
+    );
+
+    return false;
+
+  }
+
+
+  const {
+    data: profile,
+    error: profileError
+  } =
+    await supabaseClient
+
+      .from("profiles")
+
+      .select(
+        "role, status"
+      )
+
+      .eq(
+        "id",
+        user.id
+      )
+
+      .single();
+
+
+  if (
+    profileError ||
+    !profile ||
+    profile.role !== "admin" ||
+    profile.status !== "approved"
+  ) {
+
+    await supabaseClient.auth.signOut();
+
+    window.location.replace(
+      "index.html"
+    );
+
+    return false;
+
+  }
+
+
+  currentAdmin =
+    user;
+
+
+  return true;
+
+}
+
+
+/* --------------------------------
+   START
+-------------------------------- */
+
+async function startAdmin() {
+
+  const allowed =
+    await checkAdmin();
+
+
+  if (!allowed) {
+
+    return;
+
+  }
+
+
+  await loadUsers();
+
+}
+
+
+/* --------------------------------
+   AUTH STATE LISTENER
+-------------------------------- */
+
+supabaseClient.auth.onAuthStateChange(
+  function(event, session) {
 
     if (
-      event.key === "Enter" &&
-      !event.shiftKey
+      event === "SIGNED_OUT" ||
+      !session
     ) {
 
-      event.preventDefault();
-
-      sendMessage();
+      window.location.replace(
+        "index.html"
+      );
 
     }
 
@@ -412,102 +516,9 @@ messageInput.addEventListener(
 );
 
 
-/* START */
-
-startAdmin();
-
-
-async function startAdmin() {
-
-  try {
-
-    const {
-      data: {
-        user
-      },
-      error
-    } =
-      await supabaseClient.auth.getUser();
-
-
-    if (error) {
-
-      throw error;
-
-    }
-
-
-    if (!user) {
-
-      window.location.href =
-        "index.html";
-
-      return;
-
-    }
-
-
-    currentAdmin = user;
-
-
-    const {
-      data: profile,
-      error: profileError
-    } =
-      await supabaseClient
-
-        .from("profiles")
-
-        .select(
-          "name, role, status"
-        )
-
-        .eq(
-          "id",
-          user.id
-        )
-
-        .single();
-
-
-    if (profileError) {
-
-      throw profileError;
-
-    }
-
-
-    if (
-      !profile ||
-      profile.role !== "admin" ||
-      profile.status !== "approved"
-    ) {
-
-      await supabaseClient.auth.signOut();
-
-      window.location.href =
-        "index.html";
-
-      return;
-
-    }
-
-
-    await loadUsers();
-
-  } catch (error) {
-
-    console.error(error);
-
-    errorMessage.textContent =
-      error.message;
-
-  }
-
-}
-
-
-/* LOAD USERS */
+/* --------------------------------
+   LOAD USERS
+-------------------------------- */
 
 async function loadUsers() {
 
@@ -520,7 +531,7 @@ async function loadUsers() {
       .from("profiles")
 
       .select(
-        "id, name, email, role, status"
+        "id, name, email, role, status, created_at"
       )
 
       .eq(
@@ -581,15 +592,37 @@ async function loadUsers() {
         user.id;
 
 
-      div.innerHTML = `
-        <div class="user-name">
-          ${escapeHtml(user.name)}
-        </div>
+      const name =
+        document.createElement(
+          "div"
+        );
 
-        <div class="user-email">
-          ${escapeHtml(user.email || "")}
-        </div>
-      `;
+      name.className =
+        "user-name";
+
+      name.textContent =
+        user.name;
+
+
+      const email =
+        document.createElement(
+          "div"
+        );
+
+      email.className =
+        "user-email";
+
+      email.textContent =
+        user.email || "";
+
+
+      div.appendChild(
+        name
+      );
+
+      div.appendChild(
+        email
+      );
 
 
       div.addEventListener(
@@ -614,7 +647,9 @@ async function loadUsers() {
 }
 
 
-/* SELECT USER */
+/* --------------------------------
+   SELECT USER
+-------------------------------- */
 
 async function selectUser(
   user
@@ -732,8 +767,7 @@ async function selectUser(
 
 
     if (
-      character.character_type ===
-      "Other" &&
+      character.character_type === "Other" &&
       character.custom_character
     ) {
 
@@ -792,12 +826,6 @@ async function selectUser(
       messageList.innerHTML =
         '<div class="empty">No conversation yet.</div>';
 
-      messageInput.disabled =
-        true;
-
-      sendButton.disabled =
-        true;
-
       return;
 
     }
@@ -816,7 +844,6 @@ async function selectUser(
 
     await loadMessages();
 
-
     setupRealtime();
 
 
@@ -832,7 +859,9 @@ async function selectUser(
 }
 
 
-/* LOAD MESSAGES */
+/* --------------------------------
+   LOAD MESSAGES
+-------------------------------- */
 
 async function loadMessages() {
 
@@ -905,7 +934,9 @@ async function loadMessages() {
 }
 
 
-/* DISPLAY MESSAGE */
+/* --------------------------------
+   DISPLAY MESSAGE
+-------------------------------- */
 
 function displayMessage(
   message
@@ -982,13 +1013,13 @@ function displayMessage(
 }
 
 
-/* SEND ADMIN REPLY */
+/* --------------------------------
+   SEND MESSAGE
+-------------------------------- */
 
 async function sendMessage() {
 
-  if (
-    !selectedConversation
-  ) {
+  if (!selectedConversation) {
 
     return;
 
@@ -1064,13 +1095,13 @@ async function sendMessage() {
 }
 
 
-/* REALTIME */
+/* --------------------------------
+   REALTIME
+-------------------------------- */
 
 function setupRealtime() {
 
-  if (
-    !selectedConversation
-  ) {
+  if (!selectedConversation) {
 
     return;
 
@@ -1079,10 +1110,9 @@ function setupRealtime() {
 
   if (realtimeChannel) {
 
-    supabaseClient
-      .removeChannel(
-        realtimeChannel
-      );
+    supabaseClient.removeChannel(
+      realtimeChannel
+    );
 
   }
 
@@ -1096,50 +1126,32 @@ function setupRealtime() {
       )
 
       .on(
-
         "postgres_changes",
-
         {
-
           event: "INSERT",
-
           schema: "public",
-
           table: "messages",
-
           filter:
             "conversation_id=eq." +
             selectedConversation.id
-
         },
-
-        payload => {
+        function(payload) {
 
           displayMessage(
             payload.new
           );
 
         }
-
       )
 
-      .subscribe(
-
-        status => {
-
-          console.log(
-            "Admin realtime:",
-            status
-          );
-
-        }
-
-      );
+      .subscribe();
 
 }
 
 
-/* SCROLL */
+/* --------------------------------
+   SCROLL
+-------------------------------- */
 
 function scrollToBottom() {
 
@@ -1162,59 +1174,38 @@ function scrollToBottom() {
 }
 
 
-/* LOGOUT */
+/* --------------------------------
+   LOGOUT
+-------------------------------- */
 
 async function logout() {
 
   if (realtimeChannel) {
 
-    await supabaseClient
-      .removeChannel(
-        realtimeChannel
-      );
+    await supabaseClient.removeChannel(
+      realtimeChannel
+    );
+
+    realtimeChannel =
+      null;
 
   }
 
 
   await supabaseClient.auth.signOut();
 
-
-  window.location.href =
-    "index.html";
-
-}
-
-
-/* ESCAPE HTML */
-
-function escapeHtml(
-  value
-) {
-
-  return String(value)
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-    .replace(
-      /</g,
-      "&lt;"
-    )
-    .replace(
-      />/g,
-      "&gt;"
-    )
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-    .replace(
-      /'/g,
-      "&#039;"
-    );
+  window.location.replace(
+    "index.html"
+  );
 
 }
 
+
+/* --------------------------------
+   START
+-------------------------------- */
+
+startAdmin();
 
 </script>
 
