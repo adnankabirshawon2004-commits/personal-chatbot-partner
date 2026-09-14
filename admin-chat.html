@@ -1,662 +1,569 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Admin Chat</title>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <style>
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: Inter, Arial, sans-serif;
-      min-height: 100vh;
-
-      background:
-        radial-gradient(
-          circle at top left,
-          rgba(124,58,237,0.30),
-          transparent 35%
-        ),
-        radial-gradient(
-          circle at bottom right,
-          rgba(6,182,212,0.20),
-          transparent 35%
-        ),
-        #070b14;
-
-      color: white;
-
-      padding: 16px;
-    }
-
-    .app {
-      width: 100%;
-      max-width: 1200px;
-
-      height: calc(100vh - 32px);
-
-      margin: auto;
-
-      display: flex;
-
-      overflow: hidden;
-
-      border-radius: 22px;
-
-      background:
-        rgba(15,23,42,0.78);
-
-      border:
-        1px solid rgba(255,255,255,0.10);
-
-      backdrop-filter: blur(20px);
-
-      box-shadow:
-        0 25px 80px rgba(0,0,0,0.45);
-    }
-
-    /* =========================
-       SIDEBAR
-    ========================= */
-
-    .sidebar {
-      width: 290px;
-
-      flex-shrink: 0;
-
-      border-right:
-        1px solid rgba(255,255,255,0.08);
-
-      display: flex;
-
-      flex-direction: column;
-    }
-
-    .sidebar-header {
-      padding: 20px;
-
-      border-bottom:
-        1px solid rgba(255,255,255,0.08);
-    }
-
-    .sidebar-title {
-      font-size: 19px;
-
-      font-weight: 800;
-    }
-
-    .sidebar-subtitle {
-      margin-top: 5px;
-
-      font-size: 12px;
-
-      color:
-        rgba(255,255,255,0.45);
-    }
-
-    .users {
-      flex: 1;
-
-      overflow-y: auto;
-    }
-
-    .user-item {
-      display: flex;
-
-      align-items: center;
-
-      gap: 11px;
-
-      padding: 13px 15px;
-
-      cursor: pointer;
-
-      border-bottom:
-        1px solid rgba(255,255,255,0.04);
-
-      transition: 0.2s;
-    }
-
-    .user-item:hover {
-      background:
-        rgba(255,255,255,0.05);
-    }
-
-    .user-item.active {
-      background:
-        rgba(124,58,237,0.18);
-
-      border-left:
-        3px solid #8b5cf6;
-    }
-
-    .user-avatar {
-      width: 42px;
-      height: 42px;
-
-      border-radius: 50%;
-
-      flex-shrink: 0;
-
-      display: flex;
-
-      align-items: center;
-      justify-content: center;
-
-      background:
-        linear-gradient(
-          135deg,
-          #7c3aed,
-          #06b6d4
-        );
-
-      overflow: hidden;
-
-      font-size: 19px;
-    }
-
-    .user-avatar img {
-      width: 100%;
-      height: 100%;
-
-      object-fit: cover;
-    }
-
-    .user-info {
-      min-width: 0;
-
-      flex: 1;
-    }
-
-    .user-name {
-      font-size: 13px;
-
-      font-weight: 700;
-
-      white-space: nowrap;
-
-      overflow: hidden;
-
-      text-overflow: ellipsis;
-    }
-
-    .user-email {
-      margin-top: 3px;
-
-      font-size: 10px;
-
-      color:
-        rgba(255,255,255,0.40);
-
-      white-space: nowrap;
-
-      overflow: hidden;
-
-      text-overflow: ellipsis;
-    }
-
-    /* =========================
-       CHAT
-    ========================= */
-
-    .chat {
-      flex: 1;
-
-      min-width: 0;
-
-      display: flex;
-
-      flex-direction: column;
-    }
-
-    .chat-header {
-      min-height: 74px;
-
-      display: flex;
-
-      align-items: center;
-
-      gap: 12px;
-
-      padding: 13px 18px;
-
-      border-bottom:
-        1px solid rgba(255,255,255,0.08);
-    }
-
-    .back-button {
-      display: none;
-
-      width: 40px;
-      height: 40px;
-
-      border: none;
-
-      border-radius: 12px;
-
-      background:
-        rgba(255,255,255,0.08);
-
-      color: white;
-
-      font-size: 22px;
-
-      cursor: pointer;
-    }
-
-    .chat-avatar {
-      width: 45px;
-      height: 45px;
-
-      border-radius: 50%;
-
-      background:
-        linear-gradient(
-          135deg,
-          #7c3aed,
-          #06b6d4
-        );
-
-      display: flex;
-
-      align-items: center;
-      justify-content: center;
-
-      overflow: hidden;
-
-      font-size: 21px;
-
-      flex-shrink: 0;
-    }
-
-    .chat-avatar img {
-      width: 100%;
-      height: 100%;
-
-      object-fit: cover;
-    }
-
-    .chat-user-name {
-      font-size: 16px;
-
-      font-weight: 800;
-    }
-
-    .chat-character {
-      margin-top: 3px;
-
-      font-size: 11px;
-
-      color:
-        rgba(255,255,255,0.45);
-    }
-
-    .messages {
-      flex: 1;
-
-      overflow-y: auto;
-
-      padding: 22px 18px;
-
-      display: flex;
-
-      flex-direction: column;
-
-      gap: 12px;
-    }
-
-    .message-row {
-      display: flex;
-
-      width: 100%;
-    }
-
-    .message-row.admin {
-      justify-content: flex-end;
-    }
-
-    .message-row.user {
-      justify-content: flex-start;
-    }
-
-    .bubble {
-      max-width:
-        min(72%, 560px);
-
-      padding: 11px 14px;
-
-      border-radius: 18px;
-
-      font-size: 14px;
-
-      line-height: 1.5;
-
-      overflow-wrap: anywhere;
-    }
-
-    .message-row.admin .bubble {
-      background:
-        linear-gradient(
-          135deg,
-          #7c3aed,
-          #2563eb
-        );
-
-      border-bottom-right-radius: 5px;
-    }
-
-    .message-row.user .bubble {
-      background:
-        rgba(255,255,255,0.10);
-
-      border:
-        1px solid rgba(255,255,255,0.08);
-
-      border-bottom-left-radius: 5px;
-    }
-
-    .message-image {
-      display: block;
-
-      max-width: 330px;
-
-      max-height: 420px;
-
-      width: 100%;
-
-      object-fit: contain;
-
-      border-radius: 13px;
-
-      background:
-        rgba(0,0,0,0.15);
-
-      cursor: pointer;
-    }
-
-    .message-text {
-      margin-top: 8px;
-
-      white-space: pre-wrap;
-    }
-
-    .message-text.only {
-      margin-top: 0;
-    }
-
-    .time {
-      margin-top: 5px;
-
-      font-size: 10px;
-
-      opacity: 0.55;
-
-      text-align: right;
-    }
-
-    .empty {
-      margin: auto;
-
-      text-align: center;
-
-      color:
-        rgba(255,255,255,0.45);
-    }
-
-    /* =========================
-       PREVIEW
-    ========================= */
-
-    .preview {
-      display: none;
-
-      align-items: center;
-
-      gap: 10px;
-
-      padding: 9px 14px;
-
-      border-top:
-        1px solid rgba(255,255,255,0.07);
-    }
-
-    .preview.show {
-      display: flex;
-    }
-
-    .preview img {
-      width: 55px;
-      height: 55px;
-
-      border-radius: 10px;
-
-      object-fit: cover;
-    }
-
-    .preview-info {
-      flex: 1;
-
-      min-width: 0;
-    }
-
-    .preview-name {
-      font-size: 12px;
-
-      overflow: hidden;
-
-      white-space: nowrap;
-
-      text-overflow: ellipsis;
-    }
-
-    .preview-size {
-      font-size: 10px;
-
-      opacity: 0.45;
-
-      margin-top: 3px;
-    }
-
-    .remove-preview {
-      width: 32px;
-      height: 32px;
-
-      border: none;
-
-      border-radius: 9px;
-
-      background:
-        rgba(239,68,68,0.15);
-
-      color: #f87171;
-
-      cursor: pointer;
-    }
-
-    /* =========================
-       COMPOSER
-    ========================= */
-
-    .composer {
-      padding: 11px 13px 13px;
-
-      border-top:
-        1px solid rgba(255,255,255,0.08);
-    }
-
-    .composer-inner {
-      display: flex;
-
-      align-items: flex-end;
-
-      gap: 8px;
-    }
-
-    .image-button {
-      width: 45px;
-      height: 45px;
-
-      border:
-        1px solid rgba(255,255,255,0.10);
-
-      border-radius: 13px;
-
-      background:
-        rgba(255,255,255,0.07);
-
-      color: #c4b5fd;
-
-      cursor: pointer;
-
-      font-size: 20px;
-
-      flex-shrink: 0;
-    }
-
-    #fileInput {
-      display: none;
-    }
-
-    #messageInput {
-      flex: 1;
-
-      min-height: 45px;
-
-      max-height: 130px;
-
-      resize: none;
-
-      border:
-        1px solid rgba(255,255,255,0.10);
-
-      border-radius: 14px;
-
-      background:
-        rgba(255,255,255,0.07);
-
-      color: white;
-
-      outline: none;
-
-      padding: 12px 13px;
-
-      font-family: inherit;
-
-      font-size: 14px;
-    }
-
-    #messageInput::placeholder {
-      color:
-        rgba(255,255,255,0.40);
-    }
-
-    .send-button {
-      width: 45px;
-      height: 45px;
-
-      border: none;
-
-      border-radius: 13px;
-
-      background:
-        linear-gradient(
-          135deg,
-          #7c3aed,
-          #2563eb
-        );
-
-      color: white;
-
-      font-size: 18px;
-
-      cursor: pointer;
-
-      flex-shrink: 0;
-    }
-
-    button:disabled {
-      opacity: 0.45;
-
-      cursor: not-allowed;
-    }
-
-    .notice {
-      text-align: center;
-
-      font-size: 9px;
-
-      opacity: 0.35;
-
-      margin-top: 6px;
-    }
-
-    @media (max-width: 700px) {
-
-      body {
-        padding: 0;
-      }
-
-      .app {
-        height: 100vh;
-
-        border-radius: 0;
-      }
-
-      .sidebar {
-        width: 85px;
-      }
-
-      .sidebar-header {
-        padding: 14px 8px;
-
-        text-align: center;
-      }
-
-      .sidebar-title {
-        font-size: 12px;
-      }
-
-      .sidebar-subtitle {
-        display: none;
-      }
-
-      .user-item {
-        justify-content: center;
-
-        padding: 12px 6px;
-      }
-
-      .user-info {
-        display: none;
-      }
-
-      .back-button {
-        display: block;
-      }
-
-      .chat-header {
-        padding: 10px;
-      }
-
-      .bubble {
-        max-width: 82%;
-      }
-
-      .message-image {
-        max-width: 250px;
-      }
-    }
-
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Admin Chat</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  font-family:Inter,Arial,sans-serif;
+  min-height:100vh;
+  background:
+    radial-gradient(circle at top left,rgba(124,58,237,.30),transparent 35%),
+    radial-gradient(circle at bottom right,rgba(6,182,212,.20),transparent 35%),
+    #070b14;
+  color:white;
+  padding:16px;
+}
+
+.app{
+  width:100%;
+  max-width:1200px;
+  height:calc(100vh - 32px);
+  margin:auto;
+  display:flex;
+  overflow:hidden;
+  border-radius:22px;
+  background:rgba(15,23,42,.78);
+  border:1px solid rgba(255,255,255,.10);
+  backdrop-filter:blur(20px);
+  box-shadow:0 25px 80px rgba(0,0,0,.45);
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar{
+  width:310px;
+  flex-shrink:0;
+  border-right:1px solid rgba(255,255,255,.08);
+  display:flex;
+  flex-direction:column;
+}
+
+.sidebar-header{
+  padding:20px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.sidebar-title{
+  font-size:19px;
+  font-weight:800;
+}
+
+.sidebar-subtitle{
+  margin-top:5px;
+  font-size:12px;
+  color:rgba(255,255,255,.45);
+}
+
+.users{
+  flex:1;
+  overflow-y:auto;
+  padding-bottom:10px;
+}
+
+.user-section{
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+
+.user-item{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:13px 15px;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.user-item:hover{
+  background:rgba(255,255,255,.05);
+}
+
+.user-item.active{
+  background:rgba(124,58,237,.15);
+}
+
+.user-avatar{
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,#7c3aed,#06b6d4);
+  overflow:hidden;
+  font-size:19px;
+}
+
+.user-avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.user-info{
+  min-width:0;
+  flex:1;
+}
+
+.user-name{
+  font-size:13px;
+  font-weight:700;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.user-email{
+  margin-top:3px;
+  font-size:10px;
+  color:rgba(255,255,255,.40);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.character-list{
+  display:none;
+  padding:4px 8px 10px 48px;
+}
+
+.character-list.show{
+  display:block;
+}
+
+.character-item{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:9px;
+  margin:3px 0;
+  border-radius:12px;
+  cursor:pointer;
+  transition:.2s;
+  background:rgba(255,255,255,.025);
+}
+
+.character-item:hover{
+  background:rgba(255,255,255,.07);
+}
+
+.character-item.active{
+  background:rgba(124,58,237,.28);
+  border:1px solid rgba(139,92,246,.35);
+}
+
+.character-avatar{
+  width:35px;
+  height:35px;
+  border-radius:50%;
+  overflow:hidden;
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,#7c3aed,#06b6d4);
+  font-size:16px;
+}
+
+.character-avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.character-info{
+  min-width:0;
+  flex:1;
+}
+
+.character-name{
+  font-size:11px;
+  font-weight:700;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.character-type{
+  margin-top:2px;
+  font-size:9px;
+  color:rgba(255,255,255,.45);
+}
+
+.character-mood{
+  margin-top:3px;
+  font-size:9px;
+  color:#c4b5fd;
+}
+
+.no-character{
+  font-size:10px;
+  color:rgba(255,255,255,.35);
+  padding:6px 0;
+}
+
+.empty{
+  margin:auto;
+  text-align:center;
+  color:rgba(255,255,255,.45);
+  padding:20px;
+  font-size:13px;
+}
+
+/* =========================
+   CHAT
+========================= */
+
+.chat{
+  flex:1;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+}
+
+.chat-header{
+  min-height:74px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:13px 18px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.back-button{
+  display:none;
+  width:40px;
+  height:40px;
+  border:none;
+  border-radius:12px;
+  background:rgba(255,255,255,.08);
+  color:white;
+  font-size:22px;
+  cursor:pointer;
+}
+
+.chat-avatar{
+  width:45px;
+  height:45px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#7c3aed,#06b6d4);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  font-size:21px;
+  flex-shrink:0;
+}
+
+.chat-avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.chat-user-name{
+  font-size:16px;
+  font-weight:800;
+}
+
+.chat-character{
+  margin-top:3px;
+  font-size:11px;
+  color:rgba(255,255,255,.45);
+}
+
+.chat-mood{
+  margin-top:4px;
+  font-size:10px;
+  color:#c4b5fd;
+}
+
+.messages{
+  flex:1;
+  overflow-y:auto;
+  padding:22px 18px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.message-row{
+  display:flex;
+  width:100%;
+}
+
+.message-row.admin{
+  justify-content:flex-end;
+}
+
+.message-row.user{
+  justify-content:flex-start;
+}
+
+.bubble{
+  max-width:min(72%,560px);
+  padding:11px 14px;
+  border-radius:18px;
+  font-size:14px;
+  line-height:1.5;
+  overflow-wrap:anywhere;
+}
+
+.message-row.admin .bubble{
+  background:linear-gradient(135deg,#7c3aed,#2563eb);
+  border-bottom-right-radius:5px;
+}
+
+.message-row.user .bubble{
+  background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.08);
+  border-bottom-left-radius:5px;
+}
+
+.message-image{
+  display:block;
+  max-width:330px;
+  max-height:420px;
+  width:100%;
+  object-fit:contain;
+  border-radius:13px;
+  background:rgba(0,0,0,.15);
+  cursor:pointer;
+}
+
+.message-text{
+  margin-top:8px;
+  white-space:pre-wrap;
+}
+
+.message-text.only{
+  margin-top:0;
+}
+
+.time{
+  margin-top:5px;
+  font-size:10px;
+  opacity:.55;
+  text-align:right;
+}
+
+/* =========================
+   PREVIEW
+========================= */
+
+.preview{
+  display:none;
+  align-items:center;
+  gap:10px;
+  padding:9px 14px;
+  border-top:1px solid rgba(255,255,255,.07);
+}
+
+.preview.show{
+  display:flex;
+}
+
+.preview img{
+  width:55px;
+  height:55px;
+  border-radius:10px;
+  object-fit:cover;
+}
+
+.preview-info{
+  flex:1;
+  min-width:0;
+}
+
+.preview-name{
+  font-size:12px;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+
+.preview-size{
+  font-size:10px;
+  opacity:.45;
+  margin-top:3px;
+}
+
+.remove-preview{
+  width:32px;
+  height:32px;
+  border:none;
+  border-radius:9px;
+  background:rgba(239,68,68,.15);
+  color:#f87171;
+  cursor:pointer;
+}
+
+/* =========================
+   COMPOSER
+========================= */
+
+.composer{
+  padding:11px 13px 13px;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+
+.composer-inner{
+  display:flex;
+  align-items:flex-end;
+  gap:8px;
+}
+
+.image-button{
+  width:45px;
+  height:45px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:13px;
+  background:rgba(255,255,255,.07);
+  color:#c4b5fd;
+  cursor:pointer;
+  font-size:20px;
+  flex-shrink:0;
+}
+
+#fileInput{
+  display:none;
+}
+
+#messageInput{
+  flex:1;
+  min-height:45px;
+  max-height:130px;
+  resize:none;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:14px;
+  background:rgba(255,255,255,.07);
+  color:white;
+  outline:none;
+  padding:12px 13px;
+  font-family:inherit;
+  font-size:14px;
+}
+
+#messageInput::placeholder{
+  color:rgba(255,255,255,.40);
+}
+
+.send-button{
+  width:45px;
+  height:45px;
+  border:none;
+  border-radius:13px;
+  background:linear-gradient(135deg,#7c3aed,#2563eb);
+  color:white;
+  font-size:18px;
+  cursor:pointer;
+  flex-shrink:0;
+}
+
+button:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+
+.notice{
+  text-align:center;
+  font-size:9px;
+  opacity:.35;
+  margin-top:6px;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:700px){
+
+  body{
+    padding:0;
+  }
+
+  .app{
+    height:100vh;
+    border-radius:0;
+  }
+
+  .sidebar{
+    width:85px;
+  }
+
+  .sidebar-header{
+    padding:14px 8px;
+    text-align:center;
+  }
+
+  .sidebar-title{
+    font-size:12px;
+  }
+
+  .sidebar-subtitle{
+    display:none;
+  }
+
+  .user-item{
+    justify-content:center;
+    padding:12px 6px;
+  }
+
+  .user-info{
+    display:none;
+  }
+
+  .character-list{
+    padding:4px 4px 8px;
+  }
+
+  .character-info{
+    display:none;
+  }
+
+  .character-item{
+    justify-content:center;
+    padding:5px;
+  }
+
+  .character-mood{
+    display:none;
+  }
+
+  .back-button{
+    display:block;
+  }
+
+  .chat-header{
+    padding:10px;
+  }
+
+  .bubble{
+    max-width:82%;
+  }
+
+  .message-image{
+    max-width:250px;
+  }
+
+}
+
+</style>
 </head>
 
 <body>
@@ -674,15 +581,12 @@
       </div>
 
       <div class="sidebar-subtitle">
-        Approved users
+        Approved users • All characters
       </div>
 
     </div>
 
-
-    <div
-      class="users"
-      id="users">
+    <div class="users" id="users">
 
       <div class="empty">
         Loading...
@@ -705,30 +609,28 @@
         ‹
       </button>
 
-
       <div
         class="chat-avatar"
         id="chatAvatar">
-
         💬
-
       </div>
-
 
       <div>
 
         <div
           class="chat-user-name"
           id="chatUserName">
-
-          Select a user
-
+          Select a character
         </div>
 
         <div
           class="chat-character"
           id="chatCharacter">
+        </div>
 
+        <div
+          class="chat-mood"
+          id="chatMood">
         </div>
 
       </div>
@@ -741,7 +643,7 @@
       id="messages">
 
       <div class="empty">
-        Select a user to start chatting.
+        Select a character to view messages.
       </div>
 
     </div>
@@ -753,8 +655,7 @@
       class="preview"
       id="preview">
 
-      <img
-        id="previewImage">
+      <img id="previewImage">
 
       <div class="preview-info">
 
@@ -773,9 +674,7 @@
       <button
         class="remove-preview"
         onclick="removeImage()">
-
         ×
-
       </button>
 
     </div>
@@ -791,17 +690,13 @@
           class="image-button"
           id="imageButton"
           onclick="document.getElementById('fileInput').click()">
-
           🖼️
-
         </button>
-
 
         <input
           type="file"
           id="fileInput"
           accept="image/jpeg,image/png,image/webp,image/gif">
-
 
         <textarea
           id="messageInput"
@@ -809,18 +704,14 @@
           placeholder="Reply to user...">
         </textarea>
 
-
         <button
           class="send-button"
           id="sendButton"
           onclick="sendMessage()">
-
           ➤
-
         </button>
 
       </div>
-
 
       <div class="notice">
         Press Enter to send • Shift + Enter for new line
@@ -840,7 +731,6 @@ const SUPABASE_URL =
 
 const SUPABASE_KEY =
   "sb_publishable_CEOgfj8n1K6CeIqizGVhTw_8oPlWuKk";
-
 
 const supabaseClient =
   window.supabase.createClient(
@@ -866,10 +756,10 @@ let selectedImage = null;
    INIT
 ========================= */
 
-async function init() {
+async function init(){
 
   const {
-    data: {
+    data:{
       session
     }
   } =
@@ -877,8 +767,7 @@ async function init() {
       .auth
       .getSession();
 
-
-  if (!session) {
+  if(!session){
 
     window.location.replace(
       "index.html"
@@ -886,34 +775,28 @@ async function init() {
 
     return;
   }
-
 
   currentUser =
     session.user;
 
-
   const {
-    data: profile
+    data:profile
   } =
     await supabaseClient
       .from("profiles")
-      .select(
-        "role,status"
-      )
-      .eq(
-        "id",
-        currentUser.id
-      )
+      .select("role,status")
+      .eq("id",currentUser.id)
       .single();
 
-
-  if (
+  if(
     !profile ||
     profile.role !== "admin" ||
     profile.status !== "approved"
-  ) {
+  ){
 
-    await supabaseClient.auth.signOut();
+    await supabaseClient
+      .auth
+      .signOut();
 
     window.location.replace(
       "index.html"
@@ -922,41 +805,41 @@ async function init() {
     return;
   }
 
-
   await loadUsers();
-
 
   const params =
     new URLSearchParams(
       window.location.search
     );
 
-
   const userId =
     params.get("user");
 
+  const characterId =
+    params.get("character");
 
-  if (userId) {
+  if(userId){
 
     await selectUser(
-      userId
+      userId,
+      characterId
     );
+
   }
 
 }
 
 
 /* =========================
-   LOAD USERS
+   LOAD USERS + ALL CHARACTERS
 ========================= */
 
-async function loadUsers() {
+async function loadUsers(){
 
   const container =
     document.getElementById(
       "users"
     );
-
 
   const {
     data,
@@ -964,28 +847,22 @@ async function loadUsers() {
   } =
     await supabaseClient
       .from("profiles")
-      .select(
-        "id,name,email"
-      )
-      .eq(
-        "role",
-        "user"
-      )
-      .eq(
-        "status",
-        "approved"
-      )
+      .select("id,name,email")
+      .eq("role","user")
+      .eq("status","approved")
       .order(
         "created_at",
         {
-          ascending: false
+          ascending:false
         }
       );
 
+  if(error){
 
-  if (error) {
-
-    console.error(error);
+    console.error(
+      "Users error:",
+      error
+    );
 
     container.innerHTML =
       `<div class="empty">
@@ -995,12 +872,9 @@ async function loadUsers() {
     return;
   }
 
+  container.innerHTML = "";
 
-  container.innerHTML =
-    "";
-
-
-  if (!data || data.length === 0) {
+  if(!data || data.length === 0){
 
     container.innerHTML =
       `<div class="empty">
@@ -1010,70 +884,295 @@ async function loadUsers() {
     return;
   }
 
+  for(const user of data){
 
-  for (
-    const user of data
-  ) {
+    await createUserSection(
+      container,
+      user
+    );
+
+  }
+
+}
+
+
+/* =========================
+   CREATE USER SECTION
+========================= */
+
+async function createUserSection(
+  container,
+  user
+){
+
+  const section =
+    document.createElement(
+      "div"
+    );
+
+  section.className =
+    "user-section";
+
+  section.dataset.userId =
+    user.id;
+
+  const userItem =
+    document.createElement(
+      "div"
+    );
+
+  userItem.className =
+    "user-item";
+
+  userItem.dataset.userId =
+    user.id;
+
+  userItem.innerHTML = `
+
+    <div class="user-avatar">
+      👤
+    </div>
+
+    <div class="user-info">
+
+      <div class="user-name">
+        ${escapeHtml(
+          user.name || "User"
+        )}
+      </div>
+
+      <div class="user-email">
+        ${escapeHtml(
+          user.email || ""
+        )}
+      </div>
+
+    </div>
+
+  `;
+
+  userItem.onclick =
+    () => selectUser(
+      user.id
+    );
+
+  section.appendChild(
+    userItem
+  );
+
+  const characterList =
+    document.createElement(
+      "div"
+    );
+
+  characterList.className =
+    "character-list";
+
+  characterList.dataset.userId =
+    user.id;
+
+  section.appendChild(
+    characterList
+  );
+
+  container.appendChild(
+    section
+  );
+
+  await loadUserAvatar(
+    userItem.querySelector(
+      ".user-avatar"
+    ),
+    user.id
+  );
+
+  await loadCharacters(
+    user.id,
+    characterList
+  );
+
+}
+
+
+/* =========================
+   LOAD ALL CHARACTERS
+========================= */
+
+async function loadCharacters(
+  userId,
+  container
+){
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("characters")
+      .select("*")
+      .eq(
+        "user_id",
+        userId
+      )
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+  if(error){
+
+    console.error(
+      "Characters error:",
+      error
+    );
+
+    container.innerHTML =
+      `<div class="no-character">
+        Could not load characters.
+      </div>`;
+
+    return;
+  }
+
+  container.innerHTML = "";
+
+  if(!data || data.length === 0){
+
+    container.innerHTML =
+      `<div class="no-character">
+        No characters yet
+      </div>`;
+
+    return;
+  }
+
+  for(const character of data){
 
     const item =
-      document.createElement(
-        "div"
+      await createCharacterItem(
+        character
       );
-
-
-    item.className =
-      "user-item";
-
-
-    item.dataset.userId =
-      user.id;
-
-
-    item.innerHTML = `
-
-      <div class="user-avatar">
-        👤
-      </div>
-
-      <div class="user-info">
-
-        <div class="user-name">
-          ${escapeHtml(
-            user.name || "User"
-          )}
-        </div>
-
-        <div class="user-email">
-          ${escapeHtml(
-            user.email || ""
-          )}
-        </div>
-
-      </div>
-
-    `;
-
-
-    item.onclick =
-      () => selectUser(
-        user.id
-      );
-
 
     container.appendChild(
       item
     );
 
+  }
 
-    await loadUserAvatar(
-      item
-        .querySelector(
-          ".user-avatar"
-        ),
-      user.id
+}
+
+
+/* =========================
+   CHARACTER ITEM
+========================= */
+
+async function createCharacterItem(
+  character
+){
+
+  const item =
+    document.createElement(
+      "div"
     );
 
+  item.className =
+    "character-item";
+
+  item.dataset.characterId =
+    character.id;
+
+  let characterName =
+    character.custom_character ||
+    character.character_type ||
+    "Character";
+
+  let mood =
+    character.chat_experience ||
+    "Normal";
+
+  item.innerHTML = `
+
+    <div class="character-avatar">
+      ${getAvatar(
+        character.character_type
+      )}
+    </div>
+
+    <div class="character-info">
+
+      <div class="character-name">
+        ${escapeHtml(
+          characterName
+        )}
+      </div>
+
+      <div class="character-type">
+        ${escapeHtml(
+          character.character_type ||
+          "Other"
+        )}
+      </div>
+
+      <div class="character-mood">
+        💭 ${escapeHtml(
+          mood
+        )}
+      </div>
+
+    </div>
+
+  `;
+
+  item.onclick =
+    event => {
+
+      event.stopPropagation();
+
+      selectCharacter(
+        character
+      );
+
+    };
+
+  if(character.avatar_url){
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .storage
+        .from("character-avatars")
+        .createSignedUrl(
+          character.avatar_url,
+          3600
+        );
+
+    if(
+      !error &&
+      data &&
+      data.signedUrl
+    ){
+
+      item
+        .querySelector(
+          ".character-avatar"
+        )
+        .innerHTML = `
+
+          <img
+            src="${data.signedUrl}"
+            alt="Character">
+
+        `;
+
+    }
+
   }
+
+  return item;
 
 }
 
@@ -1085,10 +1184,10 @@ async function loadUsers() {
 async function loadUserAvatar(
   avatarElement,
   userId
-) {
+){
 
   const {
-    data: character
+    data:character
   } =
     await supabaseClient
       .from("characters")
@@ -1102,24 +1201,18 @@ async function loadUserAvatar(
       .order(
         "created_at",
         {
-          ascending: false
+          ascending:false
         }
       )
       .limit(1)
       .maybeSingle();
 
-
-  if (
-    !character
-  ) {
+  if(!character){
 
     return;
   }
 
-
-  if (
-    !character.avatar_url
-  ) {
+  if(!character.avatar_url){
 
     avatarElement.textContent =
       getAvatar(
@@ -1129,27 +1222,23 @@ async function loadUserAvatar(
     return;
   }
 
-
   const {
     data,
     error
   } =
     await supabaseClient
       .storage
-      .from(
-        "character-avatars"
-      )
+      .from("character-avatars")
       .createSignedUrl(
         character.avatar_url,
         3600
       );
 
-
-  if (
+  if(
     !error &&
     data &&
     data.signedUrl
-  ) {
+  ){
 
     avatarElement.innerHTML = `
 
@@ -1169,8 +1258,12 @@ async function loadUserAvatar(
 ========================= */
 
 async function selectUser(
-  userId
-) {
+  userId,
+  characterId = null
+){
+
+  selectedUser =
+    userId;
 
   document
     .querySelectorAll(
@@ -1181,36 +1274,44 @@ async function selectUser(
 
         item.classList.toggle(
           "active",
-          item.dataset.userId === userId
+          item.dataset.userId ===
+          userId
         );
 
       }
     );
 
+  /* Open character list */
 
-  selectedUser =
-    userId;
+  document
+    .querySelectorAll(
+      ".character-list"
+    )
+    .forEach(
+      list => {
 
+        list.classList.toggle(
+          "show",
+          list.dataset.userId ===
+          userId
+        );
+
+      }
+    );
 
   const {
-    data: profile
+    data:profile
   } =
     await supabaseClient
       .from("profiles")
-      .select(
-        "name,email"
-      )
-      .eq(
-        "id",
-        userId
-      )
+      .select("name,email")
+      .eq("id",userId)
       .single();
 
+  if(!profile){
 
-  if (!profile) {
     return;
   }
-
 
   document
     .getElementById(
@@ -1220,30 +1321,47 @@ async function selectUser(
       profile.name ||
       "User";
 
+  /*
+     If URL has a specific
+     character, open it.
+  */
 
-  await loadCharacter(
-    userId
-  );
+  if(characterId){
 
+    const {
+      data:character
+    } =
+      await supabaseClient
+        .from("characters")
+        .select("*")
+        .eq(
+          "id",
+          characterId
+        )
+        .eq(
+          "user_id",
+          userId
+        )
+        .maybeSingle();
 
-  await loadConversation(
-    userId
-  );
+    if(character){
 
-}
+      await selectCharacter(
+        character
+      );
 
+      return;
+    }
 
-/* =========================
-   LOAD CHARACTER
-========================= */
+  }
 
-async function loadCharacter(
-  userId
-) {
+  /*
+     Otherwise select first
+     character automatically.
+  */
 
   const {
-    data,
-    error
+    data:characters
   } =
     await supabaseClient
       .from("characters")
@@ -1255,134 +1373,199 @@ async function loadCharacter(
       .order(
         "created_at",
         {
-          ascending: false
+          ascending:false
         }
-      )
-      .limit(1)
-      .maybeSingle();
-
-
-  if (error) {
-
-    console.error(error);
-
-    return;
-  }
-
-
-  selectedCharacter =
-    data;
-
-
-  const avatar =
-    document.getElementById(
-      "chatAvatar"
-    );
-
-
-  const characterText =
-    document.getElementById(
-      "chatCharacter"
-    );
-
-
-  if (!data) {
-
-    avatar.textContent =
-      "💬";
-
-    characterText.textContent =
-      "";
-
-    return;
-  }
-
-
-  characterText.textContent =
-    data.custom_character ||
-    data.character_type ||
-    "Character";
-
-
-  if (
-    data.avatar_url
-  ) {
-
-    const {
-      data: signed,
-      error: avatarError
-    } =
-      await supabaseClient
-        .storage
-        .from(
-          "character-avatars"
-        )
-        .createSignedUrl(
-          data.avatar_url,
-          3600
-        );
-
-
-    if (
-      !avatarError &&
-      signed &&
-      signed.signedUrl
-    ) {
-
-      avatar.innerHTML = `
-
-        <img
-          src="${signed.signedUrl}"
-          alt="Character picture">
-
-      `;
-
-    } else {
-
-      avatar.textContent =
-        getAvatar(
-          data.character_type
-        );
-
-    }
-
-  } else {
-
-    avatar.textContent =
-      getAvatar(
-        data.character_type
       );
+
+  if(
+    characters &&
+    characters.length > 0
+  ){
+
+    await selectCharacter(
+      characters[0]
+    );
+
+  }else{
+
+    selectedCharacter =
+      null;
+
+    conversationId =
+      null;
+
+    showEmpty(
+      "This user has no character yet."
+    );
 
   }
 
 }
 
 
-function getAvatar(
-  type
-) {
+/* =========================
+   SELECT CHARACTER
+========================= */
+
+async function selectCharacter(
+  character
+){
+
+  selectedCharacter =
+    character;
+
+  selectedUser =
+    character.user_id;
+
+  document
+    .querySelectorAll(
+      ".character-item"
+    )
+    .forEach(
+      item => {
+
+        item.classList.toggle(
+          "active",
+          item.dataset.characterId ===
+          character.id
+        );
+
+      }
+    );
+
+  updateCharacterHeader(
+    character
+  );
+
+  await loadConversation(
+    character
+  );
+
+}
+
+
+/* =========================
+   CHARACTER HEADER
+========================= */
+
+async function updateCharacterHeader(
+  character
+){
+
+  const avatar =
+    document.getElementById(
+      "chatAvatar"
+    );
+
+  const characterText =
+    document.getElementById(
+      "chatCharacter"
+    );
+
+  const moodText =
+    document.getElementById(
+      "chatMood"
+    );
+
+  const {
+    data:profile
+  } =
+    await supabaseClient
+      .from("profiles")
+      .select("name")
+      .eq(
+        "id",
+        character.user_id
+      )
+      .maybeSingle();
+
+  document
+    .getElementById(
+      "chatUserName"
+    )
+    .textContent =
+      profile?.name ||
+      "User";
+
+  characterText.textContent =
+    character.custom_character ||
+    character.character_type ||
+    "Character";
+
+  moodText.textContent =
+    "💭 Chat: " +
+    (
+      character.chat_experience ||
+      "Normal"
+    );
+
+  avatar.textContent =
+    getAvatar(
+      character.character_type
+    );
+
+  if(character.avatar_url){
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .storage
+        .from("character-avatars")
+        .createSignedUrl(
+          character.avatar_url,
+          3600
+        );
+
+    if(
+      !error &&
+      data &&
+      data.signedUrl
+    ){
+
+      avatar.innerHTML = `
+
+        <img
+          src="${data.signedUrl}"
+          alt="Character picture">
+
+      `;
+
+    }
+
+  }
+
+}
+
+
+/* =========================
+   AVATAR
+========================= */
+
+function getAvatar(type){
 
   const avatars = {
 
-    Father: "👨",
+    Father:"👨",
 
-    Mother: "👩",
+    Mother:"👩",
 
-    Boyfriend: "🧑",
+    Boyfriend:"🧑",
 
-    Girlfriend: "👩",
+    Girlfriend:"👩",
 
-    "Male Teacher": "👨‍🏫",
+    "Male Teacher":"👨‍🏫",
 
-    "Female Teacher": "👩‍🏫",
+    "Female Teacher":"👩‍🏫",
 
-    Other: "💬"
+    Other:"💬"
 
   };
 
-
   return avatars[type] ||
     "💬";
+
 }
 
 
@@ -1391,10 +1574,10 @@ function getAvatar(
 ========================= */
 
 async function loadConversation(
-  userId
-) {
+  character
+){
 
-  if (realtimeChannel) {
+  if(realtimeChannel){
 
     await supabaseClient
       .removeChannel(
@@ -1405,36 +1588,8 @@ async function loadConversation(
       null;
   }
 
-
-  const {
-    data: character
-  } =
-    await supabaseClient
-      .from("characters")
-      .select("id")
-      .eq(
-        "user_id",
-        userId
-      )
-      .order(
-        "created_at",
-        {
-          ascending: false
-        }
-      )
-      .limit(1)
-      .maybeSingle();
-
-
-  if (!character) {
-
-    showEmpty(
-      "This user has no character yet."
-    );
-
-    return;
-  }
-
+  conversationId =
+    null;
 
   const {
     data,
@@ -1445,18 +1600,27 @@ async function loadConversation(
       .select("*")
       .eq(
         "user_id",
-        userId
+        character.user_id
       )
       .eq(
         "character_id",
         character.id
       )
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      )
+      .limit(1)
       .maybeSingle();
 
+  if(error){
 
-  if (error) {
-
-    console.error(error);
+    console.error(
+      "Conversation error:",
+      error
+    );
 
     showEmpty(
       "Could not load conversation."
@@ -1465,23 +1629,19 @@ async function loadConversation(
     return;
   }
 
-
-  if (!data) {
+  if(!data){
 
     showEmpty(
-      "No conversation yet."
+      "No conversation yet for this character."
     );
 
     return;
   }
 
-
   conversationId =
     data.id;
 
-
   await loadMessages();
-
 
   startRealtime();
 
@@ -1492,17 +1652,15 @@ async function loadConversation(
    LOAD MESSAGES
 ========================= */
 
-async function loadMessages() {
+async function loadMessages(){
 
   const container =
     document.getElementById(
       "messages"
     );
 
-
   container.innerHTML =
     "";
-
 
   const {
     data,
@@ -1518,14 +1676,16 @@ async function loadMessages() {
       .order(
         "created_at",
         {
-          ascending: true
+          ascending:true
         }
       );
 
+  if(error){
 
-  if (error) {
-
-    console.error(error);
+    console.error(
+      "Messages error:",
+      error
+    );
 
     showEmpty(
       "Could not load messages."
@@ -1534,11 +1694,7 @@ async function loadMessages() {
     return;
   }
 
-
-  if (
-    !data ||
-    data.length === 0
-  ) {
+  if(!data || data.length === 0){
 
     showEmpty(
       "No messages yet."
@@ -1547,17 +1703,13 @@ async function loadMessages() {
     return;
   }
 
-
-  for (
-    const message of data
-  ) {
+  for(const message of data){
 
     await addMessage(
       message
     );
 
   }
-
 
   scrollBottom();
 
@@ -1570,33 +1722,31 @@ async function loadMessages() {
 
 async function addMessage(
   message
-) {
+){
 
-  if (message.id) {
+  if(message.id){
 
     const existing =
       document.querySelector(
         `[data-message-id="${message.id}"]`
       );
 
+    if(existing){
 
-    if (existing) {
       return;
+
     }
 
   }
-
 
   const isAdmin =
     message.sender_id ===
     currentUser.id;
 
-
   const row =
     document.createElement(
       "div"
     );
-
 
   row.className =
     `message-row ${
@@ -1605,18 +1755,15 @@ async function addMessage(
         : "user"
     }`;
 
-
   const bubble =
     document.createElement(
       "div"
     );
 
-
   bubble.className =
     "bubble";
 
-
-  if (message.id) {
+  if(message.id){
 
     bubble.dataset.messageId =
       message.id;
@@ -1626,24 +1773,19 @@ async function addMessage(
 
   /* IMAGE */
 
-  if (
-    message.image_path
-  ) {
+  if(message.image_path){
 
     const image =
       document.createElement(
         "img"
       );
 
-
     image.className =
       "message-image";
-
 
     image.alt =
       message.image_name ||
       "Chat image";
-
 
     const {
       data,
@@ -1651,24 +1793,20 @@ async function addMessage(
     } =
       await supabaseClient
         .storage
-        .from(
-          "chat-images"
-        )
+        .from("chat-images")
         .createSignedUrl(
           message.image_path,
           3600
         );
 
-
-    if (
+    if(
       !error &&
       data &&
       data.signedUrl
-    ) {
+    ){
 
       image.src =
         data.signedUrl;
-
 
       image.onclick =
         () => {
@@ -1682,7 +1820,6 @@ async function addMessage(
 
     }
 
-
     bubble.appendChild(
       image
     );
@@ -1692,25 +1829,20 @@ async function addMessage(
 
   /* TEXT */
 
-  if (
-    message.content
-  ) {
+  if(message.content){
 
     const text =
       document.createElement(
         "div"
       );
 
-
     text.className =
       message.image_path
         ? "message-text"
         : "message-text only";
 
-
     text.textContent =
       message.content;
-
 
     bubble.appendChild(
       text
@@ -1724,26 +1856,21 @@ async function addMessage(
       "div"
     );
 
-
   time.className =
     "time";
-
 
   time.textContent =
     formatTime(
       message.created_at
     );
 
-
   bubble.appendChild(
     time
   );
 
-
   row.appendChild(
     bubble
   );
-
 
   document
     .getElementById(
@@ -1752,7 +1879,6 @@ async function addMessage(
     .appendChild(
       row
     );
-
 
   scrollBottom();
 
@@ -1763,51 +1889,46 @@ async function addMessage(
    SEND MESSAGE
 ========================= */
 
-async function sendMessage() {
+async function sendMessage(){
 
-  if (
+  if(
     !selectedUser ||
+    !selectedCharacter ||
     !conversationId
-  ) {
+  ){
 
     alert(
-      "Please select a user first."
+      "Please select a character first."
     );
 
     return;
   }
-
 
   const input =
     document.getElementById(
       "messageInput"
     );
 
-
   const content =
     input.value.trim();
 
-
-  if (
+  if(
     !content &&
     !selectedImage
-  ) {
+  ){
 
     return;
   }
-
 
   const sendButton =
     document.getElementById(
       "sendButton"
     );
 
-
   const imageButton =
     document.getElementById(
       "imageButton"
     );
-
 
   sendButton.disabled =
     true;
@@ -1815,8 +1936,7 @@ async function sendMessage() {
   imageButton.disabled =
     true;
 
-
-  try {
+  try{
 
     let imagePath =
       null;
@@ -1827,8 +1947,7 @@ async function sendMessage() {
     let imageName =
       null;
 
-
-    if (selectedImage) {
+    if(selectedImage){
 
       const extension =
         selectedImage.name
@@ -1836,19 +1955,15 @@ async function sendMessage() {
           .pop()
           .toLowerCase();
 
-
       const fileName =
         `${selectedUser}/${conversationId}/${Date.now()}-${crypto.randomUUID()}.${extension}`;
-
 
       const {
         error
       } =
         await supabaseClient
           .storage
-          .from(
-            "chat-images"
-          )
+          .from("chat-images")
           .upload(
             fileName,
             selectedImage,
@@ -1856,16 +1971,15 @@ async function sendMessage() {
               contentType:
                 selectedImage.type,
 
-              upsert:
-                false
+              upsert:false
             }
           );
 
+      if(error){
 
-      if (error) {
         throw error;
-      }
 
+      }
 
       imagePath =
         fileName;
@@ -1877,7 +1991,6 @@ async function sendMessage() {
         selectedImage.name;
 
     }
-
 
     const {
       error
@@ -1906,11 +2019,11 @@ async function sendMessage() {
 
         });
 
+    if(error){
 
-    if (error) {
       throw error;
-    }
 
+    }
 
     input.value =
       "";
@@ -1918,19 +2031,19 @@ async function sendMessage() {
     input.style.height =
       "45px";
 
-
     removeImage();
 
+  }catch(error){
 
-  } catch (error) {
-
-    console.error(error);
+    console.error(
+      error
+    );
 
     alert(
       "Could not send message."
     );
 
-  } finally {
+  }finally{
 
     sendButton.disabled =
       false;
@@ -1960,17 +2073,17 @@ document
       const file =
         event.target.files[0];
 
+      if(!file){
 
-      if (!file) {
         return;
+
       }
 
-
-      if (
+      if(
         !file.type.startsWith(
           "image/"
         )
-      ) {
+      ){
 
         alert(
           "Please select an image."
@@ -1980,13 +2093,13 @@ document
           "";
 
         return;
+
       }
 
-
-      if (
+      if(
         file.size >
         10 * 1024 * 1024
-      ) {
+      ){
 
         alert(
           "Image must be smaller than 10 MB."
@@ -1996,16 +2109,14 @@ document
           "";
 
         return;
-      }
 
+      }
 
       selectedImage =
         file;
 
-
       const reader =
         new FileReader();
-
 
       reader.onload =
         e => {
@@ -2017,14 +2128,12 @@ document
             .src =
               e.target.result;
 
-
           document
             .getElementById(
               "previewName"
             )
             .textContent =
               file.name;
-
 
           document
             .getElementById(
@@ -2034,7 +2143,6 @@ document
               formatFileSize(
                 file.size
               );
-
 
           document
             .getElementById(
@@ -2046,7 +2154,6 @@ document
 
         };
 
-
       reader.readAsDataURL(
         file
       );
@@ -2054,17 +2161,17 @@ document
     });
 
 
-function removeImage() {
+function removeImage(){
 
   selectedImage =
     null;
 
-
-  document.getElementById(
-    "fileInput"
-  ).value =
-    "";
-
+  document
+    .getElementById(
+      "fileInput"
+    )
+    .value =
+      "";
 
   document
     .getElementById(
@@ -2081,32 +2188,46 @@ function removeImage() {
    REALTIME
 ========================= */
 
-function startRealtime() {
+function startRealtime(){
+
+  if(!conversationId){
+
+    return;
+
+  }
 
   realtimeChannel =
     supabaseClient
       .channel(
         "admin-chat-" +
-        conversationId
+        conversationId +
+        "-" +
+        Date.now()
       )
       .on(
         "postgres_changes",
         {
-          event:
-            "INSERT",
-
-          schema:
-            "public",
-
-          table:
-            "messages",
-
+          event:"INSERT",
+          schema:"public",
+          table:"messages",
           filter:
             `conversation_id=eq.${conversationId}`
-
         },
-
         async payload => {
+
+          /*
+             Make sure message belongs
+             to currently selected chat.
+          */
+
+          if(
+            payload.new.conversation_id !==
+            conversationId
+          ){
+
+            return;
+
+          }
 
           await addMessage(
             payload.new
@@ -2134,28 +2255,29 @@ function startRealtime() {
 
 function showEmpty(
   text
-) {
+){
 
-  document.getElementById(
-    "messages"
-  ).innerHTML = `
+  document
+    .getElementById(
+      "messages"
+    )
+    .innerHTML = `
 
-    <div class="empty">
-      ${text}
-    </div>
+      <div class="empty">
+        ${escapeHtml(text)}
+      </div>
 
-  `;
+    `;
 
 }
 
 
-function scrollBottom() {
+function scrollBottom(){
 
   const messages =
     document.getElementById(
       "messages"
     );
-
 
   setTimeout(
     () => {
@@ -2172,18 +2294,15 @@ function scrollBottom() {
 
 function formatTime(
   value
-) {
+){
 
   return new Date(
     value
   ).toLocaleTimeString(
     [],
     {
-      hour:
-        "2-digit",
-
-      minute:
-        "2-digit"
+      hour:"2-digit",
+      minute:"2-digit"
     }
   );
 
@@ -2192,30 +2311,25 @@ function formatTime(
 
 function formatFileSize(
   bytes
-) {
+){
 
-  if (
-    bytes <
-    1024
-  ) {
+  if(bytes < 1024){
 
     return bytes + " B";
 
   }
 
-
-  if (
+  if(
     bytes <
     1024 * 1024
-  ) {
+  ){
 
     return (
       bytes / 1024
     ).toFixed(1) +
-      " KB";
+    " KB";
 
   }
-
 
   return (
     bytes /
@@ -2228,7 +2342,7 @@ function formatFileSize(
 
 function escapeHtml(
   value
-) {
+){
 
   return String(
     value
@@ -2257,7 +2371,7 @@ function escapeHtml(
 }
 
 
-function backToAdmin() {
+function backToAdmin(){
 
   window.location.replace(
     "admin.html"
@@ -2277,7 +2391,7 @@ window.addEventListener(
   "beforeunload",
   () => {
 
-    if (realtimeChannel) {
+    if(realtimeChannel){
 
       supabaseClient
         .removeChannel(
