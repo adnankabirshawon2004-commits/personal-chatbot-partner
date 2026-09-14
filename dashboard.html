@@ -1,1012 +1,1213 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-<title>Dashboard - Personal Chatbot Partner</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style>
-* {
-    box-sizing: border-box;
-}
-
-html {
-    width: 100%;
-    min-height: 100%;
-}
-
-body {
-    margin: 0;
-    width: 100%;
-    min-height: 100vh;
-    min-height: 100dvh;
-
-    font-family: Arial, sans-serif;
-    color: white;
-
-    background:
-        radial-gradient(circle at 10% 10%, rgba(124,58,237,0.28), transparent 30%),
-        radial-gradient(circle at 90% 90%, rgba(37,99,235,0.22), transparent 30%),
-        linear-gradient(135deg, #050816, #0b1026 50%, #111936);
-
-    padding: 20px;
-    overflow-x: hidden;
-}
-
-/* Header */
-
-.header {
-    width: 100%;
-    max-width: 900px;
-
-    margin: 0 auto 22px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    gap: 15px;
-}
-
-.brand {
-    display: flex;
-    align-items: center;
-
-    gap: 12px;
-}
-
-.brand-icon {
-    width: 44px;
-    height: 44px;
-
-    flex-shrink: 0;
-
-    border-radius: 14px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: 20px;
-
-    background: linear-gradient(135deg, #8b5cf6, #3b82f6);
-
-    box-shadow: 0 8px 25px rgba(99,102,241,0.25);
-}
-
-.brand-text {
-    font-size: 17px;
-    font-weight: 700;
-}
-
-.logout {
-    padding: 10px 16px;
-
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 11px;
-
-    background: rgba(255,255,255,0.05);
-
-    color: #cbd5e1;
-
-    font-size: 13px;
-    font-weight: 600;
-
-    cursor: pointer;
-}
-
-.logout:hover {
-    background: rgba(255,255,255,0.09);
-}
-
-/* Main */
-
-.container {
-    width: 100%;
-    max-width: 900px;
-
-    margin: 0 auto;
-}
-
-.hero {
-    margin-bottom: 25px;
-}
-
-.hero h1 {
-    margin: 0 0 8px;
-
-    font-size: 32px;
-    line-height: 1.2;
-
-    letter-spacing: -0.6px;
-}
-
-.hero p {
-    margin: 0;
-
-    color: #9ca9c4;
-
-    font-size: 14px;
-    line-height: 1.6;
-}
-
-/* Card */
-
-.card {
-    padding: 28px;
-
-    border: 1px solid rgba(255,255,255,0.11);
-    border-radius: 24px;
-
-    background: rgba(15,23,42,0.76);
-
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-
-    box-shadow:
-        0 25px 70px rgba(0,0,0,0.35),
-        inset 0 1px 0 rgba(255,255,255,0.06);
-}
-
-.section {
-    margin-bottom: 27px;
-}
-
-.section:last-of-type {
-    margin-bottom: 0;
-}
-
-.section-title {
-    margin-bottom: 12px;
-
-    font-size: 14px;
-    font-weight: 700;
-
-    color: #e5e7eb;
-}
-
-.section-subtitle {
-    margin-top: -5px;
-    margin-bottom: 13px;
-
-    color: #7f8ba5;
-
-    font-size: 12px;
-}
-
-/* Options */
-
-.options {
-    display: grid;
-
-    grid-template-columns: repeat(3, 1fr);
-
-    gap: 10px;
-}
-
-.option {
-    position: relative;
-
-    min-height: 58px;
-
-    padding: 12px;
-
-    border: 1px solid rgba(255,255,255,0.09);
-    border-radius: 14px;
-
-    background: rgba(255,255,255,0.045);
-
-    color: #cbd5e1;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    text-align: center;
-
-    font-size: 13px;
-    font-weight: 600;
-
-    cursor: pointer;
-
-    transition: 0.2s ease;
-}
-
-.option:hover {
-    border-color: rgba(139,92,246,0.5);
-
-    background: rgba(139,92,246,0.08);
-}
-
-.option.selected {
-    border-color: #8b5cf6;
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(139,92,246,0.20),
-            rgba(99,102,241,0.12)
-        );
-
-    color: white;
-
-    box-shadow:
-        0 0 0 2px rgba(139,92,246,0.08);
-}
-
-.option input {
-    position: absolute;
-
-    opacity: 0;
-
-    pointer-events: none;
-}
-
-/* Character cards */
-
-.character-grid {
-    display: grid;
-
-    grid-template-columns: repeat(4, 1fr);
-
-    gap: 10px;
-}
-
-.character {
-    min-height: 82px;
-
-    padding: 12px 8px;
-
-    border: 1px solid rgba(255,255,255,0.09);
-    border-radius: 15px;
-
-    background: rgba(255,255,255,0.045);
-
-    color: #cbd5e1;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    gap: 7px;
-
-    text-align: center;
-
-    cursor: pointer;
-
-    transition: 0.2s ease;
-}
-
-.character-icon {
-    font-size: 23px;
-}
-
-.character-name {
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.character:hover {
-    border-color: rgba(139,92,246,0.5);
-
-    transform: translateY(-2px);
-}
-
-.character.selected {
-    border-color: #8b5cf6;
-
-    background: rgba(139,92,246,0.15);
-
-    color: white;
-
-    box-shadow:
-        0 8px 25px rgba(99,102,241,0.12);
-}
-
-/* Custom character */
-
-.custom-box {
-    display: none;
-
-    margin-top: 13px;
-}
-
-.custom-box.show {
-    display: block;
-}
-
-input[type="text"] {
-    width: 100%;
-
-    height: 48px;
-
-    padding: 0 14px;
-
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 13px;
-
-    outline: none;
-
-    background: rgba(255,255,255,0.05);
-
-    color: white;
-
-    font-size: 14px;
-}
-
-input[type="text"]::placeholder {
-    color: #71809b;
-}
-
-input[type="text"]:focus {
-    border-color: rgba(139,92,246,0.8);
-
-    box-shadow:
-        0 0 0 3px rgba(139,92,246,0.1);
-}
-
-/* Start button */
-
-.start-button {
-    width: 100%;
-
-    height: 54px;
-
-    margin-top: 27px;
-
-    border: none;
-    border-radius: 15px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #8b5cf6,
-            #6366f1,
-            #3b82f6
-        );
-
-    color: white;
-
-    font-size: 15px;
-    font-weight: 700;
-
-    cursor: pointer;
-
-    box-shadow:
-        0 12px 30px rgba(99,102,241,0.25);
-
-    transition: 0.2s ease;
-}
-
-.start-button:hover {
-    transform: translateY(-2px);
-
-    box-shadow:
-        0 16px 35px rgba(99,102,241,0.35);
-}
-
-.start-button:active {
-    transform: translateY(0);
-}
-
-.start-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-}
-
-/* Message */
-
-#message {
-    min-height: 22px;
-
-    margin-top: 14px;
-
-    text-align: center;
-
-    color: #fca5a5;
-
-    font-size: 13px;
-
-    line-height: 1.5;
-}
-
-/* Mobile */
-
-@media (max-width: 700px) {
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Create Your Character</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
-        padding: 16px;
+      font-family: Inter, Arial, sans-serif;
+      min-height: 100vh;
+      padding: 24px;
+
+      background:
+        radial-gradient(
+          circle at top left,
+          rgba(124, 58, 237, 0.35),
+          transparent 35%
+        ),
+        radial-gradient(
+          circle at bottom right,
+          rgba(6, 182, 212, 0.25),
+          transparent 35%
+        ),
+        #070b14;
+
+      color: white;
     }
 
-    .header {
-        margin-bottom: 20px;
+    .container {
+      width: 100%;
+      max-width: 700px;
+      margin: 0 auto;
     }
 
-    .hero h1 {
-        font-size: 27px;
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
     }
 
-    .card {
-        padding: 21px;
-
-        border-radius: 21px;
-    }
-
-    .options {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .character-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-/* Small phones */
-
-@media (max-width: 400px) {
-
-    body {
-        padding: 12px;
-    }
-
-    .brand-text {
-        font-size: 15px;
-    }
-
-    .brand-icon {
-        width: 40px;
-        height: 40px;
-
-        border-radius: 12px;
+    .brand {
+      font-size: 20px;
+      font-weight: 800;
     }
 
     .logout {
-        padding: 9px 12px;
-    }
-
-    .hero h1 {
-        font-size: 24px;
-    }
-
-    .hero p {
-        font-size: 13px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.07);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 12px;
+      cursor: pointer;
     }
 
     .card {
-        padding: 17px;
+      background: rgba(15, 23, 42, 0.78);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 26px;
+      padding: 30px;
+
+      backdrop-filter: blur(22px);
+
+      box-shadow:
+        0 25px 80px rgba(0,0,0,0.40);
+    }
+
+    .title {
+      font-size: 30px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: rgba(255,255,255,0.55);
+      font-size: 14px;
+      margin-bottom: 28px;
+      line-height: 1.6;
+    }
+
+    .section {
+      margin-bottom: 26px;
+    }
+
+    .label {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 10px;
     }
 
     .options {
-        grid-template-columns: 1fr 1fr;
-
-        gap: 8px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
     }
 
     .option {
-        min-height: 53px;
+      padding: 13px 14px;
+      border-radius: 13px;
 
-        font-size: 12px;
+      border: 1px solid rgba(255,255,255,0.10);
+
+      background: rgba(255,255,255,0.05);
+
+      color: white;
+      cursor: pointer;
+
+      font-size: 13px;
+
+      transition: 0.2s;
     }
 
-    .character-grid {
-        grid-template-columns: 1fr 1fr;
-
-        gap: 8px;
+    .option:hover {
+      background: rgba(124,58,237,0.15);
+      border-color: rgba(124,58,237,0.45);
     }
 
-    .character {
-        min-height: 76px;
-    }
-}
-</style>
+    .option.selected {
+      background: linear-gradient(
+        135deg,
+        rgba(124,58,237,0.40),
+        rgba(37,99,235,0.35)
+      );
 
+      border-color: rgba(139,92,246,0.8);
+
+      box-shadow:
+        0 8px 25px rgba(124,58,237,0.15);
+    }
+
+    input,
+    select {
+      width: 100%;
+
+      padding: 13px 14px;
+
+      border-radius: 13px;
+
+      border: 1px solid rgba(255,255,255,0.10);
+
+      background: rgba(255,255,255,0.06);
+
+      color: white;
+
+      outline: none;
+
+      font-size: 14px;
+    }
+
+    input::placeholder {
+      color: rgba(255,255,255,0.38);
+    }
+
+    input:focus,
+    select:focus {
+      border-color: rgba(124,58,237,0.7);
+
+      box-shadow:
+        0 0 0 3px rgba(124,58,237,0.10);
+    }
+
+    select option {
+      background: #111827;
+      color: white;
+    }
+
+    .custom-name {
+      display: none;
+      margin-top: 12px;
+    }
+
+    /* =========================
+       CHARACTER PICTURE
+    ========================= */
+
+    .avatar-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+
+      padding: 22px;
+
+      border-radius: 20px;
+
+      border: 1px dashed rgba(255,255,255,0.16);
+
+      background: rgba(255,255,255,0.035);
+
+      margin-bottom: 8px;
+    }
+
+    .avatar-preview {
+      width: 120px;
+      height: 120px;
+
+      border-radius: 50%;
+
+      object-fit: cover;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background:
+        linear-gradient(
+          135deg,
+          #7c3aed,
+          #06b6d4
+        );
+
+      border: 4px solid rgba(255,255,255,0.10);
+
+      box-shadow:
+        0 12px 35px rgba(0,0,0,0.30);
+
+      font-size: 48px;
+
+      margin-bottom: 14px;
+
+      overflow: hidden;
+    }
+
+    .avatar-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .avatar-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .avatar-description {
+      font-size: 12px;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 15px;
+    }
+
+    .upload-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      padding: 11px 17px;
+
+      border-radius: 12px;
+
+      background: rgba(124,58,237,0.18);
+
+      border: 1px solid rgba(139,92,246,0.45);
+
+      color: #ddd6fe;
+
+      font-size: 13px;
+      font-weight: 700;
+
+      cursor: pointer;
+
+      transition: 0.2s;
+    }
+
+    .upload-button:hover {
+      background: rgba(124,58,237,0.30);
+    }
+
+    #avatarInput {
+      display: none;
+    }
+
+    .remove-avatar {
+      display: none;
+
+      margin-top: 9px;
+
+      border: none;
+
+      background: transparent;
+
+      color: #f87171;
+
+      font-size: 12px;
+
+      cursor: pointer;
+    }
+
+    .remove-avatar.show {
+      display: block;
+    }
+
+    .hint {
+      font-size: 11px;
+      color: rgba(255,255,255,0.38);
+      margin-top: 8px;
+    }
+
+    .create-button {
+      width: 100%;
+
+      padding: 15px;
+
+      border: none;
+
+      border-radius: 15px;
+
+      background:
+        linear-gradient(
+          135deg,
+          #7c3aed,
+          #2563eb
+        );
+
+      color: white;
+
+      font-size: 15px;
+      font-weight: 800;
+
+      cursor: pointer;
+
+      box-shadow:
+        0 12px 30px rgba(37,99,235,0.25);
+
+      transition: 0.2s;
+    }
+
+    .create-button:hover {
+      transform: translateY(-1px);
+
+      box-shadow:
+        0 15px 35px rgba(37,99,235,0.32);
+    }
+
+    .create-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .message {
+      display: none;
+
+      margin-top: 15px;
+
+      padding: 12px;
+
+      border-radius: 12px;
+
+      text-align: center;
+
+      font-size: 13px;
+    }
+
+    .message.error {
+      display: block;
+
+      background: rgba(239,68,68,0.10);
+
+      border: 1px solid rgba(239,68,68,0.20);
+
+      color: #fca5a5;
+    }
+
+    @media (max-width: 600px) {
+
+      body {
+        padding: 15px;
+      }
+
+      .card {
+        padding: 22px 18px;
+        border-radius: 21px;
+      }
+
+      .title {
+        font-size: 25px;
+      }
+
+      .options {
+        grid-template-columns: 1fr;
+      }
+
+      .avatar-preview {
+        width: 105px;
+        height: 105px;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<header class="header">
+<div class="container">
 
-```
-<div class="brand">
+  <div class="topbar">
 
-    <div class="brand-icon">✦</div>
-
-    <div class="brand-text">
-        Personal Chatbot Partner
-    </div>
-
-</div>
-
-<button class="logout" id="logoutButton">
-    Logout
-</button>
-```
-
-</header>
-
-<main class="container">
-
-```
-<div class="hero">
-
-    <h1>Create Your Chat</h1>
-
-    <p>
-        Choose your language, character and preferred chat experience.
-    </p>
-
-</div>
-
-<div class="card">
-
-    <!-- Language -->
-
-    <div class="section">
-
-        <div class="section-title">
-            Language
-        </div>
-
-        <div class="options">
-
-            <label class="option selected">
-                <input
-                    type="radio"
-                    name="language"
-                    value="English"
-                    checked
-                >
-                🇬🇧 English
-            </label>
-
-            <label class="option">
-                <input
-                    type="radio"
-                    name="language"
-                    value="Bangla"
-                >
-                🇧🇩 Bangla
-            </label>
-
-        </div>
-
-    </div>
-
-    <!-- Character -->
-
-    <div class="section">
-
-        <div class="section-title">
-            Choose Character
-        </div>
-
-        <div class="section-subtitle">
-            Who would you like to chat with?
-        </div>
-
-        <div class="character-grid">
-
-            <label class="character">
-                <input
-                    type="radio"
-                    name="character"
-                    value="Father"
-                >
-                <div class="character-icon">👨‍👧</div>
-                <div class="character-name">Father</div>
-            </label>
-
-            <label class="character">
-                <input
-                    type="radio"
-                    name="character"
-                    value="Mother"
-                >
-                <div class="character-icon">👩‍👧</div>
-                <div class="character-name">Mother</div>
-            </label>
-
-            <label class="character">
-                <input
-                    type="radio"
-                    name="character"
-                    value="Boyfriend"
-                >
-                <div class="character-icon">👤</div>
-                <div class="character-name">Boyfriend</div>
-            </label>
-
-            <label class="character">
-                <input
-                    type="radio"
-                    name="character"
-                    value="Girlfriend"
-                >
-                <div class="character-icon">👤</div>
-                <div class="character-name">Girlfriend</div>
-            </label>
-
-            <label class="character">
-                <input
-                    type="radio"
-                    name="character"
-                    value="Male Teacher"
-                >
-                <div class="character-icon">👨‍🏫</div>
-                <div class="character-name">Male Teacher</div>
-            </label>
-
-            <label class="character">
-                <input
-                    type="radio"
-                    name="character"
-                    value="Female Teacher"
-                >
-                <div class="character-icon">👩‍🏫</div>
-                <div class="character-name">Female Teacher</div>
-            </label>
-
-            <label class="character">
-                <input
-                    type="radio"
-                    name="character"
-                    value="Other"
-                >
-                <div class="character-icon">✨</div>
-                <div class="character-name">Other</div>
-            </label>
-
-        </div>
-
-        <div class="custom-box" id="customBox">
-
-            <input
-                type="text"
-                id="customCharacter"
-                placeholder="Enter character name"
-                maxlength="50"
-            >
-
-        </div>
-
-    </div>
-
-    <!-- Experience -->
-
-    <div class="section">
-
-        <div class="section-title">
-            Chat Experience
-        </div>
-
-        <div class="options">
-
-            <label class="option">
-                <input
-                    type="radio"
-                    name="experience"
-                    value="Romantic"
-                >
-                💜 Romantic
-            </label>
-
-            <label class="option selected">
-                <input
-                    type="radio"
-                    name="experience"
-                    value="Normal"
-                    checked
-                >
-                💬 Normal
-            </label>
-
-            <label class="option">
-                <input
-                    type="radio"
-                    name="experience"
-                    value="Calm"
-                >
-                🌿 Calm
-            </label>
-
-        </div>
-
+    <div class="brand">
+      Personal Chatbot
     </div>
 
     <button
-        class="start-button"
-        id="startButton"
-    >
-        Start Chat
+      class="logout"
+      onclick="logout()">
+      Logout
     </button>
 
-    <div id="message"></div>
+  </div>
+
+
+  <div class="card">
+
+    <div class="title">
+      Create Your Character
+    </div>
+
+    <div class="subtitle">
+      Customize your character and choose how you want your chat experience to feel.
+    </div>
+
+
+    <!-- LANGUAGE -->
+
+    <div class="section">
+
+      <label class="label">
+        Language
+      </label>
+
+      <div class="options">
+
+        <button
+          class="option selected"
+          data-group="language"
+          data-value="English"
+          onclick="selectOption(this)">
+          🇬🇧 English
+        </button>
+
+        <button
+          class="option"
+          data-group="language"
+          data-value="Bangla"
+          onclick="selectOption(this)">
+          🇧🇩 বাংলা
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- CHARACTER -->
+
+    <div class="section">
+
+      <label class="label">
+        Choose Character
+      </label>
+
+      <div class="options">
+
+        <button
+          class="option"
+          data-group="character"
+          data-value="Father"
+          onclick="selectOption(this)">
+          👨 Father
+        </button>
+
+        <button
+          class="option"
+          data-group="character"
+          data-value="Mother"
+          onclick="selectOption(this)">
+          👩 Mother
+        </button>
+
+        <button
+          class="option"
+          data-group="character"
+          data-value="Boyfriend"
+          onclick="selectOption(this)">
+          🧑 Boyfriend
+        </button>
+
+        <button
+          class="option"
+          data-group="character"
+          data-value="Girlfriend"
+          onclick="selectOption(this)">
+          👩 Girlfriend
+        </button>
+
+        <button
+          class="option"
+          data-group="character"
+          data-value="Male Teacher"
+          onclick="selectOption(this)">
+          👨‍🏫 Male Teacher
+        </button>
+
+        <button
+          class="option"
+          data-group="character"
+          data-value="Female Teacher"
+          onclick="selectOption(this)">
+          👩‍🏫 Female Teacher
+        </button>
+
+        <button
+          class="option"
+          data-group="character"
+          data-value="Other"
+          onclick="selectOption(this)">
+          ✨ Other
+        </button>
+
+      </div>
+
+
+      <div
+        class="custom-name"
+        id="customNameBox">
+
+        <input
+          type="text"
+          id="customCharacter"
+          placeholder="Enter your character name">
+
+      </div>
+
+    </div>
+
+
+    <!-- CHARACTER PICTURE -->
+
+    <div class="section">
+
+      <label class="label">
+        Character Picture
+      </label>
+
+      <div class="avatar-section">
+
+        <div
+          class="avatar-preview"
+          id="avatarPreview">
+          👤
+        </div>
+
+        <div class="avatar-title">
+          Set your character picture
+        </div>
+
+        <div class="avatar-description">
+          Choose a picture for your character's avatar.
+        </div>
+
+        <label
+          class="upload-button"
+          for="avatarInput">
+          🖼️ Choose Picture
+        </label>
+
+        <input
+          type="file"
+          id="avatarInput"
+          accept="image/jpeg,image/png,image/webp">
+
+        <button
+          type="button"
+          class="remove-avatar"
+          id="removeAvatar"
+          onclick="removeAvatar()">
+          Remove picture
+        </button>
+
+        <div class="hint">
+          JPG, PNG or WEBP • Maximum 5 MB
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- EXPERIENCE -->
+
+    <div class="section">
+
+      <label class="label">
+        Chat Experience
+      </label>
+
+      <div class="options">
+
+        <button
+          class="option"
+          data-group="experience"
+          data-value="Romantic"
+          onclick="selectOption(this)">
+          💜 Romantic
+        </button>
+
+        <button
+          class="option selected"
+          data-group="experience"
+          data-value="Normal"
+          onclick="selectOption(this)">
+          💬 Normal
+        </button>
+
+        <button
+          class="option"
+          data-group="experience"
+          data-value="Calm"
+          onclick="selectOption(this)">
+          🌿 Calm
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <button
+      class="create-button"
+      id="createButton"
+      onclick="createCharacter()">
+
+      Create Character
+
+    </button>
+
+
+    <div
+      id="message"
+      class="message">
+    </div>
+
+  </div>
 
 </div>
-```
 
-</main>
 
 <script>
 
 const SUPABASE_URL =
-"https://bnagfjhghlncqqnenejn.supabase.co";
+  "https://bnagfjhghlncqqnenejn.supabase.co";
 
 const SUPABASE_KEY =
-"sb_publishable_CEOgfj8n1K6CeIqizGVhTw_8oPlWuKk";
+  "sb_publishable_CEOgfj8n1K6CeIqizGVhTw_8oPlWuKk";
 
 const supabaseClient =
-window.supabase.createClient(
+  window.supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
-);
+  );
+
 
 let currentUser = null;
 
-/* -------------------------
-   Authentication
-------------------------- */
+let selectedLanguage =
+  "English";
 
-async function checkUser() {
+let selectedCharacter =
+  null;
 
-    const {
-        data: { session }
-    } = await supabaseClient.auth.getSession();
+let selectedExperience =
+  "Normal";
 
-    if (!session) {
+let selectedAvatar =
+  null;
 
-        window.location.href = "index.html";
 
-        return;
-    }
+/* =========================
+   AUTH
+========================= */
 
-    currentUser = session.user;
+async function init() {
 
-    const { data: profile } =
-        await supabaseClient
-        .from("profiles")
-        .select("status, role")
-        .eq("id", currentUser.id)
-        .single();
+  const {
+    data: { session }
+  } =
+    await supabaseClient.auth.getSession();
 
-    if (!profile || profile.status !== "approved") {
 
-        await supabaseClient.auth.signOut();
+  if (!session) {
 
-        window.location.href = "index.html";
+    window.location.replace(
+      "index.html"
+    );
 
-        return;
-    }
+    return;
+  }
 
-}
 
-/* -------------------------
-   Option selection UI
-------------------------- */
+  currentUser =
+    session.user;
 
-function setupOptionGroups() {
 
-    document
-    .querySelectorAll(".options")
-    .forEach(group => {
+  const {
+    data: profile,
+    error
+  } =
+    await supabaseClient
+      .from("profiles")
+      .select(
+        "name, role, status"
+      )
+      .eq(
+        "id",
+        currentUser.id
+      )
+      .single();
 
-        group
-        .querySelectorAll(".option")
-        .forEach(option => {
 
-            option.addEventListener("click", function() {
-
-                group
-                .querySelectorAll(".option")
-                .forEach(item => {
-                    item.classList.remove("selected");
-                });
-
-                this.classList.add("selected");
-
-            });
-
-        });
-
-    });
-
-}
-
-/* -------------------------
-   Character selection
-------------------------- */
-
-function setupCharacters() {
-
-    const characters =
-        document.querySelectorAll(".character");
-
-    const customBox =
-        document.getElementById("customBox");
-
-    characters.forEach(character => {
-
-        character.addEventListener("click", function() {
-
-            characters.forEach(item => {
-                item.classList.remove("selected");
-            });
-
-            this.classList.add("selected");
-
-            const input =
-                this.querySelector("input");
-
-            if (input.value === "Other") {
-
-                customBox.classList.add("show");
-
-                setTimeout(() => {
-
-                    document
-                    .getElementById("customCharacter")
-                    .focus();
-
-                }, 100);
-
-            } else {
-
-                customBox.classList.remove("show");
-
-                document
-                .getElementById("customCharacter")
-                .value = "";
-
-            }
-
-        });
-
-    });
-
-}
-
-/* -------------------------
-   Start chat
-------------------------- */
-
-document
-.getElementById("startButton")
-.addEventListener("click", async function() {
-
-    const button = this;
-
-    const message =
-        document.getElementById("message");
-
-    message.textContent = "";
-
-    const language =
-        document.querySelector(
-            'input[name="language"]:checked'
-        )?.value;
-
-    const character =
-        document.querySelector(
-            'input[name="character"]:checked'
-        )?.value;
-
-    const experience =
-        document.querySelector(
-            'input[name="experience"]:checked'
-        )?.value;
-
-    const customCharacter =
-        document
-        .getElementById("customCharacter")
-        .value
-        .trim();
-
-    if (!language) {
-
-        message.textContent =
-            "Please choose a language.";
-
-        return;
-    }
-
-    if (!character) {
-
-        message.textContent =
-            "Please choose a character.";
-
-        return;
-    }
-
-    if (character === "Other" && !customCharacter) {
-
-        message.textContent =
-            "Please enter a character name.";
-
-        document
-        .getElementById("customCharacter")
-        .focus();
-
-        return;
-    }
-
-    if (!experience) {
-
-        message.textContent =
-            "Please choose a chat experience.";
-
-        return;
-    }
-
-    button.disabled = true;
-    button.textContent = "Creating chat...";
-
-    try {
-
-        const { data, error } =
-            await supabaseClient
-            .from("characters")
-            .insert({
-                user_id: currentUser.id,
-                language: language,
-                character_type: character,
-                custom_character:
-                    character === "Other"
-                        ? customCharacter
-                        : null,
-                chat_experience: experience
-            })
-            .select()
-            .single();
-
-        if (error) {
-            throw error;
-        }
-
-        window.location.href =
-            "chat.html?id=" + data.id;
-
-    } catch (error) {
-
-        console.error(error);
-
-        message.textContent =
-            error.message ||
-            "Unable to create chat.";
-
-        button.disabled = false;
-        button.textContent = "Start Chat";
-
-    }
-
-});
-
-/* -------------------------
-   Logout
-------------------------- */
-
-document
-.getElementById("logoutButton")
-.addEventListener("click", async function() {
+  if (
+    error ||
+    !profile ||
+    profile.status !== "approved"
+  ) {
 
     await supabaseClient.auth.signOut();
 
-    window.location.href = "index.html";
+    window.location.replace(
+      "index.html"
+    );
 
-});
+    return;
+  }
+}
 
-/* -------------------------
-   Start
-------------------------- */
 
-setupOptionGroups();
-setupCharacters();
-checkUser();
+/* =========================
+   SELECT OPTIONS
+========================= */
+
+function selectOption(
+  button
+) {
+
+  const group =
+    button.dataset.group;
+
+  const value =
+    button.dataset.value;
+
+
+  document
+    .querySelectorAll(
+      `.option[data-group="${group}"]`
+    )
+    .forEach(
+      item => {
+
+        item.classList.remove(
+          "selected"
+        );
+
+      }
+    );
+
+
+  button.classList.add(
+    "selected"
+  );
+
+
+  if (
+    group ===
+    "language"
+  ) {
+
+    selectedLanguage =
+      value;
+  }
+
+
+  if (
+    group ===
+    "character"
+  ) {
+
+    selectedCharacter =
+      value;
+
+
+    const customBox =
+      document.getElementById(
+        "customNameBox"
+      );
+
+
+    if (
+      value === "Other"
+    ) {
+
+      customBox.style.display =
+        "block";
+
+    } else {
+
+      customBox.style.display =
+        "none";
+
+      document.getElementById(
+        "customCharacter"
+      ).value = "";
+
+    }
+  }
+
+
+  if (
+    group ===
+    "experience"
+  ) {
+
+    selectedExperience =
+      value;
+  }
+}
+
+
+/* =========================
+   AVATAR SELECT
+========================= */
+
+document
+  .getElementById(
+    "avatarInput"
+  )
+  .addEventListener(
+    "change",
+    handleAvatarSelect
+  );
+
+
+function handleAvatarSelect(
+  event
+) {
+
+  const file =
+    event.target.files[0];
+
+
+  if (!file) {
+    return;
+  }
+
+
+  if (
+    !file.type.startsWith(
+      "image/"
+    )
+  ) {
+
+    showError(
+      "Please choose an image file."
+    );
+
+    event.target.value = "";
+
+    return;
+  }
+
+
+  if (
+    file.size >
+    5 * 1024 * 1024
+  ) {
+
+    showError(
+      "Picture must be smaller than 5 MB."
+    );
+
+    event.target.value = "";
+
+    return;
+  }
+
+
+  selectedAvatar =
+    file;
+
+
+  const reader =
+    new FileReader();
+
+
+  reader.onload =
+    function(e) {
+
+      document
+        .getElementById(
+          "avatarPreview"
+        )
+        .innerHTML = `
+          <img
+            src="${e.target.result}"
+            alt="Character picture">
+        `;
+
+
+      document
+        .getElementById(
+          "removeAvatar"
+        )
+        .classList.add(
+          "show"
+        );
+
+    };
+
+
+  reader.readAsDataURL(
+    file
+  );
+}
+
+
+/* =========================
+   REMOVE AVATAR
+========================= */
+
+function removeAvatar() {
+
+  selectedAvatar =
+    null;
+
+
+  document.getElementById(
+    "avatarInput"
+  ).value = "";
+
+
+  document.getElementById(
+    "avatarPreview"
+  ).innerHTML =
+    "👤";
+
+
+  document
+    .getElementById(
+      "removeAvatar"
+    )
+    .classList.remove(
+      "show"
+    );
+}
+
+
+/* =========================
+   CREATE CHARACTER
+========================= */
+
+async function createCharacter() {
+
+  clearMessage();
+
+
+  if (!selectedCharacter) {
+
+    showError(
+      "Please choose a character."
+    );
+
+    return;
+  }
+
+
+  let customCharacter =
+    null;
+
+
+  if (
+    selectedCharacter ===
+    "Other"
+  ) {
+
+    customCharacter =
+      document
+        .getElementById(
+          "customCharacter"
+        )
+        .value
+        .trim();
+
+
+    if (!customCharacter) {
+
+      showError(
+        "Please enter your character name."
+      );
+
+      return;
+    }
+  }
+
+
+  const button =
+    document.getElementById(
+      "createButton"
+    );
+
+
+  button.disabled =
+    true;
+
+
+  button.textContent =
+    "Creating...";
+
+
+  try {
+
+    let avatarPath =
+      null;
+
+
+    /* =========================
+       UPLOAD AVATAR
+    ========================= */
+
+    if (selectedAvatar) {
+
+      const extension =
+        selectedAvatar.name
+          .split(".")
+          .pop()
+          .toLowerCase();
+
+
+      const fileName =
+        `${currentUser.id}/${Date.now()}-${crypto.randomUUID()}.${extension}`;
+
+
+      const {
+        error:
+          uploadError
+      } =
+        await supabaseClient
+          .storage
+          .from(
+            "character-avatars"
+          )
+          .upload(
+            fileName,
+            selectedAvatar,
+            {
+              contentType:
+                selectedAvatar.type,
+
+              upsert:
+                false
+            }
+          );
+
+
+      if (uploadError) {
+
+        throw uploadError;
+      }
+
+
+      avatarPath =
+        fileName;
+    }
+
+
+    /* =========================
+       SAVE CHARACTER
+    ========================= */
+
+    const {
+      data: character,
+      error
+    } =
+      await supabaseClient
+        .from("characters")
+        .insert({
+
+          user_id:
+            currentUser.id,
+
+          language:
+            selectedLanguage,
+
+          character_type:
+            selectedCharacter,
+
+          custom_character:
+            customCharacter,
+
+          chat_experience:
+            selectedExperience,
+
+          avatar_url:
+            avatarPath
+
+        })
+        .select()
+        .single();
+
+
+    if (error) {
+
+      throw error;
+    }
+
+
+    window.location.replace(
+      `chat.html?id=${character.id}`
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      error
+    );
+
+
+    showError(
+      error.message ||
+      "Could not create character."
+    );
+
+
+    button.disabled =
+      false;
+
+    button.textContent =
+      "Create Character";
+  }
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+async function logout() {
+
+  await supabaseClient.auth.signOut();
+
+  window.location.replace(
+    "index.html"
+  );
+}
+
+
+/* =========================
+   MESSAGE
+========================= */
+
+function showError(
+  text
+) {
+
+  const message =
+    document.getElementById(
+      "message"
+    );
+
+
+  message.textContent =
+    text;
+
+
+  message.className =
+    "message error";
+}
+
+
+function clearMessage() {
+
+  const message =
+    document.getElementById(
+      "message"
+    );
+
+
+  message.textContent =
+    "";
+
+
+  message.className =
+    "message";
+}
+
+
+/* =========================
+   START
+========================= */
+
+init();
 
 </script>
 
