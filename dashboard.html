@@ -4,11 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Create Your Character</title>
+  <title>My Characters</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -18,7 +19,7 @@
     body {
       font-family: Inter, Arial, sans-serif;
       min-height: 100vh;
-      padding: 24px;
+      padding: 20px;
 
       background:
         radial-gradient(
@@ -38,283 +39,82 @@
 
     .container {
       width: 100%;
-      max-width: 700px;
+      max-width: 900px;
       margin: 0 auto;
     }
+
+    /* =========================
+       TOPBAR
+    ========================= */
 
     .topbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 24px;
+
+      margin-bottom: 25px;
     }
 
     .brand {
-      font-size: 20px;
+      font-size: 21px;
       font-weight: 800;
     }
 
     .logout {
       border: 1px solid rgba(255,255,255,0.12);
+
       background: rgba(255,255,255,0.07);
+
       color: white;
+
       padding: 10px 15px;
+
       border-radius: 12px;
+
       cursor: pointer;
+
+      transition: 0.2s;
     }
 
-    .card {
-      background: rgba(15, 23, 42, 0.78);
-      border: 1px solid rgba(255,255,255,0.10);
-      border-radius: 26px;
-      padding: 30px;
+    .logout:hover {
+      background: rgba(255,255,255,0.12);
+    }
 
-      backdrop-filter: blur(22px);
+    /* =========================
+       HEADER
+    ========================= */
 
-      box-shadow:
-        0 25px 80px rgba(0,0,0,0.40);
+    .header {
+      margin-bottom: 22px;
     }
 
     .title {
       font-size: 30px;
       font-weight: 800;
-      margin-bottom: 8px;
+
+      margin-bottom: 7px;
     }
 
     .subtitle {
       color: rgba(255,255,255,0.55);
+
       font-size: 14px;
-      margin-bottom: 28px;
+
       line-height: 1.6;
     }
 
-    .section {
-      margin-bottom: 26px;
-    }
-
-    .label {
-      display: block;
-      font-size: 14px;
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
-
-    .options {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-    }
-
-    .option {
-      padding: 13px 14px;
-      border-radius: 13px;
-
-      border: 1px solid rgba(255,255,255,0.10);
-
-      background: rgba(255,255,255,0.05);
-
-      color: white;
-      cursor: pointer;
-
-      font-size: 13px;
-
-      transition: 0.2s;
-    }
-
-    .option:hover {
-      background: rgba(124,58,237,0.15);
-      border-color: rgba(124,58,237,0.45);
-    }
-
-    .option.selected {
-      background: linear-gradient(
-        135deg,
-        rgba(124,58,237,0.40),
-        rgba(37,99,235,0.35)
-      );
-
-      border-color: rgba(139,92,246,0.8);
-
-      box-shadow:
-        0 8px 25px rgba(124,58,237,0.15);
-    }
-
-    input,
-    select {
-      width: 100%;
-
-      padding: 13px 14px;
-
-      border-radius: 13px;
-
-      border: 1px solid rgba(255,255,255,0.10);
-
-      background: rgba(255,255,255,0.06);
-
-      color: white;
-
-      outline: none;
-
-      font-size: 14px;
-    }
-
-    input::placeholder {
-      color: rgba(255,255,255,0.38);
-    }
-
-    input:focus,
-    select:focus {
-      border-color: rgba(124,58,237,0.7);
-
-      box-shadow:
-        0 0 0 3px rgba(124,58,237,0.10);
-    }
-
-    select option {
-      background: #111827;
-      color: white;
-    }
-
-    .custom-name {
-      display: none;
-      margin-top: 12px;
-    }
-
     /* =========================
-       CHARACTER PICTURE
+       CREATE BUTTON
     ========================= */
 
-    .avatar-section {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-
-      padding: 22px;
-
-      border-radius: 20px;
-
-      border: 1px dashed rgba(255,255,255,0.16);
-
-      background: rgba(255,255,255,0.035);
-
-      margin-bottom: 8px;
-    }
-
-    .avatar-preview {
-      width: 120px;
-      height: 120px;
-
-      border-radius: 50%;
-
-      object-fit: cover;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      background:
-        linear-gradient(
-          135deg,
-          #7c3aed,
-          #06b6d4
-        );
-
-      border: 4px solid rgba(255,255,255,0.10);
-
-      box-shadow:
-        0 12px 35px rgba(0,0,0,0.30);
-
-      font-size: 48px;
-
-      margin-bottom: 14px;
-
-      overflow: hidden;
-    }
-
-    .avatar-preview img {
+    .new-character-button {
       width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
 
-    .avatar-title {
-      font-size: 15px;
-      font-weight: 700;
-      margin-bottom: 5px;
-    }
-
-    .avatar-description {
-      font-size: 12px;
-      color: rgba(255,255,255,0.45);
-      margin-bottom: 15px;
-    }
-
-    .upload-button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-
-      padding: 11px 17px;
-
-      border-radius: 12px;
-
-      background: rgba(124,58,237,0.18);
-
-      border: 1px solid rgba(139,92,246,0.45);
-
-      color: #ddd6fe;
-
-      font-size: 13px;
-      font-weight: 700;
-
-      cursor: pointer;
-
-      transition: 0.2s;
-    }
-
-    .upload-button:hover {
-      background: rgba(124,58,237,0.30);
-    }
-
-    #avatarInput {
-      display: none;
-    }
-
-    .remove-avatar {
-      display: none;
-
-      margin-top: 9px;
+      padding: 16px;
 
       border: none;
 
-      background: transparent;
-
-      color: #f87171;
-
-      font-size: 12px;
-
-      cursor: pointer;
-    }
-
-    .remove-avatar.show {
-      display: block;
-    }
-
-    .hint {
-      font-size: 11px;
-      color: rgba(255,255,255,0.38);
-      margin-top: 8px;
-    }
-
-    .create-button {
-      width: 100%;
-
-      padding: 15px;
-
-      border: none;
-
-      border-radius: 15px;
+      border-radius: 16px;
 
       background:
         linear-gradient(
@@ -326,9 +126,12 @@
       color: white;
 
       font-size: 15px;
+
       font-weight: 800;
 
       cursor: pointer;
+
+      margin-bottom: 25px;
 
       box-shadow:
         0 12px 30px rgba(37,99,235,0.25);
@@ -336,18 +139,539 @@
       transition: 0.2s;
     }
 
-    .create-button:hover {
+    .new-character-button:hover {
       transform: translateY(-1px);
+    }
+
+    /* =========================
+       CHARACTER GRID
+    ========================= */
+
+    .characters {
+      display: grid;
+
+      grid-template-columns:
+        repeat(2, 1fr);
+
+      gap: 16px;
+    }
+
+    .character-card {
+      position: relative;
+
+      background:
+        rgba(15,23,42,0.78);
+
+      border:
+        1px solid rgba(255,255,255,0.10);
+
+      border-radius: 22px;
+
+      padding: 20px;
+
+      backdrop-filter: blur(20px);
 
       box-shadow:
-        0 15px 35px rgba(37,99,235,0.32);
+        0 18px 50px rgba(0,0,0,0.25);
+
+      transition: 0.2s;
+    }
+
+    .character-card:hover {
+      transform: translateY(-2px);
+
+      border-color:
+        rgba(139,92,246,0.35);
+    }
+
+    /* =========================
+       DELETE BUTTON
+    ========================= */
+
+    .delete-button {
+      position: absolute;
+
+      top: 12px;
+      right: 12px;
+
+      width: 34px;
+      height: 34px;
+
+      border-radius: 10px;
+
+      border:
+        1px solid rgba(239,68,68,0.20);
+
+      background:
+        rgba(239,68,68,0.08);
+
+      color: #fca5a5;
+
+      cursor: pointer;
+
+      font-size: 15px;
+
+      transition: 0.2s;
+    }
+
+    .delete-button:hover {
+      background:
+        rgba(239,68,68,0.18);
+    }
+
+    /* =========================
+       AVATAR
+    ========================= */
+
+    .character-avatar {
+      width: 82px;
+      height: 82px;
+
+      border-radius: 50%;
+
+      margin-bottom: 14px;
+
+      overflow: hidden;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      font-size: 34px;
+
+      background:
+        linear-gradient(
+          135deg,
+          #7c3aed,
+          #06b6d4
+        );
+
+      border:
+        3px solid rgba(255,255,255,0.10);
+
+      box-shadow:
+        0 10px 30px rgba(0,0,0,0.30);
+    }
+
+    .character-avatar img {
+      width: 100%;
+      height: 100%;
+
+      object-fit: cover;
+    }
+
+    /* =========================
+       INFO
+    ========================= */
+
+    .character-name {
+      font-size: 19px;
+
+      font-weight: 800;
+
+      margin-bottom: 7px;
+
+      padding-right: 35px;
+    }
+
+    .character-meta {
+      display: flex;
+
+      flex-wrap: wrap;
+
+      gap: 7px;
+
+      margin-bottom: 17px;
+    }
+
+    .tag {
+      padding: 5px 9px;
+
+      border-radius: 8px;
+
+      background:
+        rgba(255,255,255,0.06);
+
+      border:
+        1px solid rgba(255,255,255,0.08);
+
+      color:
+        rgba(255,255,255,0.65);
+
+      font-size: 11px;
+    }
+
+    /* =========================
+       CHAT BUTTON
+    ========================= */
+
+    .chat-button {
+      width: 100%;
+
+      padding: 12px;
+
+      border: none;
+
+      border-radius: 12px;
+
+      background:
+        rgba(124,58,237,0.18);
+
+      border:
+        1px solid rgba(139,92,246,0.30);
+
+      color: #ddd6fe;
+
+      font-size: 13px;
+
+      font-weight: 700;
+
+      cursor: pointer;
+
+      transition: 0.2s;
+    }
+
+    .chat-button:hover {
+      background:
+        rgba(124,58,237,0.30);
+    }
+
+    /* =========================
+       EMPTY
+    ========================= */
+
+    .empty {
+      text-align: center;
+
+      padding: 55px 25px;
+
+      background:
+        rgba(15,23,42,0.65);
+
+      border:
+        1px solid rgba(255,255,255,0.08);
+
+      border-radius: 22px;
+    }
+
+    .empty-icon {
+      font-size: 45px;
+
+      margin-bottom: 15px;
+    }
+
+    .empty-title {
+      font-size: 20px;
+
+      font-weight: 800;
+
+      margin-bottom: 8px;
+    }
+
+    .empty-text {
+      color:
+        rgba(255,255,255,0.50);
+
+      font-size: 13px;
+
+      line-height: 1.6;
+
+      margin-bottom: 20px;
+    }
+
+    /* =========================
+       CREATE FORM
+    ========================= */
+
+    .create-panel {
+      display: none;
+
+      background:
+        rgba(15,23,42,0.82);
+
+      border:
+        1px solid rgba(255,255,255,0.10);
+
+      border-radius: 25px;
+
+      padding: 25px;
+
+      margin-bottom: 25px;
+
+      backdrop-filter: blur(20px);
+    }
+
+    .create-panel.show {
+      display: block;
+    }
+
+    .form-title {
+      font-size: 23px;
+
+      font-weight: 800;
+
+      margin-bottom: 7px;
+    }
+
+    .form-subtitle {
+      color:
+        rgba(255,255,255,0.50);
+
+      font-size: 13px;
+
+      line-height: 1.6;
+
+      margin-bottom: 25px;
+    }
+
+    .section {
+      margin-bottom: 23px;
+    }
+
+    .label {
+      display: block;
+
+      font-size: 13px;
+
+      font-weight: 700;
+
+      margin-bottom: 9px;
+    }
+
+    .options {
+      display: grid;
+
+      grid-template-columns:
+        repeat(2, 1fr);
+
+      gap: 9px;
+    }
+
+    .option {
+      padding: 12px;
+
+      border-radius: 12px;
+
+      border:
+        1px solid rgba(255,255,255,0.10);
+
+      background:
+        rgba(255,255,255,0.05);
+
+      color: white;
+
+      cursor: pointer;
+
+      font-size: 13px;
+
+      transition: 0.2s;
+    }
+
+    .option.selected {
+      background:
+        linear-gradient(
+          135deg,
+          rgba(124,58,237,0.40),
+          rgba(37,99,235,0.35)
+        );
+
+      border-color:
+        rgba(139,92,246,0.75);
+    }
+
+    input {
+      width: 100%;
+
+      padding: 13px;
+
+      border-radius: 12px;
+
+      border:
+        1px solid rgba(255,255,255,0.10);
+
+      background:
+        rgba(255,255,255,0.06);
+
+      color: white;
+
+      outline: none;
+
+      font-size: 14px;
+    }
+
+    input::placeholder {
+      color:
+        rgba(255,255,255,0.35);
+    }
+
+    .custom-name {
+      display: none;
+
+      margin-top: 10px;
+    }
+
+    /* =========================
+       AVATAR
+    ========================= */
+
+    .avatar-section {
+      display: flex;
+
+      flex-direction: column;
+
+      align-items: center;
+
+      text-align: center;
+
+      padding: 20px;
+
+      border:
+        1px dashed rgba(255,255,255,0.14);
+
+      border-radius: 18px;
+
+      background:
+        rgba(255,255,255,0.025);
+    }
+
+    .avatar-preview {
+      width: 105px;
+      height: 105px;
+
+      border-radius: 50%;
+
+      overflow: hidden;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      font-size: 42px;
+
+      background:
+        linear-gradient(
+          135deg,
+          #7c3aed,
+          #06b6d4
+        );
+
+      margin-bottom: 12px;
+    }
+
+    .avatar-preview img {
+      width: 100%;
+      height: 100%;
+
+      object-fit: cover;
+    }
+
+    .upload-button {
+      padding: 10px 15px;
+
+      border-radius: 11px;
+
+      background:
+        rgba(124,58,237,0.18);
+
+      border:
+        1px solid rgba(139,92,246,0.40);
+
+      color: #ddd6fe;
+
+      font-size: 12px;
+
+      font-weight: 700;
+
+      cursor: pointer;
+
+      margin-top: 12px;
+    }
+
+    #avatarInput {
+      display: none;
+    }
+
+    .remove-avatar {
+      display: none;
+
+      margin-top: 8px;
+
+      border: none;
+
+      background: none;
+
+      color: #f87171;
+
+      cursor: pointer;
+
+      font-size: 12px;
+    }
+
+    .remove-avatar.show {
+      display: block;
+    }
+
+    /* =========================
+       FORM BUTTONS
+    ========================= */
+
+    .form-buttons {
+      display: flex;
+
+      gap: 10px;
+    }
+
+    .cancel-button,
+    .create-button {
+      flex: 1;
+
+      padding: 14px;
+
+      border-radius: 13px;
+
+      font-size: 13px;
+
+      font-weight: 800;
+
+      cursor: pointer;
+    }
+
+    .cancel-button {
+      background:
+        rgba(255,255,255,0.06);
+
+      color: white;
+
+      border:
+        1px solid rgba(255,255,255,0.10);
+    }
+
+    .create-button {
+      border: none;
+
+      color: white;
+
+      background:
+        linear-gradient(
+          135deg,
+          #7c3aed,
+          #2563eb
+        );
     }
 
     .create-button:disabled {
       opacity: 0.5;
+
       cursor: not-allowed;
-      transform: none;
     }
+
+    /* =========================
+       MESSAGE
+    ========================= */
 
     .message {
       display: none;
@@ -356,7 +680,7 @@
 
       padding: 12px;
 
-      border-radius: 12px;
+      border-radius: 11px;
 
       text-align: center;
 
@@ -366,43 +690,184 @@
     .message.error {
       display: block;
 
-      background: rgba(239,68,68,0.10);
+      background:
+        rgba(239,68,68,0.10);
 
-      border: 1px solid rgba(239,68,68,0.20);
+      border:
+        1px solid rgba(239,68,68,0.20);
 
       color: #fca5a5;
     }
 
-    @media (max-width: 600px) {
+    .message.success {
+      display: block;
+
+      background:
+        rgba(34,197,94,0.10);
+
+      border:
+        1px solid rgba(34,197,94,0.20);
+
+      color: #86efac;
+    }
+
+    /* =========================
+       LOADING
+    ========================= */
+
+    .loading {
+      text-align: center;
+
+      padding: 50px;
+
+      color:
+        rgba(255,255,255,0.50);
+
+      font-size: 14px;
+    }
+
+    /* =========================
+       DELETE MODAL
+    ========================= */
+
+    .modal {
+      display: none;
+
+      position: fixed;
+
+      inset: 0;
+
+      background:
+        rgba(0,0,0,0.65);
+
+      backdrop-filter: blur(7px);
+
+      align-items: center;
+
+      justify-content: center;
+
+      padding: 20px;
+
+      z-index: 1000;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-box {
+      width: 100%;
+
+      max-width: 400px;
+
+      background:
+        #111827;
+
+      border:
+        1px solid rgba(255,255,255,0.10);
+
+      border-radius: 20px;
+
+      padding: 25px;
+
+      box-shadow:
+        0 25px 80px rgba(0,0,0,0.50);
+    }
+
+    .modal-title {
+      font-size: 20px;
+
+      font-weight: 800;
+
+      margin-bottom: 9px;
+    }
+
+    .modal-text {
+      color:
+        rgba(255,255,255,0.55);
+
+      font-size: 13px;
+
+      line-height: 1.6;
+
+      margin-bottom: 20px;
+    }
+
+    .modal-buttons {
+      display: flex;
+
+      gap: 10px;
+    }
+
+    .modal-cancel,
+    .modal-delete {
+      flex: 1;
+
+      padding: 12px;
+
+      border-radius: 11px;
+
+      cursor: pointer;
+
+      font-weight: 700;
+    }
+
+    .modal-cancel {
+      background:
+        rgba(255,255,255,0.06);
+
+      border:
+        1px solid rgba(255,255,255,0.10);
+
+      color: white;
+    }
+
+    .modal-delete {
+      background:
+        rgba(239,68,68,0.15);
+
+      border:
+        1px solid rgba(239,68,68,0.30);
+
+      color: #fca5a5;
+    }
+
+    /* =========================
+       MOBILE
+    ========================= */
+
+    @media (max-width: 650px) {
 
       body {
-        padding: 15px;
+        padding: 14px;
       }
 
-      .card {
-        padding: 22px 18px;
-        border-radius: 21px;
-      }
-
-      .title {
-        font-size: 25px;
+      .characters {
+        grid-template-columns: 1fr;
       }
 
       .options {
         grid-template-columns: 1fr;
       }
 
-      .avatar-preview {
-        width: 105px;
-        height: 105px;
+      .title {
+        font-size: 25px;
       }
+
+      .card {
+        padding: 18px;
+      }
+
     }
+
   </style>
 </head>
 
 <body>
 
 <div class="container">
+
+  <!-- TOPBAR -->
 
   <div class="topbar">
 
@@ -413,20 +878,53 @@
     <button
       class="logout"
       onclick="logout()">
+
       Logout
+
     </button>
 
   </div>
 
 
-  <div class="card">
+  <!-- HEADER -->
+
+  <div class="header">
 
     <div class="title">
-      Create Your Character
+      My Characters
     </div>
 
     <div class="subtitle">
-      Customize your character and choose how you want your chat experience to feel.
+      Continue your previous conversations or create a new character.
+      Your conversations stay saved even after logout.
+    </div>
+
+  </div>
+
+
+  <!-- NEW CHARACTER -->
+
+  <button
+    class="new-character-button"
+    onclick="showCreatePanel()">
+
+    ＋ Create New Character
+
+  </button>
+
+
+  <!-- CREATE PANEL -->
+
+  <div
+    class="create-panel"
+    id="createPanel">
+
+    <div class="form-title">
+      Create New Character
+    </div>
+
+    <div class="form-subtitle">
+      Create another character without affecting your existing characters or conversations.
     </div>
 
 
@@ -445,7 +943,9 @@
           data-group="language"
           data-value="English"
           onclick="selectOption(this)">
+
           🇬🇧 English
+
         </button>
 
         <button
@@ -453,7 +953,9 @@
           data-group="language"
           data-value="Bangla"
           onclick="selectOption(this)">
+
           🇧🇩 বাংলা
+
         </button>
 
       </div>
@@ -476,7 +978,9 @@
           data-group="character"
           data-value="Father"
           onclick="selectOption(this)">
+
           👨 Father
+
         </button>
 
         <button
@@ -484,7 +988,9 @@
           data-group="character"
           data-value="Mother"
           onclick="selectOption(this)">
+
           👩 Mother
+
         </button>
 
         <button
@@ -492,7 +998,9 @@
           data-group="character"
           data-value="Boyfriend"
           onclick="selectOption(this)">
+
           🧑 Boyfriend
+
         </button>
 
         <button
@@ -500,7 +1008,9 @@
           data-group="character"
           data-value="Girlfriend"
           onclick="selectOption(this)">
+
           👩 Girlfriend
+
         </button>
 
         <button
@@ -508,7 +1018,9 @@
           data-group="character"
           data-value="Male Teacher"
           onclick="selectOption(this)">
+
           👨‍🏫 Male Teacher
+
         </button>
 
         <button
@@ -516,7 +1028,9 @@
           data-group="character"
           data-value="Female Teacher"
           onclick="selectOption(this)">
+
           👩‍🏫 Female Teacher
+
         </button>
 
         <button
@@ -524,7 +1038,9 @@
           data-group="character"
           data-value="Other"
           onclick="selectOption(this)">
+
           ✨ Other
+
         </button>
 
       </div>
@@ -544,7 +1060,7 @@
     </div>
 
 
-    <!-- CHARACTER PICTURE -->
+    <!-- AVATAR -->
 
     <div class="section">
 
@@ -557,21 +1073,24 @@
         <div
           class="avatar-preview"
           id="avatarPreview">
+
           👤
+
         </div>
 
-        <div class="avatar-title">
-          Set your character picture
-        </div>
-
-        <div class="avatar-description">
-          Choose a picture for your character's avatar.
+        <div style="
+          font-size:14px;
+          font-weight:700;
+        ">
+          Set character picture
         </div>
 
         <label
           class="upload-button"
           for="avatarInput">
+
           🖼️ Choose Picture
+
         </label>
 
         <input
@@ -584,12 +1103,10 @@
           class="remove-avatar"
           id="removeAvatar"
           onclick="removeAvatar()">
-          Remove picture
-        </button>
 
-        <div class="hint">
-          JPG, PNG or WEBP • Maximum 5 MB
-        </div>
+          Remove picture
+
+        </button>
 
       </div>
 
@@ -611,7 +1128,9 @@
           data-group="experience"
           data-value="Romantic"
           onclick="selectOption(this)">
+
           💜 Romantic
+
         </button>
 
         <button
@@ -619,7 +1138,9 @@
           data-group="experience"
           data-value="Normal"
           onclick="selectOption(this)">
+
           💬 Normal
+
         </button>
 
         <button
@@ -627,7 +1148,9 @@
           data-group="experience"
           data-value="Calm"
           onclick="selectOption(this)">
+
           🌿 Calm
+
         </button>
 
       </div>
@@ -635,14 +1158,26 @@
     </div>
 
 
-    <button
-      class="create-button"
-      id="createButton"
-      onclick="createCharacter()">
+    <div class="form-buttons">
 
-      Create Character
+      <button
+        class="cancel-button"
+        onclick="hideCreatePanel()">
 
-    </button>
+        Cancel
+
+      </button>
+
+      <button
+        class="create-button"
+        id="createButton"
+        onclick="createCharacter()">
+
+        Create Character
+
+      </button>
+
+    </div>
 
 
     <div
@@ -652,10 +1187,75 @@
 
   </div>
 
+
+  <!-- CHARACTERS -->
+
+  <div
+    id="charactersContainer">
+
+    <div class="loading">
+      Loading your characters...
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- DELETE MODAL -->
+
+<div
+  class="modal"
+  id="deleteModal">
+
+  <div class="modal-box">
+
+    <div class="modal-title">
+      Delete Character?
+    </div>
+
+    <div class="modal-text">
+
+      This will permanently delete this character,
+      its conversation and its messages.
+
+      <br><br>
+
+      This action cannot be undone.
+
+    </div>
+
+    <div class="modal-buttons">
+
+      <button
+        class="modal-cancel"
+        onclick="closeDeleteModal()">
+
+        Cancel
+
+      </button>
+
+      <button
+        class="modal-delete"
+        id="confirmDeleteButton"
+        onclick="confirmDeleteCharacter()">
+
+        Delete
+
+      </button>
+
+    </div>
+
+  </div>
+
 </div>
 
 
 <script>
+
+/* =========================
+   SUPABASE
+========================= */
 
 const SUPABASE_URL =
   "https://bnagfjhghlncqqnenejn.supabase.co";
@@ -669,6 +1269,10 @@ const supabaseClient =
     SUPABASE_KEY
   );
 
+
+/* =========================
+   VARIABLES
+========================= */
 
 let currentUser = null;
 
@@ -684,15 +1288,20 @@ let selectedExperience =
 let selectedAvatar =
   null;
 
+let characterToDelete =
+  null;
+
 
 /* =========================
-   AUTH
+   INIT
 ========================= */
 
 async function init() {
 
   const {
-    data: { session }
+    data: {
+      session
+    }
   } =
     await supabaseClient.auth.getSession();
 
@@ -741,6 +1350,332 @@ async function init() {
 
     return;
   }
+
+
+  await loadCharacters();
+
+}
+
+
+/* =========================
+   LOAD CHARACTERS
+========================= */
+
+async function loadCharacters() {
+
+  const container =
+    document.getElementById(
+      "charactersContainer"
+    );
+
+
+  container.innerHTML = `
+    <div class="loading">
+      Loading your characters...
+    </div>
+  `;
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("characters")
+      .select("*")
+      .eq(
+        "user_id",
+        currentUser.id
+      )
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Character loading error:",
+      error
+    );
+
+
+    container.innerHTML = `
+      <div class="empty">
+
+        <div class="empty-icon">
+          ⚠️
+        </div>
+
+        <div class="empty-title">
+          Could not load characters
+        </div>
+
+        <div class="empty-text">
+          ${escapeHtml(error.message)}
+        </div>
+
+      </div>
+    `;
+
+    return;
+  }
+
+
+  if (!data || data.length === 0) {
+
+    container.innerHTML = `
+      <div class="empty">
+
+        <div class="empty-icon">
+          👤
+        </div>
+
+        <div class="empty-title">
+          No characters yet
+        </div>
+
+        <div class="empty-text">
+          Create your first character and start a conversation.
+        </div>
+
+        <button
+          class="new-character-button"
+          style="margin-bottom:0"
+          onclick="showCreatePanel()">
+
+          ＋ Create Your First Character
+
+        </button>
+
+      </div>
+    `;
+
+    return;
+  }
+
+
+  container.innerHTML = `
+
+    <div class="characters">
+
+      ${data.map(
+        character =>
+          characterCard(
+            character
+          )
+      ).join("")}
+
+    </div>
+
+  `;
+
+}
+
+
+/* =========================
+   CHARACTER CARD
+========================= */
+
+function characterCard(
+  character
+) {
+
+  const name =
+    character.custom_character ||
+    character.character_type ||
+    "Character";
+
+
+  let avatar =
+    "👤";
+
+
+  if (
+    character.avatar_url
+  ) {
+
+    const {
+      data
+    } =
+      supabaseClient
+        .storage
+        .from(
+          "character-avatars"
+        )
+        .getPublicUrl(
+          character.avatar_url
+        );
+
+
+    if (data && data.publicUrl) {
+
+      avatar = `
+        <img
+          src="${data.publicUrl}"
+          alt="Character">
+      `;
+
+    }
+
+  }
+
+
+  const language =
+    character.language ||
+    "English";
+
+
+  const experience =
+    character.chat_experience ||
+    "Normal";
+
+
+  return `
+
+    <div class="character-card">
+
+      <button
+        class="delete-button"
+        title="Delete character"
+        onclick="openDeleteModal(
+          '${character.id}'
+        )">
+
+        🗑
+
+      </button>
+
+
+      <div class="character-avatar">
+
+        ${avatar}
+
+      </div>
+
+
+      <div class="character-name">
+
+        ${escapeHtml(name)}
+
+      </div>
+
+
+      <div class="character-meta">
+
+        <span class="tag">
+          🌐 ${escapeHtml(language)}
+        </span>
+
+        <span class="tag">
+          ${experienceEmoji(experience)}
+          ${escapeHtml(experience)}
+        </span>
+
+      </div>
+
+
+      <button
+        class="chat-button"
+        onclick="openChat('${character.id}')">
+
+        💬 Continue Chat
+
+      </button>
+
+    </div>
+
+  `;
+
+}
+
+
+/* =========================
+   EXPERIENCE EMOJI
+========================= */
+
+function experienceEmoji(
+  experience
+) {
+
+  if (
+    experience ===
+    "Romantic"
+  ) {
+
+    return "💜";
+
+  }
+
+  if (
+    experience ===
+    "Calm"
+  ) {
+
+    return "🌿";
+
+  }
+
+  return "💬";
+
+}
+
+
+/* =========================
+   OPEN CHAT
+========================= */
+
+function openChat(
+  characterId
+) {
+
+  window.location.href =
+    `chat.html?id=${encodeURIComponent(
+      characterId
+    )}`;
+
+}
+
+
+/* =========================
+   CREATE PANEL
+========================= */
+
+function showCreatePanel() {
+
+  document
+    .getElementById(
+      "createPanel"
+    )
+    .classList.add(
+      "show"
+    );
+
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+
+}
+
+
+function hideCreatePanel() {
+
+  document
+    .getElementById(
+      "createPanel"
+    )
+    .classList.remove(
+      "show"
+    );
+
+
+  resetForm();
+
 }
 
 
@@ -786,6 +1721,7 @@ function selectOption(
 
     selectedLanguage =
       value;
+
   }
 
 
@@ -821,6 +1757,7 @@ function selectOption(
       ).value = "";
 
     }
+
   }
 
 
@@ -831,7 +1768,9 @@ function selectOption(
 
     selectedExperience =
       value;
+
   }
+
 }
 
 
@@ -875,6 +1814,7 @@ function handleAvatarSelect(
     event.target.value = "";
 
     return;
+
   }
 
 
@@ -890,6 +1830,7 @@ function handleAvatarSelect(
     event.target.value = "";
 
     return;
+
   }
 
 
@@ -911,7 +1852,7 @@ function handleAvatarSelect(
         .innerHTML = `
           <img
             src="${e.target.result}"
-            alt="Character picture">
+            alt="Character">
         `;
 
 
@@ -929,6 +1870,7 @@ function handleAvatarSelect(
   reader.readAsDataURL(
     file
   );
+
 }
 
 
@@ -960,6 +1902,7 @@ function removeAvatar() {
     .classList.remove(
       "show"
     );
+
 }
 
 
@@ -979,6 +1922,7 @@ async function createCharacter() {
     );
 
     return;
+
   }
 
 
@@ -1007,7 +1951,9 @@ async function createCharacter() {
       );
 
       return;
+
     }
+
   }
 
 
@@ -1035,7 +1981,9 @@ async function createCharacter() {
        UPLOAD AVATAR
     ========================= */
 
-    if (selectedAvatar) {
+    if (
+      selectedAvatar
+    ) {
 
       const extension =
         selectedAvatar.name
@@ -1073,16 +2021,18 @@ async function createCharacter() {
       if (uploadError) {
 
         throw uploadError;
+
       }
 
 
       avatarPath =
         fileName;
+
     }
 
 
     /* =========================
-       SAVE CHARACTER
+       INSERT CHARACTER
     ========================= */
 
     const {
@@ -1119,12 +2069,29 @@ async function createCharacter() {
     if (error) {
 
       throw error;
+
     }
 
 
-    window.location.replace(
-      `chat.html?id=${character.id}`
-    );
+    /*
+
+      IMPORTANT:
+
+      We do NOT create a conversation here.
+
+      The chat page creates the conversation
+      only when needed.
+
+      Therefore each character gets its
+      own conversation.
+
+    */
+
+
+    window.location.href =
+      `chat.html?id=${encodeURIComponent(
+        character.id
+      )}`;
 
 
   } catch (error) {
@@ -1143,9 +2110,313 @@ async function createCharacter() {
     button.disabled =
       false;
 
+
     button.textContent =
       "Create Character";
+
   }
+
+}
+
+
+/* =========================
+   DELETE MODAL
+========================= */
+
+function openDeleteModal(
+  characterId
+) {
+
+  characterToDelete =
+    characterId;
+
+
+  document
+    .getElementById(
+      "deleteModal"
+    )
+    .classList.add(
+      "show"
+    );
+
+}
+
+
+function closeDeleteModal() {
+
+  characterToDelete =
+    null;
+
+
+  document
+    .getElementById(
+      "deleteModal"
+    )
+    .classList.remove(
+      "show"
+    );
+
+}
+
+
+/* =========================
+   DELETE CHARACTER
+========================= */
+
+async function confirmDeleteCharacter() {
+
+  if (
+    !characterToDelete
+  ) {
+
+    return;
+
+  }
+
+
+  const characterId =
+    characterToDelete;
+
+
+  const button =
+    document.getElementById(
+      "confirmDeleteButton"
+    );
+
+
+  button.disabled =
+    true;
+
+
+  button.textContent =
+    "Deleting...";
+
+
+  try {
+
+    /* =========================
+       GET CHARACTER
+    ========================= */
+
+    const {
+      data: character,
+      error:
+        characterError
+    } =
+      await supabaseClient
+        .from("characters")
+        .select("*")
+        .eq(
+          "id",
+          characterId
+        )
+        .eq(
+          "user_id",
+          currentUser.id
+        )
+        .single();
+
+
+    if (
+      characterError
+    ) {
+
+      throw characterError;
+
+    }
+
+
+    /* =========================
+       FIND CONVERSATIONS
+    ========================= */
+
+    const {
+      data: conversations,
+      error:
+        conversationError
+    } =
+      await supabaseClient
+        .from("conversations")
+        .select("id")
+        .eq(
+          "character_id",
+          characterId
+        )
+        .eq(
+          "user_id",
+          currentUser.id
+        );
+
+
+    if (
+      conversationError
+    ) {
+
+      throw conversationError;
+
+    }
+
+
+    /* =========================
+       DELETE MESSAGES
+    ========================= */
+
+    if (
+      conversations &&
+      conversations.length > 0
+    ) {
+
+      const conversationIds =
+        conversations.map(
+          item => item.id
+        );
+
+
+      const {
+        error:
+          messageError
+      } =
+        await supabaseClient
+          .from("messages")
+          .delete()
+          .in(
+            "conversation_id",
+            conversationIds
+          );
+
+
+      if (
+        messageError
+      ) {
+
+        throw messageError;
+
+      }
+
+
+      /* =========================
+         DELETE CONVERSATIONS
+      ========================= */
+
+      const {
+        error:
+          deleteConversationError
+      } =
+        await supabaseClient
+          .from("conversations")
+          .delete()
+          .in(
+            "id",
+            conversationIds
+          );
+
+
+      if (
+        deleteConversationError
+      ) {
+
+        throw deleteConversationError;
+
+      }
+
+    }
+
+
+    /* =========================
+       DELETE CHARACTER
+    ========================= */
+
+    const {
+      error:
+        deleteCharacterError
+    } =
+      await supabaseClient
+        .from("characters")
+        .delete()
+        .eq(
+          "id",
+          characterId
+        )
+        .eq(
+          "user_id",
+          currentUser.id
+        );
+
+
+    if (
+      deleteCharacterError
+    ) {
+
+      throw deleteCharacterError;
+
+    }
+
+
+    /* =========================
+       DELETE AVATAR
+    ========================= */
+
+    if (
+      character.avatar_url
+    ) {
+
+      const {
+        error:
+          storageError
+      } =
+        await supabaseClient
+          .storage
+          .from(
+            "character-avatars"
+          )
+          .remove([
+            character.avatar_url
+          ]);
+
+
+      if (
+        storageError
+      ) {
+
+        console.warn(
+          "Avatar delete warning:",
+          storageError
+        );
+
+      }
+
+    }
+
+
+    closeDeleteModal();
+
+
+    await loadCharacters();
+
+
+  } catch (error) {
+
+    console.error(
+      "Delete error:",
+      error
+    );
+
+
+    alert(
+      "Could not delete character:\n\n" +
+      error.message
+    );
+
+  }
+
+
+  button.disabled =
+    false;
+
+
+  button.textContent =
+    "Delete";
+
 }
 
 
@@ -1155,11 +2426,127 @@ async function createCharacter() {
 
 async function logout() {
 
+  /*
+     IMPORTANT:
+
+     Logout ONLY ends the session.
+
+     It does NOT delete:
+     - characters
+     - conversations
+     - messages
+     - avatars
+  */
+
   await supabaseClient.auth.signOut();
+
 
   window.location.replace(
     "index.html"
   );
+
+}
+
+
+/* =========================
+   RESET FORM
+========================= */
+
+function resetForm() {
+
+  selectedLanguage =
+    "English";
+
+  selectedCharacter =
+    null;
+
+  selectedExperience =
+    "Normal";
+
+  selectedAvatar =
+    null;
+
+
+  document
+    .querySelectorAll(
+      ".option"
+    )
+    .forEach(
+      item => {
+
+        item.classList.remove(
+          "selected"
+        );
+
+      }
+    );
+
+
+  const english =
+    document.querySelector(
+      '.option[data-group="language"][data-value="English"]'
+    );
+
+
+  if (english) {
+
+    english.classList.add(
+      "selected"
+    );
+
+  }
+
+
+  const normal =
+    document.querySelector(
+      '.option[data-group="experience"][data-value="Normal"]'
+    );
+
+
+  if (normal) {
+
+    normal.classList.add(
+      "selected"
+    );
+
+  }
+
+
+  document.getElementById(
+    "customNameBox"
+  ).style.display =
+    "none";
+
+
+  document.getElementById(
+    "customCharacter"
+  ).value =
+    "";
+
+
+  document.getElementById(
+    "avatarInput"
+  ).value =
+    "";
+
+
+  document.getElementById(
+    "avatarPreview"
+  ).innerHTML =
+    "👤";
+
+
+  document
+    .getElementById(
+      "removeAvatar"
+    )
+    .classList.remove(
+      "show"
+    );
+
+
+  clearMessage();
+
 }
 
 
@@ -1183,6 +2570,7 @@ function showError(
 
   message.className =
     "message error";
+
 }
 
 
@@ -1200,6 +2588,50 @@ function clearMessage() {
 
   message.className =
     "message";
+
+}
+
+
+/* =========================
+   ESCAPE HTML
+========================= */
+
+function escapeHtml(
+  text
+) {
+
+  if (
+    text === null ||
+    text === undefined
+  ) {
+
+    return "";
+
+  }
+
+
+  return String(text)
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
 }
 
 
