@@ -682,6 +682,57 @@
 
     }
 
+
+    /* =========================
+       SLEEP MODE
+    ========================= */
+
+    .sleep-notice {
+      margin: 10px 14px 0;
+      padding: 11px 14px;
+
+      display: none;
+      align-items: center;
+      gap: 10px;
+
+      border-radius: 12px;
+
+      background: rgba(245,158,11,0.10);
+
+      border: 1px solid rgba(245,158,11,0.22);
+
+      color: #fbbf24;
+
+      font-size: 12px;
+    }
+
+    .sleep-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .sleep-notice strong {
+      display: block;
+      font-size: 12px;
+      margin-bottom: 2px;
+    }
+
+    .sleep-notice-text {
+      color: rgba(255,255,255,0.55);
+      font-size: 11px;
+    }
+
+    .sleep-notice.show {
+      display: flex;
+    }
+
+    @media(max-width:600px) {
+      .sleep-notice {
+        margin: 8px 10px 0;
+        padding: 9px 11px;
+      }
+    }
+
   </style>
 </head>
 
@@ -713,14 +764,40 @@
         Chat
       </div>
 
-      <div class="status">
+      <div
+        class="status"
+        id="characterStatus">
 
-        <span class="status-dot"></span>
+        <span
+          class="status-dot"
+          id="statusDot"></span>
 
-        Available
+        <span id="statusText">
+          Available
+        </span>
 
       </div>
 
+    </div>
+
+  </div>
+
+
+  <!-- SLEEP MODE NOTICE -->
+
+  <div
+    id="sleepNotice"
+    class="sleep-notice">
+
+    <span class="sleep-icon">
+      💤
+    </span>
+
+    <div>
+      <strong>AI is sleeping</strong>
+      <div class="sleep-notice-text">
+        Will be back soon.
+      </div>
     </div>
 
   </div>
@@ -839,6 +916,8 @@ let character = null;
 
 let realtimeChannel = null;
 
+let characterRealtimeChannel = null;
+
 let selectedImage = null;
 
 
@@ -940,6 +1019,8 @@ async function loadCharacter() {
   character =
     data;
 
+  updateSleepModeUI();
+
 
   const displayName =
     character.custom_character ||
@@ -958,6 +1039,179 @@ async function loadCharacter() {
   await loadCharacterAvatar();
 
   await loadConversation();
+
+  startCharacterRealtime();
+
+}
+
+
+
+/* =========================
+   SLEEP MODE UI
+========================= */
+
+function updateSleepModeUI() {
+
+  const notice =
+    document.getElementById(
+      "sleepNotice"
+    );
+
+  const statusText =
+    document.getElementById(
+      "statusText"
+    );
+
+  const statusDot =
+    document.getElementById(
+      "statusDot"
+    );
+
+  const sleeping =
+    character &&
+    character.sleep_mode === true;
+
+
+  if (notice) {
+
+    if (sleeping) {
+
+      notice.classList.add(
+        "show"
+      );
+
+    } else {
+
+      notice.classList.remove(
+        "show"
+      );
+
+    }
+
+  }
+
+
+  if (statusText) {
+
+    statusText.textContent =
+      sleeping
+        ? "Sleeping"
+        : "Available";
+
+  }
+
+
+  if (statusDot) {
+
+    statusDot.style.background =
+      sleeping
+        ? "#f59e0b"
+        : "#4ade80";
+
+    statusDot.style.boxShadow =
+      sleeping
+        ? "0 0 10px #f59e0b"
+        : "0 0 10px #4ade80";
+
+  }
+
+}
+
+
+/* =========================
+   CHARACTER SLEEP REALTIME
+========================= */
+
+function startCharacterRealtime() {
+
+  stopCharacterRealtime();
+
+
+  if (
+    !character ||
+    !character.id
+  ) {
+
+    return;
+
+  }
+
+
+  characterRealtimeChannel =
+    supabaseClient
+      .channel(
+        "character-sleep-" +
+        character.id +
+        "-" +
+        Date.now()
+      )
+      .on(
+        "postgres_changes",
+        {
+          event:
+            "UPDATE",
+
+          schema:
+            "public",
+
+          table:
+            "characters",
+
+          filter:
+            `id=eq.${character.id}`
+        },
+        payload => {
+
+          console.log(
+            "CHARACTER UPDATE:",
+            payload.new
+          );
+
+
+          if (
+            payload.new &&
+            payload.new.id ===
+              character.id
+          ) {
+
+            character.sleep_mode =
+              payload.new.sleep_mode === true;
+
+            updateSleepModeUI();
+
+          }
+
+        }
+      )
+      .subscribe(
+        status => {
+
+          console.log(
+            "Character realtime:",
+            status
+          );
+
+        }
+      );
+
+}
+
+
+function stopCharacterRealtime() {
+
+  if (
+    characterRealtimeChannel
+  ) {
+
+    supabaseClient
+      .removeChannel(
+        characterRealtimeChannel
+      );
+
+    characterRealtimeChannel =
+      null;
+
+  }
 
 }
 
@@ -2304,6 +2558,8 @@ window.addEventListener(
         );
 
     }
+
+    stopCharacterRealtime();
 
   }
 );
