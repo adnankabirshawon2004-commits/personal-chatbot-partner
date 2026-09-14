@@ -334,24 +334,45 @@ button,textarea{
   text-overflow:ellipsis;
 }
 
+/* MESSAGE ACTIONS */
+
 .message-actions{
   display:flex;
   justify-content:flex-end;
+  align-items:center;
+  gap:5px;
   margin-top:5px;
 }
 
-.reply-button{
+.reply-button,
+.delete-button{
   border:none;
-  background:rgba(255,255,255,.12);
-  color:rgba(255,255,255,.85);
+  color:rgba(255,255,255,.9);
   font-size:10px;
   padding:4px 8px;
   border-radius:6px;
   cursor:pointer;
 }
 
+.reply-button{
+  background:rgba(255,255,255,.12);
+}
+
 .reply-button:hover{
   background:rgba(255,255,255,.2);
+}
+
+.delete-button{
+  background:rgba(239,68,68,.18);
+}
+
+.delete-button:hover{
+  background:rgba(239,68,68,.35);
+}
+
+.delete-button:disabled{
+  opacity:.5;
+  cursor:not-allowed;
 }
 
 .message-time{
@@ -591,6 +612,12 @@ textarea::placeholder{
 
   textarea{
     min-height:38px;
+  }
+
+  .delete-button,
+  .reply-button{
+    font-size:9px;
+    padding:4px 6px;
   }
 
 }
@@ -1615,10 +1642,29 @@ async function addMessage(
   allMessages = []
 ){
 
+  if(!message || !message.id){
+
+    return;
+
+  }
+
   const messages =
     document.getElementById(
       "messages"
     );
+
+  /* PREVENT DUPLICATE */
+
+  const existing =
+    messages.querySelector(
+      `[data-message-id="${message.id}"]`
+    );
+
+  if(existing){
+
+    return;
+
+  }
 
   const empty =
     messages.querySelector(
@@ -1833,13 +1879,16 @@ async function addMessage(
   }
 
 
-  /* REPLY BUTTON */
+  /* MESSAGE ACTIONS */
 
   const actions =
     document.createElement("div");
 
   actions.className =
     "message-actions";
+
+
+  /* REPLY BUTTON */
 
   const replyButton =
     document.createElement("button");
@@ -1865,6 +1914,36 @@ async function addMessage(
   actions.appendChild(
     replyButton
   );
+
+
+  /* DELETE BUTTON */
+
+  const deleteButton =
+    document.createElement("button");
+
+  deleteButton.className =
+    "delete-button";
+
+  deleteButton.type =
+    "button";
+
+  deleteButton.textContent =
+    "🗑 Delete";
+
+  deleteButton.onclick =
+    () => {
+
+      deleteMessage(
+        message.id,
+        deleteButton
+      );
+
+    };
+
+  actions.appendChild(
+    deleteButton
+  );
+
 
   bubble.appendChild(
     actions
@@ -1897,9 +1976,7 @@ async function addMessage(
   );
 
 
-  /* =========================
-     AUTO SCROLL NEW MESSAGE
-  ========================= */
+  /* AUTO SCROLL */
 
   setTimeout(() => {
 
@@ -1916,6 +1993,154 @@ async function addMessage(
     }
 
   },50);
+
+}
+
+
+/* =========================
+   DELETE MESSAGE
+========================= */
+
+async function deleteMessage(
+  messageId,
+  button
+){
+
+  if(!messageId){
+
+    return;
+
+  }
+
+  const confirmed =
+    confirm(
+      "Delete this message for everyone?"
+    );
+
+  if(!confirmed){
+
+    return;
+
+  }
+
+  if(button){
+
+    button.disabled =
+      true;
+
+    button.textContent =
+      "Deleting...";
+
+  }
+
+  try{
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .from("messages")
+        .delete()
+        .eq(
+          "id",
+          messageId
+        )
+        .eq(
+          "conversation_id",
+          conversationId
+        );
+
+    if(error){
+
+      throw error;
+
+    }
+
+    /* REMOVE IMMEDIATELY FROM ADMIN UI */
+
+    removeMessageFromUI(
+      messageId
+    );
+
+    /* IF THIS MESSAGE WAS BEING REPLIED TO */
+
+    if(
+      replyingToMessage &&
+      replyingToMessage.id === messageId
+    ){
+
+      cancelReply();
+
+    }
+
+  }catch(error){
+
+    console.error(
+      "DELETE MESSAGE ERROR:",
+      error
+    );
+
+    alert(
+      "Could not delete message."
+    );
+
+    if(button){
+
+      button.disabled =
+        false;
+
+      button.textContent =
+        "🗑 Delete";
+
+    }
+
+  }
+
+}
+
+
+/* =========================
+   REMOVE MESSAGE FROM UI
+========================= */
+
+function removeMessageFromUI(
+  messageId
+){
+
+  if(!messageId){
+
+    return;
+
+  }
+
+  const target =
+    document.querySelector(
+      `[data-message-id="${messageId}"]`
+    );
+
+  if(target){
+
+    target.remove();
+
+  }
+
+  const messages =
+    document.getElementById(
+      "messages"
+    );
+
+  if(
+    messages &&
+    !messages.querySelector(
+      ".message-row"
+    )
+  ){
+
+    showEmpty(
+      "No messages yet."
+    );
+
+  }
 
 }
 
@@ -2351,6 +2576,9 @@ function startRealtime(){
         "-" +
         Date.now()
       )
+
+      /* NEW MESSAGE */
+
       .on(
         "postgres_changes",
         {
@@ -2372,11 +2600,43 @@ function startRealtime(){
             []
           );
 
-          /* EXTRA AUTO SCROLL */
           scrollBottom();
 
         }
       )
+
+      /* DELETED MESSAGE */
+
+      .on(
+        "postgres_changes",
+        {
+          event:"DELETE",
+          schema:"public",
+          table:"messages",
+          filter:
+            `conversation_id=eq.${conversationId}`
+        },
+        payload => {
+
+          console.log(
+            "REALTIME DELETE:",
+            payload.old
+          );
+
+          if(
+            payload.old &&
+            payload.old.id
+          ){
+
+            removeMessageFromUI(
+              payload.old.id
+            );
+
+          }
+
+        }
+      )
+
       .subscribe(
         status => {
 
