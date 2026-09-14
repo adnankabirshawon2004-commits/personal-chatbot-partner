@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Chat</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -17,63 +19,128 @@
     body {
       font-family: Inter, Arial, sans-serif;
       min-height: 100vh;
+
       background:
-        radial-gradient(circle at top left, rgba(91, 33, 182, 0.35), transparent 35%),
-        radial-gradient(circle at bottom right, rgba(6, 182, 212, 0.25), transparent 35%),
+        radial-gradient(
+          circle at top left,
+          rgba(91, 33, 182, 0.35),
+          transparent 35%
+        ),
+        radial-gradient(
+          circle at bottom right,
+          rgba(6, 182, 212, 0.25),
+          transparent 35%
+        ),
         #070b14;
+
       color: #fff;
+
       display: flex;
       justify-content: center;
+
       padding: 18px;
     }
 
     .app {
       width: 100%;
       max-width: 900px;
+
       height: calc(100vh - 36px);
       min-height: 550px;
+
       display: flex;
       flex-direction: column;
+
       overflow: hidden;
+
       background: rgba(15, 23, 42, 0.72);
+
       border: 1px solid rgba(255,255,255,0.10);
+
       border-radius: 24px;
+
       backdrop-filter: blur(22px);
-      box-shadow: 0 25px 80px rgba(0,0,0,0.45);
+
+      box-shadow:
+        0 25px 80px rgba(0,0,0,0.45);
     }
+
+    /* =========================
+       HEADER
+    ========================= */
 
     .header {
       min-height: 78px;
+
       display: flex;
       align-items: center;
+
       gap: 14px;
+
       padding: 14px 18px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      background: rgba(15,23,42,0.65);
+
+      border-bottom:
+        1px solid rgba(255,255,255,0.08);
+
+      background:
+        rgba(15,23,42,0.65);
     }
 
     .back {
       width: 42px;
       height: 42px;
+
       border: none;
+
       border-radius: 14px;
-      background: rgba(255,255,255,0.08);
-      color: #fff;
+
+      background:
+        rgba(255,255,255,0.08);
+
+      color: white;
+
       font-size: 22px;
+
       cursor: pointer;
+
+      flex-shrink: 0;
     }
 
     .avatar {
       width: 46px;
       height: 46px;
+
       border-radius: 50%;
+
       display: flex;
       align-items: center;
       justify-content: center;
+
       font-size: 22px;
-      background: linear-gradient(135deg, #7c3aed, #06b6d4);
-      box-shadow: 0 8px 25px rgba(124,58,237,0.35);
+
+      background:
+        linear-gradient(
+          135deg,
+          #7c3aed,
+          #06b6d4
+        );
+
+      box-shadow:
+        0 8px 25px rgba(124,58,237,0.35);
+
       flex-shrink: 0;
+
+      overflow: hidden;
+
+      border:
+        2px solid rgba(255,255,255,0.12);
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+
+      object-fit: cover;
     }
 
     .character-info {
@@ -84,6 +151,7 @@
     .character-name {
       font-size: 17px;
       font-weight: 700;
+
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -91,28 +159,45 @@
 
     .status {
       margin-top: 4px;
+
       font-size: 12px;
+
       color: #4ade80;
+
       display: flex;
       align-items: center;
+
       gap: 5px;
     }
 
     .status-dot {
       width: 7px;
       height: 7px;
+
       border-radius: 50%;
+
       background: #4ade80;
-      box-shadow: 0 0 10px #4ade80;
+
+      box-shadow:
+        0 0 10px #4ade80;
     }
+
+    /* =========================
+       MESSAGES
+    ========================= */
 
     .messages {
       flex: 1;
+
       overflow-y: auto;
+
       padding: 24px 18px;
+
       display: flex;
       flex-direction: column;
+
       gap: 12px;
+
       scroll-behavior: smooth;
     }
 
@@ -121,7 +206,9 @@
     }
 
     .messages::-webkit-scrollbar-thumb {
-      background: rgba(255,255,255,0.14);
+      background:
+        rgba(255,255,255,0.14);
+
       border-radius: 10px;
     }
 
@@ -139,40 +226,68 @@
     }
 
     .bubble {
-      max-width: min(72%, 560px);
+      max-width:
+        min(72%, 560px);
+
       padding: 11px 14px;
+
       border-radius: 18px;
+
       word-wrap: break-word;
+
       overflow-wrap: anywhere;
+
       font-size: 14px;
+
       line-height: 1.5;
     }
 
     .message-row.user .bubble {
-      background: linear-gradient(135deg, #7c3aed, #2563eb);
+      background:
+        linear-gradient(
+          135deg,
+          #7c3aed,
+          #2563eb
+        );
+
       border-bottom-right-radius: 5px;
-      box-shadow: 0 8px 25px rgba(37,99,235,0.20);
+
+      box-shadow:
+        0 8px 25px rgba(37,99,235,0.20);
     }
 
     .message-row.admin .bubble {
-      background: rgba(255,255,255,0.09);
-      border: 1px solid rgba(255,255,255,0.08);
+      background:
+        rgba(255,255,255,0.09);
+
+      border:
+        1px solid rgba(255,255,255,0.08);
+
       border-bottom-left-radius: 5px;
     }
 
     .message-image {
       display: block;
+
       width: 100%;
+
       max-width: 330px;
+
       max-height: 420px;
+
       object-fit: contain;
+
       border-radius: 13px;
+
       cursor: pointer;
-      background: rgba(0,0,0,0.15);
+
+      background:
+        rgba(0,0,0,0.15);
     }
 
     .message-text {
       margin-top: 8px;
+
       white-space: pre-wrap;
     }
 
@@ -182,42 +297,65 @@
 
     .time {
       margin-top: 5px;
+
       font-size: 10px;
+
       opacity: 0.55;
+
       text-align: right;
     }
 
     .empty {
       margin: auto;
+
       text-align: center;
-      color: rgba(255,255,255,0.55);
+
+      color:
+        rgba(255,255,255,0.55);
+
       padding: 30px;
     }
 
     .empty-icon {
       font-size: 42px;
+
       margin-bottom: 12px;
     }
 
+    /* =========================
+       PREVIEW
+    ========================= */
+
     .preview-container {
       display: none;
+
       padding: 10px 14px;
-      border-top: 1px solid rgba(255,255,255,0.07);
-      background: rgba(15,23,42,0.75);
+
+      border-top:
+        1px solid rgba(255,255,255,0.07);
+
+      background:
+        rgba(15,23,42,0.75);
     }
 
     .preview-container.show {
       display: flex;
+
       align-items: center;
+
       gap: 10px;
     }
 
     .preview-image {
       width: 64px;
       height: 64px;
+
       object-fit: cover;
+
       border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.12);
+
+      border:
+        1px solid rgba(255,255,255,0.12);
     }
 
     .preview-info {
@@ -227,97 +365,163 @@
 
     .preview-name {
       font-size: 13px;
+
       overflow: hidden;
+
       white-space: nowrap;
+
       text-overflow: ellipsis;
     }
 
     .preview-size {
       font-size: 11px;
+
       opacity: 0.55;
+
       margin-top: 3px;
     }
 
     .remove-image {
       width: 34px;
       height: 34px;
+
       border: none;
+
       border-radius: 10px;
-      background: rgba(239,68,68,0.15);
+
+      background:
+        rgba(239,68,68,0.15);
+
       color: #f87171;
+
       cursor: pointer;
+
       font-size: 17px;
     }
 
+    /* =========================
+       COMPOSER
+    ========================= */
+
     .composer {
-      padding: 12px 14px 14px;
-      border-top: 1px solid rgba(255,255,255,0.08);
-      background: rgba(15,23,42,0.72);
+      padding:
+        12px 14px 14px;
+
+      border-top:
+        1px solid rgba(255,255,255,0.08);
+
+      background:
+        rgba(15,23,42,0.72);
     }
 
     .composer-inner {
       display: flex;
+
       align-items: flex-end;
+
       gap: 8px;
     }
 
     .image-button {
       width: 46px;
       height: 46px;
+
       flex-shrink: 0;
-      border: 1px solid rgba(255,255,255,0.10);
+
+      border:
+        1px solid rgba(255,255,255,0.10);
+
       border-radius: 14px;
-      background: rgba(255,255,255,0.07);
+
+      background:
+        rgba(255,255,255,0.07);
+
       color: #c4b5fd;
+
       font-size: 21px;
+
       cursor: pointer;
     }
 
     .image-button:hover {
-      background: rgba(124,58,237,0.20);
+      background:
+        rgba(124,58,237,0.20);
     }
 
     #messageInput {
       flex: 1;
+
       min-height: 46px;
+
       max-height: 130px;
+
       resize: none;
-      border: 1px solid rgba(255,255,255,0.10);
+
+      border:
+        1px solid rgba(255,255,255,0.10);
+
       border-radius: 15px;
-      background: rgba(255,255,255,0.07);
-      color: #fff;
+
+      background:
+        rgba(255,255,255,0.07);
+
+      color: white;
+
       padding: 13px 14px;
+
       outline: none;
+
       font-family: inherit;
+
       font-size: 14px;
+
       line-height: 20px;
     }
 
     #messageInput::placeholder {
-      color: rgba(255,255,255,0.42);
+      color:
+        rgba(255,255,255,0.42);
     }
 
     #messageInput:focus {
-      border-color: rgba(124,58,237,0.65);
-      box-shadow: 0 0 0 3px rgba(124,58,237,0.10);
+      border-color:
+        rgba(124,58,237,0.65);
+
+      box-shadow:
+        0 0 0 3px rgba(124,58,237,0.10);
     }
 
     .send-button {
       width: 46px;
       height: 46px;
+
       flex-shrink: 0;
+
       border: none;
+
       border-radius: 14px;
-      background: linear-gradient(135deg, #7c3aed, #2563eb);
-      color: #fff;
+
+      background:
+        linear-gradient(
+          135deg,
+          #7c3aed,
+          #2563eb
+        );
+
+      color: white;
+
       font-size: 19px;
+
       cursor: pointer;
-      box-shadow: 0 8px 22px rgba(37,99,235,0.25);
+
+      box-shadow:
+        0 8px 22px rgba(37,99,235,0.25);
     }
 
     .send-button:disabled,
     .image-button:disabled {
       opacity: 0.45;
+
       cursor: not-allowed;
     }
 
@@ -327,15 +531,21 @@
 
     .notice {
       text-align: center;
+
       font-size: 10px;
+
       opacity: 0.4;
+
       margin-top: 7px;
     }
 
     .loading {
       text-align: center;
+
       opacity: 0.55;
+
       padding: 20px;
+
       font-size: 13px;
     }
 
@@ -347,25 +557,31 @@
 
       .app {
         height: 100vh;
+
         min-height: 0;
+
         border-radius: 0;
+
         border: none;
       }
 
       .header {
         min-height: 68px;
+
         padding: 10px 12px;
       }
 
       .back {
         width: 38px;
         height: 38px;
+
         border-radius: 12px;
       }
 
       .avatar {
         width: 40px;
         height: 40px;
+
         font-size: 19px;
       }
 
@@ -374,21 +590,25 @@
       }
 
       .messages {
-        padding: 16px 12px;
+        padding:
+          16px 12px;
       }
 
       .bubble {
         max-width: 82%;
+
         font-size: 14px;
       }
 
       .message-image {
         max-width: 250px;
+
         max-height: 330px;
       }
 
       .composer {
-        padding: 9px 9px 10px;
+        padding:
+          9px 9px 10px;
       }
 
       .image-button,
@@ -399,15 +619,20 @@
 
       #messageInput {
         min-height: 43px;
-        padding: 11px 12px;
+
+        padding:
+          11px 12px;
       }
     }
+
   </style>
 </head>
 
 <body>
 
 <div class="app">
+
+  <!-- HEADER -->
 
   <div class="header">
 
@@ -417,29 +642,41 @@
       ‹
     </button>
 
+
     <div
       class="avatar"
       id="avatar">
-      💬
+
+      👤
+
     </div>
+
 
     <div class="character-info">
 
       <div
         class="character-name"
         id="characterName">
+
         Chat
+
       </div>
 
+
       <div class="status">
+
         <span class="status-dot"></span>
+
         Available
+
       </div>
 
     </div>
 
   </div>
 
+
+  <!-- MESSAGES -->
 
   <div
     class="messages"
@@ -451,6 +688,8 @@
 
   </div>
 
+
+  <!-- IMAGE PREVIEW -->
 
   <div
     class="preview-container"
@@ -474,14 +713,19 @@
 
     </div>
 
+
     <button
       class="remove-image"
       onclick="removeSelectedImage()">
+
       ×
+
     </button>
 
   </div>
 
+
+  <!-- COMPOSER -->
 
   <div class="composer">
 
@@ -491,15 +735,18 @@
         class="image-button"
         id="imageButton"
         onclick="document.getElementById('fileInput').click()">
+
         🖼️
+
       </button>
+
 
       <input
         type="file"
         id="fileInput"
         accept="image/jpeg,image/png,image/webp,image/gif"
-        onchange="handleImageSelect(event)"
       >
+
 
       <textarea
         id="messageInput"
@@ -507,17 +754,23 @@
         rows="1">
       </textarea>
 
+
       <button
         class="send-button"
         id="sendButton"
         onclick="sendMessage()">
+
         ➤
+
       </button>
 
     </div>
 
+
     <div class="notice">
+
       Press Enter to send • Shift + Enter for new line
+
     </div>
 
   </div>
@@ -533,6 +786,7 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
   "sb_publishable_CEOgfj8n1K6CeIqizGVhTw_8oPlWuKk";
 
+
 const supabaseClient =
   window.supabase.createClient(
     SUPABASE_URL,
@@ -541,14 +795,18 @@ const supabaseClient =
 
 
 let currentUser = null;
+
 let conversationId = null;
+
 let character = null;
+
 let realtimeChannel = null;
+
 let selectedImage = null;
 
 
 /* =========================
-   AUTH
+   INIT
 ========================= */
 
 async function init() {
@@ -557,6 +815,7 @@ async function init() {
     data: { session }
   } =
     await supabaseClient.auth.getSession();
+
 
   if (!session) {
 
@@ -567,10 +826,13 @@ async function init() {
     return;
   }
 
+
   currentUser =
     session.user;
 
+
   await loadCharacter();
+
 }
 
 
@@ -584,6 +846,7 @@ async function loadCharacter() {
     new URLSearchParams(
       window.location.search
     );
+
 
   const characterId =
     params.get("id");
@@ -610,8 +873,14 @@ async function loadCharacter() {
     await supabaseClient
       .from("characters")
       .select("*")
-      .eq("id", characterId)
-      .eq("user_id", currentUser.id)
+      .eq(
+        "id",
+        characterId
+      )
+      .eq(
+        "user_id",
+        currentUser.id
+      )
       .single();
 
 
@@ -649,17 +918,92 @@ async function loadCharacter() {
       displayName;
 
 
-  document
-    .getElementById(
+  await loadCharacterAvatar();
+
+
+  await loadConversation();
+
+}
+
+
+/* =========================
+   CHARACTER AVATAR
+========================= */
+
+async function loadCharacterAvatar() {
+
+  const avatar =
+    document.getElementById(
       "avatar"
-    )
-    .textContent =
+    );
+
+
+  if (
+    !character.avatar_url
+  ) {
+
+    avatar.textContent =
       getAvatar(
         character.character_type
       );
 
+    return;
+  }
 
-  await loadConversation();
+
+  try {
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .storage
+        .from(
+          "character-avatars"
+        )
+        .createSignedUrl(
+          character.avatar_url,
+          3600
+        );
+
+
+    if (
+      !error &&
+      data &&
+      data.signedUrl
+    ) {
+
+      avatar.innerHTML = `
+        <img
+          src="${data.signedUrl}"
+          alt="Character picture">
+      `;
+
+    } else {
+
+      avatar.textContent =
+        getAvatar(
+          character.character_type
+        );
+
+    }
+
+  } catch (error) {
+
+    console.error(
+      "Avatar error:",
+      error
+    );
+
+
+    avatar.textContent =
+      getAvatar(
+        character.character_type
+      );
+
+  }
+
 }
 
 
@@ -683,7 +1027,9 @@ function getAvatar(type) {
 
   };
 
-  return avatars[type] || "💬";
+
+  return avatars[type] ||
+    "💬";
 }
 
 
@@ -729,11 +1075,13 @@ async function loadConversation() {
       await supabaseClient
         .from("conversations")
         .insert({
+
           user_id:
             currentUser.id,
 
           character_id:
             character.id
+
         })
         .select()
         .single();
@@ -755,6 +1103,7 @@ async function loadConversation() {
 
     data =
       result.data;
+
   }
 
 
@@ -764,7 +1113,9 @@ async function loadConversation() {
 
   await loadMessages();
 
+
   startRealtime();
+
 }
 
 
@@ -780,7 +1131,8 @@ async function loadMessages() {
     );
 
 
-  container.innerHTML = "";
+  container.innerHTML =
+    "";
 
 
   const {
@@ -814,7 +1166,10 @@ async function loadMessages() {
   }
 
 
-  if (!data || data.length === 0) {
+  if (
+    !data ||
+    data.length === 0
+  ) {
 
     showEmpty();
 
@@ -822,20 +1177,24 @@ async function loadMessages() {
   }
 
 
-  for (const message of data) {
+  for (
+    const message of data
+  ) {
 
     await addMessageToUI(
       message
     );
+
   }
 
 
   scrollToBottom();
+
 }
 
 
 /* =========================
-   MESSAGE UI
+   ADD MESSAGE
 ========================= */
 
 async function addMessageToUI(
@@ -855,9 +1214,11 @@ async function addMessageToUI(
         `[data-message-id="${message.id}"]`
       );
 
+
     if (existing) {
       return;
     }
+
   }
 
 
@@ -894,6 +1255,7 @@ async function addMessageToUI(
 
     bubble.dataset.messageId =
       message.id;
+
   }
 
 
@@ -967,12 +1329,14 @@ async function addMessageToUI(
 
       image.alt =
         "Image unavailable";
+
     }
 
 
     bubble.appendChild(
       image
     );
+
   }
 
 
@@ -999,6 +1363,7 @@ async function addMessageToUI(
     bubble.appendChild(
       text
     );
+
   }
 
 
@@ -1036,12 +1401,23 @@ async function addMessageToUI(
 
 
   scrollToBottom();
+
 }
 
 
 /* =========================
    IMAGE SELECT
 ========================= */
+
+document
+  .getElementById(
+    "fileInput"
+  )
+  .addEventListener(
+    "change",
+    handleImageSelect
+  );
+
 
 function handleImageSelect(
   event
@@ -1066,7 +1442,8 @@ function handleImageSelect(
       "Please select an image."
     );
 
-    event.target.value = "";
+    event.target.value =
+      "";
 
     return;
   }
@@ -1081,7 +1458,8 @@ function handleImageSelect(
       "Image must be smaller than 10 MB."
     );
 
-    event.target.value = "";
+    event.target.value =
+      "";
 
     return;
   }
@@ -1138,11 +1516,12 @@ function handleImageSelect(
   reader.readAsDataURL(
     file
   );
+
 }
 
 
 /* =========================
-   REMOVE IMAGE
+   REMOVE SELECTED IMAGE
 ========================= */
 
 function removeSelectedImage() {
@@ -1153,7 +1532,8 @@ function removeSelectedImage() {
 
   document.getElementById(
     "fileInput"
-  ).value = "";
+  ).value =
+    "";
 
 
   document
@@ -1163,6 +1543,7 @@ function removeSelectedImage() {
     .classList.remove(
       "show"
     );
+
 }
 
 
@@ -1223,7 +1604,7 @@ async function sendMessage() {
       null;
 
 
-    /* UPLOAD */
+    /* UPLOAD IMAGE */
 
     if (selectedImage) {
 
@@ -1259,7 +1640,9 @@ async function sendMessage() {
 
 
       if (uploadError) {
+
         throw uploadError;
+
       }
 
 
@@ -1271,10 +1654,11 @@ async function sendMessage() {
 
       imageName =
         selectedImage.name;
+
     }
 
 
-    /* INSERT */
+    /* INSERT MESSAGE */
 
     const {
       error
@@ -1305,11 +1689,14 @@ async function sendMessage() {
 
 
     if (error) {
+
       throw error;
+
     }
 
 
-    input.value = "";
+    input.value =
+      "";
 
     input.style.height =
       "46px";
@@ -1320,7 +1707,10 @@ async function sendMessage() {
 
   } catch (error) {
 
-    console.error(error);
+    console.error(
+      error
+    );
+
 
     alert(
       "Could not send message. Please try again."
@@ -1336,7 +1726,9 @@ async function sendMessage() {
       false;
 
     input.focus();
+
   }
+
 }
 
 
@@ -1352,6 +1744,7 @@ function startRealtime() {
       .removeChannel(
         realtimeChannel
       );
+
   }
 
 
@@ -1375,6 +1768,7 @@ function startRealtime() {
 
           filter:
             `conversation_id=eq.${conversationId}`
+
         },
 
         async payload => {
@@ -1384,6 +1778,7 @@ function startRealtime() {
           );
 
         }
+
       )
       .subscribe(
         status => {
@@ -1395,6 +1790,7 @@ function startRealtime() {
 
         }
       );
+
 }
 
 
@@ -1407,11 +1803,21 @@ function showEmpty() {
   document.getElementById(
     "messages"
   ).innerHTML = `
+
     <div class="empty">
-      <div class="empty-icon">💬</div>
-      <div>Start your conversation</div>
+
+      <div class="empty-icon">
+        💬
+      </div>
+
+      <div>
+        Start your conversation
+      </div>
+
     </div>
+
   `;
+
 }
 
 
@@ -1422,11 +1828,21 @@ function showError(
   document.getElementById(
     "messages"
   ).innerHTML = `
+
     <div class="empty">
-      <div class="empty-icon">⚠️</div>
-      <div>${message}</div>
+
+      <div class="empty-icon">
+        ⚠️
+      </div>
+
+      <div>
+        ${message}
+      </div>
+
     </div>
+
   `;
+
 }
 
 
@@ -1446,6 +1862,7 @@ function formatTime(
         "2-digit"
     }
   );
+
 }
 
 
@@ -1454,8 +1871,11 @@ function formatFileSize(
 ) {
 
   if (bytes < 1024) {
+
     return bytes + " B";
+
   }
+
 
   if (
     bytes <
@@ -1466,13 +1886,16 @@ function formatFileSize(
       bytes / 1024
     ).toFixed(1) +
       " KB";
+
   }
+
 
   return (
     bytes /
     (1024 * 1024)
   ).toFixed(1) +
     " MB";
+
 }
 
 
@@ -1493,6 +1916,7 @@ function scrollToBottom() {
     },
     30
   );
+
 }
 
 
@@ -1501,6 +1925,7 @@ function goBack() {
   window.location.replace(
     "dashboard.html"
   );
+
 }
 
 
@@ -1527,6 +1952,7 @@ messageInput.addEventListener(
         this.scrollHeight,
         130
       ) + "px";
+
   }
 );
 
@@ -1543,7 +1969,9 @@ messageInput.addEventListener(
       event.preventDefault();
 
       sendMessage();
+
     }
+
   }
 );
 
@@ -1569,6 +1997,7 @@ window.addEventListener(
         .removeChannel(
           realtimeChannel
         );
+
     }
 
   }
