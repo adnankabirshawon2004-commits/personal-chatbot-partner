@@ -8,771 +8,291 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
-
+*{box-sizing:border-box;margin:0;padding:0}
 body{
-  font-family:Arial,sans-serif;
-  background:#080b12;
-  color:#fff;
-  height:100vh;
-  overflow:hidden;
+  font-family:Arial,sans-serif;background:#080b12;color:#fff;height:100vh;
+  overflow:hidden
 }
-
-button,textarea{
-  font-family:inherit;
-}
-
-.app{
-  display:flex;
-  width:100%;
-  height:100vh;
-}
+button,textarea{font-family:inherit}
+.app{display:flex;width:100%;height:100vh}
 
 /* SIDEBAR */
-
 .sidebar{
-  width:330px;
-  flex-shrink:0;
-  background:rgba(15,18,28,.96);
-  border-right:1px solid rgba(255,255,255,.08);
-  display:flex;
-  flex-direction:column;
+  width:330px;flex-shrink:0;background:rgba(15,18,28,.96);
+  border-right:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column
 }
-
-.sidebar-header{
-  padding:20px;
-  border-bottom:1px solid rgba(255,255,255,.08);
-}
-
-.sidebar-header h2{
-  font-size:21px;
-  margin-bottom:5px;
-}
-
-.sidebar-header p{
-  color:#8e96a8;
-  font-size:13px;
-}
-
-.users{
-  flex:1;
-  overflow-y:auto;
-  padding:12px;
-}
-
-.user-section{
-  margin-bottom:10px;
-}
-
+.sidebar-header{padding:20px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sidebar-header h2{font-size:21px;margin-bottom:5px}
+.sidebar-header p{color:#8e96a8;font-size:13px}
+.users{flex:1;overflow-y:auto;padding:12px}
+.user-section{margin-bottom:10px}
 .user-header{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:12px;
-  border-radius:12px;
-  cursor:pointer;
-  background:rgba(255,255,255,.035);
+  display:flex;align-items:center;gap:10px;padding:12px;border-radius:12px;
+  cursor:pointer;background:rgba(255,255,255,.035)
 }
-
-.user-header:hover{
-  background:rgba(255,255,255,.07);
-}
-
+.user-header:hover{background:rgba(255,255,255,.07)}
 .user-avatar{
-  width:40px;
-  height:40px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:linear-gradient(135deg,#6366f1,#8b5cf6);
-  font-weight:bold;
-  flex-shrink:0;
+  width:40px;height:40px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;background:linear-gradient(135deg,#6366f1,#8b5cf6);
+  font-weight:bold;flex-shrink:0
 }
-
-.user-info{
-  min-width:0;
-  flex:1;
-}
-
-.user-name{
-  font-weight:600;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.user-email{
-  font-size:11px;
-  color:#7f8798;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.arrow{
-  color:#8d95a7;
-  transition:.2s;
-}
-
-.arrow.open{
-  transform:rotate(90deg);
-}
-
-.characters{
-  display:none;
-  padding:5px 0 5px 15px;
-}
-
-.characters.open{
-  display:block;
-}
-
+.user-info{min-width:0;flex:1}
+.user-name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-email{font-size:11px;color:#7f8798;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.arrow{color:#8d95a7;transition:.2s}
+.arrow.open{transform:rotate(90deg)}
+.characters{display:none;padding:5px 0 5px 15px}
+.characters.open{display:block}
 .character-item{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:10px;
-  margin:3px 0;
-  border-radius:10px;
-  cursor:pointer;
+  display:flex;align-items:center;gap:10px;padding:10px;margin:3px 0;
+  border-radius:10px;cursor:pointer
 }
-
-.character-item:hover{
-  background:rgba(255,255,255,.05);
-}
-
-.character-item.active{
-  background:rgba(99,102,241,.18);
-  border:1px solid rgba(99,102,241,.3);
-}
-
+.character-item:hover{background:rgba(255,255,255,.05)}
+.character-item.active{background:rgba(99,102,241,.18);border:1px solid rgba(99,102,241,.3)}
 .character-avatar{
-  width:42px;
-  height:42px;
-  border-radius:50%;
-  object-fit:cover;
-  background:#222735;
-  flex-shrink:0;
+  width:42px;height:42px;border-radius:50%;object-fit:cover;
+  background:#222735;flex-shrink:0
 }
-
-.character-info{
-  min-width:0;
+.character-info{min-width:0}
+.character-name{font-size:14px;font-weight:600}
+.character-type{font-size:11px;color:#8e96a8}
+.character-mood{font-size:10px;color:#a78bfa;margin-top:3px}
+.character-sleep{
+  font-size:9px;color:#fbbf24;margin-top:3px;font-weight:700
 }
-
-.character-name{
-  font-size:14px;
-  font-weight:600;
-}
-
-.character-type{
-  font-size:11px;
-  color:#8e96a8;
-}
-
-.character-mood{
-  font-size:10px;
-  color:#a78bfa;
-  margin-top:3px;
-}
-
-.empty-sidebar{
-  color:#777f91;
-  font-size:13px;
-  padding:20px;
-  text-align:center;
-}
+.empty-sidebar{color:#777f91;font-size:13px;padding:20px;text-align:center}
 
 /* CHAT */
-
 .chat-area{
-  flex:1;
-  min-width:0;
-  display:flex;
-  flex-direction:column;
-  background:
-    radial-gradient(circle at top right,rgba(99,102,241,.08),transparent 35%),
-    #080b12;
+  flex:1;min-width:0;display:flex;flex-direction:column;
+  background:radial-gradient(circle at top right,rgba(99,102,241,.08),transparent 35%),#080b12
 }
-
 .chat-header{
-  min-height:75px;
-  padding:14px 20px;
-  border-bottom:1px solid rgba(255,255,255,.08);
-  display:flex;
-  align-items:center;
-  gap:12px;
-  background:rgba(10,13,21,.85);
+  min-height:75px;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,.08);
+  display:flex;align-items:center;gap:12px;background:rgba(10,13,21,.85)
 }
-
 .header-avatar{
-  width:48px;
-  height:48px;
-  border-radius:50%;
-  object-fit:cover;
-  background:#222735;
+  width:48px;height:48px;border-radius:50%;object-fit:cover;background:#222735
 }
+.header-info{min-width:0;flex:1}
+.header-name{font-size:17px;font-weight:700}
+.header-user{color:#8b93a5;font-size:12px;margin-top:3px}
+.header-mood{color:#a78bfa;font-size:11px;margin-top:3px}
 
-.header-info{
-  min-width:0;
+/* SLEEP MODE */
+.sleep-control{
+  display:flex;align-items:center;gap:10px;flex-shrink:0
 }
-
-.header-name{
-  font-size:17px;
-  font-weight:700;
+.sleep-label{font-size:11px;color:#8b93a5}
+.sleep-toggle{
+  border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:8px 12px;
+  background:#202637;color:#dbe1ef;cursor:pointer;font-size:12px;font-weight:700;
+  transition:.2s;white-space:nowrap
 }
-
-.header-user{
-  color:#8b93a5;
-  font-size:12px;
-  margin-top:3px;
+.sleep-toggle:hover{background:#293147}
+.sleep-toggle.on{
+  background:rgba(245,158,11,.18);color:#fbbf24;
+  border-color:rgba(245,158,11,.35)
 }
-
-.header-mood{
-  color:#a78bfa;
-  font-size:11px;
-  margin-top:3px;
+.sleep-toggle.off{
+  background:rgba(74,222,128,.12);color:#4ade80;
+  border-color:rgba(74,222,128,.25)
 }
+.sleep-toggle:disabled{opacity:.5;cursor:not-allowed}
 
 /* MESSAGES */
-
 .messages{
-  flex:1;
-  overflow-y:auto;
-  padding:20px;
-  display:flex;
-  flex-direction:column;
-  gap:9px;
+  flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:9px
 }
-
-.empty-chat{
-  margin:auto;
-  text-align:center;
-  color:#6f7788;
-}
-
-.empty-chat h3{
-  color:#9ca3b5;
-  margin-bottom:5px;
-}
-
-.message-row{
-  display:flex;
-  width:100%;
-}
-
-.message-row.admin{
-  justify-content:flex-end;
-}
-
-.message-row.user{
-  justify-content:flex-start;
-}
-
+.empty-chat{margin:auto;text-align:center;color:#6f7788}
+.empty-chat h3{color:#9ca3b5;margin-bottom:5px}
+.message-row{display:flex;width:100%}
+.message-row.admin{justify-content:flex-end}
+.message-row.user{justify-content:flex-start}
 .message{
-  max-width:min(75%,600px);
-  padding:9px 11px;
-  border-radius:15px;
-  background:#171c28;
-  border:1px solid rgba(255,255,255,.06);
+  max-width:min(75%,600px);padding:9px 11px;border-radius:15px;
+  background:#171c28;border:1px solid rgba(255,255,255,.06)
 }
-
 .message-row.admin .message{
   background:linear-gradient(135deg,#4f46e5,#6366f1);
-  border:none;
-  border-bottom-right-radius:4px;
+  border:none;border-bottom-right-radius:4px
 }
-
-.message-row.user .message{
-  border-bottom-left-radius:4px;
-}
-
-.message-text{
-  font-size:14px;
-  line-height:1.5;
-  white-space:pre-wrap;
-  word-break:break-word;
-}
-
+.message-row.user .message{border-bottom-left-radius:4px}
+.message-text{font-size:14px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
 .message-image{
-  display:block;
-  max-width:300px;
-  max-height:350px;
-  border-radius:10px;
-  margin-bottom:7px;
-  object-fit:contain;
-  cursor:pointer;
+  display:block;max-width:300px;max-height:350px;border-radius:10px;
+  margin-bottom:7px;object-fit:contain;cursor:pointer
 }
-
-/* REPLY PREVIEW INSIDE MESSAGE */
-
 .reply-preview{
-  padding:7px 9px;
-  margin-bottom:7px;
-  border-left:3px solid rgba(255,255,255,.65);
-  background:rgba(0,0,0,.18);
-  border-radius:6px;
-  cursor:pointer;
+  padding:7px 9px;margin-bottom:7px;border-left:3px solid rgba(255,255,255,.65);
+  background:rgba(0,0,0,.18);border-radius:6px;cursor:pointer
 }
-
-.reply-label{
-  font-size:10px;
-  font-weight:bold;
-  opacity:.8;
-  margin-bottom:2px;
-}
-
+.reply-label{font-size:10px;font-weight:bold;opacity:.8;margin-bottom:2px}
 .reply-text{
-  font-size:11px;
-  opacity:.75;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+  font-size:11px;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
 }
-
-/* MESSAGE ACTIONS */
-
-.message-actions{
-  display:flex;
-  justify-content:flex-end;
-  align-items:center;
-  gap:5px;
-  margin-top:5px;
+.message-actions{display:flex;justify-content:flex-end;align-items:center;gap:5px;margin-top:5px}
+.reply-button,.delete-button{
+  border:none;color:rgba(255,255,255,.9);font-size:10px;padding:4px 8px;
+  border-radius:6px;cursor:pointer
 }
-
-.reply-button,
-.delete-button{
-  border:none;
-  color:rgba(255,255,255,.9);
-  font-size:10px;
-  padding:4px 8px;
-  border-radius:6px;
-  cursor:pointer;
-}
-
-.reply-button{
-  background:rgba(255,255,255,.12);
-}
-
-.reply-button:hover{
-  background:rgba(255,255,255,.2);
-}
-
-.delete-button{
-  background:rgba(239,68,68,.18);
-}
-
-.delete-button:hover{
-  background:rgba(239,68,68,.35);
-}
-
-.delete-button:disabled{
-  opacity:.5;
-  cursor:not-allowed;
-}
-
-.message-time{
-  font-size:10px;
-  opacity:.6;
-  margin-top:5px;
-  text-align:right;
-}
+.reply-button{background:rgba(255,255,255,.12)}
+.reply-button:hover{background:rgba(255,255,255,.2)}
+.delete-button{background:rgba(239,68,68,.18)}
+.delete-button:hover{background:rgba(239,68,68,.35)}
+.delete-button:disabled{opacity:.5;cursor:not-allowed}
+.message-time{font-size:10px;opacity:.6;margin-top:5px;text-align:right}
 
 /* COMPOSER REPLY */
-
 .reply-composer{
-  display:none;
-  margin-bottom:8px;
-  padding:9px 12px;
-  border-left:3px solid #8b5cf6;
-  background:#171c28;
-  border-radius:9px;
-  align-items:center;
-  gap:10px;
+  display:none;margin-bottom:8px;padding:9px 12px;border-left:3px solid #8b5cf6;
+  background:#171c28;border-radius:9px;align-items:center;gap:10px
 }
-
-.reply-composer.show{
-  display:flex;
-}
-
-.reply-composer-content{
-  flex:1;
-  min-width:0;
-}
-
-.reply-composer-title{
-  font-size:11px;
-  color:#a78bfa;
-  font-weight:bold;
-  margin-bottom:3px;
-}
-
+.reply-composer.show{display:flex}
+.reply-composer-content{flex:1;min-width:0}
+.reply-composer-title{font-size:11px;color:#a78bfa;font-weight:bold;margin-bottom:3px}
 .reply-composer-text{
-  font-size:12px;
-  color:#9ca3af;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+  font-size:12px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
 }
-
 .cancel-reply{
-  width:25px;
-  height:25px;
-  border:none;
-  border-radius:50%;
-  background:#252b39;
-  color:#fff;
-  cursor:pointer;
-  flex-shrink:0;
+  width:25px;height:25px;border:none;border-radius:50%;background:#252b39;
+  color:#fff;cursor:pointer;flex-shrink:0
 }
 
 /* IMAGE PREVIEW */
-
-.image-preview{
-  display:none;
-  padding:10px 20px 0;
-}
-
-.image-preview.show{
-  display:block;
-}
-
-.preview-box{
-  position:relative;
-  display:inline-block;
-}
-
+.image-preview{display:none;padding:10px 20px 0}
+.image-preview.show{display:block}
+.preview-box{position:relative;display:inline-block}
 .preview-box img{
-  width:100px;
-  height:100px;
-  object-fit:cover;
-  border-radius:10px;
-  border:1px solid rgba(255,255,255,.15);
+  width:100px;height:100px;object-fit:cover;border-radius:10px;
+  border:1px solid rgba(255,255,255,.15)
 }
-
 .remove-image{
-  position:absolute;
-  top:-7px;
-  right:-7px;
-  width:23px;
-  height:23px;
-  border:none;
-  border-radius:50%;
-  background:#ef4444;
-  color:white;
-  cursor:pointer;
-  font-weight:bold;
+  position:absolute;top:-7px;right:-7px;width:23px;height:23px;border:none;
+  border-radius:50%;background:#ef4444;color:#fff;cursor:pointer;font-weight:bold
 }
 
 /* COMPOSER */
-
 .composer{
-  padding:12px 20px 18px;
-  border-top:1px solid rgba(255,255,255,.08);
-  background:rgba(10,13,21,.92);
+  padding:12px 20px 18px;border-top:1px solid rgba(255,255,255,.08);
+  background:rgba(10,13,21,.92)
 }
-
 .composer-box{
-  display:flex;
-  align-items:flex-end;
-  gap:8px;
-  background:#141925;
-  border:1px solid rgba(255,255,255,.09);
-  border-radius:15px;
-  padding:7px;
+  display:flex;align-items:flex-end;gap:8px;background:#141925;
+  border:1px solid rgba(255,255,255,.09);border-radius:15px;padding:7px
 }
-
 .icon-button{
-  width:42px;
-  height:42px;
-  border:none;
-  border-radius:11px;
-  background:#202637;
-  color:#dbe1ef;
-  cursor:pointer;
-  font-size:19px;
-  flex-shrink:0;
+  width:42px;height:42px;border:none;border-radius:11px;background:#202637;
+  color:#dbe1ef;cursor:pointer;font-size:19px;flex-shrink:0
 }
-
-.icon-button:hover{
-  background:#293147;
-}
-
+.icon-button:hover{background:#293147}
 textarea{
-  flex:1;
-  resize:none;
-  min-height:42px;
-  max-height:130px;
-  padding:11px 8px;
-  border:none;
-  outline:none;
-  background:transparent;
-  color:#fff;
-  font-size:14px;
-  line-height:20px;
+  flex:1;resize:none;min-height:42px;max-height:130px;padding:11px 8px;
+  border:none;outline:none;background:transparent;color:#fff;font-size:14px;line-height:20px
 }
-
-textarea::placeholder{
-  color:#697184;
-}
-
+textarea::placeholder{color:#697184}
 .send-button{
-  height:42px;
-  padding:0 18px;
-  border:none;
-  border-radius:11px;
-  background:linear-gradient(135deg,#6366f1,#8b5cf6);
-  color:#fff;
-  font-weight:700;
-  cursor:pointer;
-  flex-shrink:0;
+  height:42px;padding:0 18px;border:none;border-radius:11px;
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;
+  font-weight:700;cursor:pointer;flex-shrink:0
 }
-
-.send-button:disabled,
-.icon-button:disabled{
-  opacity:.5;
-  cursor:not-allowed;
-}
-
-.composer-help{
-  font-size:10px;
-  color:#646c7e;
-  margin-top:7px;
-  text-align:center;
-}
+.send-button:disabled,.icon-button:disabled{opacity:.5;cursor:not-allowed}
+.composer-help{font-size:10px;color:#646c7e;margin-top:7px;text-align:center}
 
 /* MOBILE */
-
 @media(max-width:750px){
-
-  .sidebar{
-    width:260px;
-  }
-
-  .message{
-    max-width:88%;
-  }
-
-  .messages{
-    padding:14px;
-  }
-
-  .composer{
-    padding:10px;
-  }
-
-  .image-preview{
-    padding:8px 10px 0;
-  }
-
-  .chat-header{
-    padding:10px 12px;
-  }
-
-  .header-name{
-    font-size:15px;
-  }
-
-  .header-user{
-    font-size:10px;
-  }
-
-  .send-button{
-    padding:0 13px;
-  }
+  .sidebar{width:260px}
+  .message{max-width:88%}
+  .messages{padding:14px}
+  .composer{padding:10px}
+  .image-preview{padding:8px 10px 0}
+  .chat-header{padding:10px 12px}
+  .header-name{font-size:15px}
+  .header-user{font-size:10px}
+  .send-button{padding:0 13px}
 }
-
 @media(max-width:550px){
-
-  .sidebar{
-    width:220px;
-  }
-
-  .character-type{
-    display:none;
-  }
-
-  .composer-help{
-    display:none;
-  }
-
-  .icon-button{
-    width:38px;
-    height:38px;
-  }
-
-  .send-button{
-    height:38px;
-    padding:0 11px;
-  }
-
-  textarea{
-    min-height:38px;
-  }
-
-  .delete-button,
-  .reply-button{
-    font-size:9px;
-    padding:4px 6px;
-  }
-
+  .sidebar{width:220px}
+  .character-type{display:none}
+  .composer-help{display:none}
+  .icon-button{width:38px;height:38px}
+  .send-button{height:38px;padding:0 11px}
+  textarea{min-height:38px}
+  .delete-button,.reply-button{font-size:9px;padding:4px 6px}
+  .sleep-label{display:none}
+  .sleep-toggle{padding:7px 9px;font-size:10px}
+  .header-avatar{width:42px;height:42px}
 }
 </style>
 </head>
 
 <body>
-
 <div class="app">
 
-  <aside class="sidebar">
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <h2>Admin Chat</h2>
+    <p>All users & characters</p>
+  </div>
+  <div id="users" class="users">
+    <div class="empty-sidebar">Loading users...</div>
+  </div>
+</aside>
 
-    <div class="sidebar-header">
-      <h2>Admin Chat</h2>
-      <p>All users & characters</p>
+<main class="chat-area">
+
+<header class="chat-header">
+  <img id="headerAvatar" class="header-avatar" src="" style="display:none;" alt="">
+  <div class="header-info">
+    <div id="headerName" class="header-name">Select a character</div>
+    <div id="headerUser" class="header-user">Choose a user and character from the left</div>
+    <div id="headerMood" class="header-mood"></div>
+  </div>
+
+  <div class="sleep-control">
+    <span class="sleep-label">Sleep Mode</span>
+    <button id="sleepToggle" class="sleep-toggle off" type="button"
+            onclick="toggleSleepMode()" disabled>🟢 OFF</button>
+  </div>
+</header>
+
+<div id="messages" class="messages">
+  <div class="empty-chat">
+    <h3>No conversation selected</h3>
+    <p>Select a character to open the chat.</p>
+  </div>
+</div>
+
+<div id="imagePreview" class="image-preview">
+  <div class="preview-box">
+    <img id="previewImage" src="" alt="Preview">
+    <button class="remove-image" onclick="removeImage()" type="button">×</button>
+  </div>
+</div>
+
+<div class="composer">
+  <div id="replyComposer" class="reply-composer">
+    <div class="reply-composer-content">
+      <div class="reply-composer-title">Replying to message</div>
+      <div id="replyComposerText" class="reply-composer-text"></div>
     </div>
+    <button class="cancel-reply" type="button" onclick="cancelReply()">×</button>
+  </div>
 
-    <div id="users" class="users">
-      <div class="empty-sidebar">
-        Loading users...
-      </div>
-    </div>
+  <div class="composer-box">
+    <input type="file" id="imageInput" accept="image/*" hidden>
+    <button id="imageButton" class="icon-button" type="button"
+            onclick="document.getElementById('imageInput').click()" title="Send image">📷</button>
+    <textarea id="messageInput" placeholder="Write a message..." rows="1"></textarea>
+    <button id="sendButton" class="send-button" type="button" onclick="sendMessage()">Send</button>
+  </div>
+  <div class="composer-help">Press Enter to send • Shift + Enter for new line</div>
+</div>
 
-  </aside>
-
-  <main class="chat-area">
-
-    <header class="chat-header">
-
-      <img
-        id="headerAvatar"
-        class="header-avatar"
-        src=""
-        style="display:none;"
-        alt=""
-      >
-
-      <div class="header-info">
-
-        <div id="headerName" class="header-name">
-          Select a character
-        </div>
-
-        <div id="headerUser" class="header-user">
-          Choose a user and character from the left
-        </div>
-
-        <div id="headerMood" class="header-mood"></div>
-
-      </div>
-
-    </header>
-
-    <div id="messages" class="messages">
-
-      <div class="empty-chat">
-        <h3>No conversation selected</h3>
-        <p>Select a character to open the chat.</p>
-      </div>
-
-    </div>
-
-    <div id="imagePreview" class="image-preview">
-
-      <div class="preview-box">
-
-        <img id="previewImage" src="" alt="Preview">
-
-        <button
-          class="remove-image"
-          onclick="removeImage()"
-          type="button"
-        >
-          ×
-        </button>
-
-      </div>
-
-    </div>
-
-    <div class="composer">
-
-      <div id="replyComposer" class="reply-composer">
-
-        <div class="reply-composer-content">
-
-          <div class="reply-composer-title">
-            Replying to message
-          </div>
-
-          <div
-            id="replyComposerText"
-            class="reply-composer-text"
-          ></div>
-
-        </div>
-
-        <button
-          class="cancel-reply"
-          type="button"
-          onclick="cancelReply()"
-        >
-          ×
-        </button>
-
-      </div>
-
-      <div class="composer-box">
-
-        <input
-          type="file"
-          id="imageInput"
-          accept="image/*"
-          hidden
-        >
-
-        <button
-          id="imageButton"
-          class="icon-button"
-          type="button"
-          onclick="document.getElementById('imageInput').click()"
-          title="Send image"
-        >
-          📷
-        </button>
-
-        <textarea
-          id="messageInput"
-          placeholder="Write a message..."
-          rows="1"
-        ></textarea>
-
-        <button
-          id="sendButton"
-          class="send-button"
-          type="button"
-          onclick="sendMessage()"
-        >
-          Send
-        </button>
-
-      </div>
-
-      <div class="composer-help">
-        Press Enter to send • Shift + Enter for new line
-      </div>
-
-    </div>
-
-  </main>
-
+</main>
 </div>
 
 <script>
-
 /* =========================
    SUPABASE
 ========================= */
@@ -784,11 +304,10 @@ const SUPABASE_KEY =
   "sb_publishable_CEOgfj8n1K6CeIqizGVhTw_8oPlWuKk";
 
 const supabaseClient =
-  supabase.createClient(
+  window.supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
   );
-
 
 /* =========================
    GLOBAL VARIABLES
@@ -799,39 +318,27 @@ let selectedUser = null;
 let selectedCharacter = null;
 let conversationId = null;
 let realtimeChannel = null;
+let characterRealtimeChannel = null;
 let selectedImage = null;
 let replyingToMessage = null;
-
 
 /* =========================
    INIT
 ========================= */
 
 async function init(){
-
   try{
-
-    const {
-      data:{
-        user
-      }
-    } =
+    const {data:{user}} =
       await supabaseClient.auth.getUser();
 
     if(!user){
-
-      window.location.href =
-        "index.html";
-
+      window.location.href = "index.html";
       return;
     }
 
     currentUser = user;
 
-    const {
-      data:profile,
-      error
-    } =
+    const {data:profile,error} =
       await supabaseClient
         .from("profiles")
         .select("*")
@@ -839,388 +346,179 @@ async function init(){
         .single();
 
     if(error){
-
       console.error(error);
-
-      alert(
-        "Could not load admin profile."
-      );
-
+      alert("Could not load admin profile.");
       return;
     }
 
-    if(
-      profile.role !== "admin" ||
-      profile.status !== "approved"
-    ){
-
+    if(profile.role !== "admin" || profile.status !== "approved"){
       alert("Access denied.");
-
-      window.location.href =
-        "dashboard.html";
-
+      window.location.href = "dashboard.html";
       return;
     }
 
     await loadUsers();
 
     const params =
-      new URLSearchParams(
-        window.location.search
-      );
+      new URLSearchParams(window.location.search);
 
-    const userId =
-      params.get("user");
-
-    const characterId =
-      params.get("character");
+    const userId = params.get("user");
+    const characterId = params.get("character");
 
     if(userId){
-
-      await selectUser(
-        userId,
-        characterId
-      );
-
+      await selectUser(userId,characterId);
     }
 
   }catch(error){
-
     console.error(error);
-
-    alert(
-      "Something went wrong."
-    );
-
+    alert("Something went wrong.");
   }
-
 }
-
 
 /* =========================
    LOAD USERS
 ========================= */
 
 async function loadUsers(){
-
-  const container =
-    document.getElementById("users");
-
+  const container = document.getElementById("users");
   container.innerHTML = "";
 
-  const {
-    data,
-    error
-  } =
+  const {data,error} =
     await supabaseClient
       .from("profiles")
       .select("*")
       .eq("role","user")
       .eq("status","approved")
-      .order("created_at",{
-        ascending:false
-      });
+      .order("created_at",{ascending:false});
 
   if(error){
-
     console.error(error);
-
-    container.innerHTML = `
-      <div class="empty-sidebar">
-        Could not load users.
-      </div>
-    `;
-
+    container.innerHTML =
+      '<div class="empty-sidebar">Could not load users.</div>';
     return;
   }
 
   if(!data || data.length === 0){
-
-    container.innerHTML = `
-      <div class="empty-sidebar">
-        No approved users.
-      </div>
-    `;
-
+    container.innerHTML =
+      '<div class="empty-sidebar">No approved users.</div>';
     return;
   }
 
   for(const user of data){
-
-    await createUserSection(
-      user,
-      container
-    );
-
+    await createUserSection(user,container);
   }
-
 }
-
 
 /* =========================
    USER SECTION
 ========================= */
 
-async function createUserSection(
-  user,
-  container
-){
+async function createUserSection(user,container){
+  const section = document.createElement("div");
+  section.className = "user-section";
 
-  const section =
-    document.createElement("div");
-
-  section.className =
-    "user-section";
-
-  const header =
-    document.createElement("div");
-
-  header.className =
-    "user-header";
+  const header = document.createElement("div");
+  header.className = "user-header";
 
   const firstLetter =
-    (
-      user.name ||
-      user.email ||
-      "U"
-    )
-      .charAt(0)
-      .toUpperCase();
+    (user.name || user.email || "U").charAt(0).toUpperCase();
 
   header.innerHTML = `
-
-    <div class="user-avatar">
-      ${escapeHtml(firstLetter)}
-    </div>
-
+    <div class="user-avatar">${escapeHtml(firstLetter)}</div>
     <div class="user-info">
-
-      <div class="user-name">
-        ${escapeHtml(
-          user.name ||
-          "Unnamed User"
-        )}
-      </div>
-
-      <div class="user-email">
-        ${escapeHtml(
-          user.email || ""
-        )}
-      </div>
-
+      <div class="user-name">${escapeHtml(user.name || "Unnamed User")}</div>
+      <div class="user-email">${escapeHtml(user.email || "")}</div>
     </div>
-
-    <div class="arrow">
-      ›
-    </div>
-
+    <div class="arrow">›</div>
   `;
 
-  const characters =
-    document.createElement("div");
+  const characters = document.createElement("div");
+  characters.className = "characters";
 
-  characters.className =
-    "characters";
+  header.addEventListener("click",async()=>{
+    const isOpen = characters.classList.contains("open");
 
-  header.addEventListener(
-    "click",
-    async() => {
+    document.querySelectorAll(".characters.open").forEach(el=>{
+      if(el !== characters) el.classList.remove("open");
+    });
 
-      const isOpen =
-        characters.classList.contains(
-          "open"
-        );
+    document.querySelectorAll(".arrow.open").forEach(el=>{
+      if(el !== header.querySelector(".arrow")) el.classList.remove("open");
+    });
 
-      document
-        .querySelectorAll(
-          ".characters.open"
-        )
-        .forEach(el => {
+    characters.classList.toggle("open");
+    header.querySelector(".arrow").classList.toggle("open");
 
-          if(el !== characters){
-
-            el.classList.remove(
-              "open"
-            );
-
-          }
-
-        });
-
-      document
-        .querySelectorAll(
-          ".arrow.open"
-        )
-        .forEach(el => {
-
-          if(
-            el !==
-            header.querySelector(
-              ".arrow"
-            )
-          ){
-
-            el.classList.remove(
-              "open"
-            );
-
-          }
-
-        });
-
-      characters.classList.toggle(
-        "open"
-      );
-
-      header
-        .querySelector(".arrow")
-        .classList.toggle(
-          "open"
-        );
-
-      if(
-        characters.dataset.loaded !==
-        "true"
-      ){
-
-        await loadCharacters(
-          user.id,
-          characters
-        );
-
-        characters.dataset.loaded =
-          "true";
-
-      }
-
+    if(characters.dataset.loaded !== "true"){
+      await loadCharacters(user.id,characters);
+      characters.dataset.loaded = "true";
     }
-  );
+  });
 
   section.appendChild(header);
-
   section.appendChild(characters);
-
   container.appendChild(section);
-
 }
-
 
 /* =========================
    LOAD CHARACTERS
 ========================= */
 
-async function loadCharacters(
-  userId,
-  container
-){
+async function loadCharacters(userId,container){
+  container.innerHTML =
+    '<div class="empty-sidebar">Loading characters...</div>';
 
-  container.innerHTML = `
-    <div class="empty-sidebar">
-      Loading characters...
-    </div>
-  `;
-
-  const {
-    data,
-    error
-  } =
+  const {data,error} =
     await supabaseClient
       .from("characters")
       .select("*")
       .eq("user_id",userId)
-      .order("created_at",{
-        ascending:false
-      });
+      .order("created_at",{ascending:false});
 
   if(error){
-
     console.error(error);
-
-    container.innerHTML = `
-      <div class="empty-sidebar">
-        Could not load characters.
-      </div>
-    `;
-
+    container.innerHTML =
+      '<div class="empty-sidebar">Could not load characters.</div>';
     return;
   }
 
   container.innerHTML = "";
 
   if(!data || data.length === 0){
-
-    container.innerHTML = `
-      <div class="empty-sidebar">
-        No characters.
-      </div>
-    `;
-
+    container.innerHTML =
+      '<div class="empty-sidebar">No characters.</div>';
     return;
   }
 
-  data.forEach(character => {
-
-    container.appendChild(
-      createCharacterItem(
-        character
-      )
-    );
-
+  data.forEach(character=>{
+    container.appendChild(createCharacterItem(character));
   });
-
 }
-
 
 /* =========================
    CHARACTER ITEM
 ========================= */
 
-function createCharacterItem(
-  character
-){
+function createCharacterItem(character){
+  const item = document.createElement("div");
+  item.className = "character-item";
 
-  const item =
-    document.createElement("div");
-
-  item.className =
-    "character-item";
-
-  const avatar =
-    document.createElement("img");
-
-  avatar.className =
-    "character-avatar";
-
+  const avatar = document.createElement("img");
+  avatar.className = "character-avatar";
   avatar.alt =
     character.custom_character ||
     character.character_type ||
     "Character";
-
-  avatar.src =
-    getDefaultAvatar();
+  avatar.src = getDefaultAvatar();
 
   if(character.avatar_url){
-
-    createSignedUrl(
-      "character-avatars",
-      character.avatar_url
-    ).then(url => {
-
-      if(url){
-
-        avatar.src = url;
-
-      }
-
+    createSignedUrl("character-avatars",character.avatar_url).then(url=>{
+      if(url) avatar.src = url;
     });
-
   }
 
-  const info =
-    document.createElement("div");
-
-  info.className =
-    "character-info";
+  const info = document.createElement("div");
+  info.className = "character-info";
 
   const name =
     character.custom_character ||
@@ -1228,74 +526,37 @@ function createCharacterItem(
     "Character";
 
   info.innerHTML = `
-
-    <div class="character-name">
-      ${escapeHtml(name)}
-    </div>
-
-    <div class="character-type">
-      ${escapeHtml(
-        character.character_type || ""
-      )}
-    </div>
-
-    <div class="character-mood">
-      ${escapeHtml(
-        character.chat_experience || ""
-      )}
-    </div>
-
+    <div class="character-name">${escapeHtml(name)}</div>
+    <div class="character-type">${escapeHtml(character.character_type || "")}</div>
+    <div class="character-mood">${escapeHtml(character.chat_experience || "")}</div>
+    ${character.sleep_mode === true
+      ? '<div class="character-sleep">💤 SLEEPING</div>'
+      : ''}
   `;
 
   item.appendChild(avatar);
-
   item.appendChild(info);
 
-  item.addEventListener(
-    "click",
-    async event => {
+  item.addEventListener("click",async event=>{
+    event.stopPropagation();
 
-      event.stopPropagation();
+    document.querySelectorAll(".character-item.active").forEach(el=>{
+      el.classList.remove("active");
+    });
 
-      document
-        .querySelectorAll(
-          ".character-item.active"
-        )
-        .forEach(el => {
-
-          el.classList.remove(
-            "active"
-          );
-
-        });
-
-      item.classList.add("active");
-
-      await selectCharacter(
-        character
-      );
-
-    }
-  );
+    item.classList.add("active");
+    await selectCharacter(character);
+  });
 
   return item;
-
 }
-
 
 /* =========================
    SELECT USER
 ========================= */
 
-async function selectUser(
-  userId,
-  characterId = null
-){
-
-  const {
-    data:user,
-    error
-  } =
+async function selectUser(userId,characterId=null){
+  const {data:user,error} =
     await supabaseClient
       .from("profiles")
       .select("*")
@@ -1303,67 +564,35 @@ async function selectUser(
       .single();
 
   if(error){
-
     console.error(error);
-
     return;
   }
 
   selectedUser = user;
 
   const sections =
-    document.querySelectorAll(
-      ".user-section"
-    );
+    document.querySelectorAll(".user-section");
 
   for(const section of sections){
-
     const email =
-      section
-        .querySelector(".user-email")
-        ?.textContent
-        ?.trim();
+      section.querySelector(".user-email")?.textContent?.trim();
 
     if(email === user.email){
-
       const characters =
-        section.querySelector(
-          ".characters"
-        );
-
+        section.querySelector(".characters");
       const header =
-        section.querySelector(
-          ".user-header"
-        );
+        section.querySelector(".user-header");
 
-      characters.classList.add(
-        "open"
-      );
+      characters.classList.add("open");
+      header.querySelector(".arrow")?.classList.add("open");
 
-      header
-        .querySelector(".arrow")
-        ?.classList.add("open");
-
-      if(
-        characters.dataset.loaded !==
-        "true"
-      ){
-
-        await loadCharacters(
-          userId,
-          characters
-        );
-
-        characters.dataset.loaded =
-          "true";
-
+      if(characters.dataset.loaded !== "true"){
+        await loadCharacters(userId,characters);
+        characters.dataset.loaded = "true";
       }
 
       if(characterId){
-
-        const {
-          data:character
-        } =
+        const {data:character} =
           await supabaseClient
             .from("characters")
             .select("*")
@@ -1372,72 +601,46 @@ async function selectUser(
             .maybeSingle();
 
         if(character){
-
-          await selectCharacter(
-            character
-          );
-
+          await selectCharacter(character);
           return;
         }
-
       }
 
-      const {
-        data:charactersData
-      } =
+      const {data:charactersData} =
         await supabaseClient
           .from("characters")
           .select("*")
           .eq("user_id",userId)
-          .order("created_at",{
-            ascending:false
-          })
+          .order("created_at",{ascending:false})
           .limit(1);
 
-      if(
-        charactersData &&
-        charactersData.length
-      ){
-
-        await selectCharacter(
-          charactersData[0]
-        );
-
+      if(charactersData && charactersData.length){
+        await selectCharacter(charactersData[0]);
       }
 
       return;
     }
-
   }
-
 }
-
 
 /* =========================
    SELECT CHARACTER
 ========================= */
 
-async function selectCharacter(
-  character
-){
+async function selectCharacter(character){
+  stopCharacterRealtime();
 
-  selectedCharacter =
-    character;
+  selectedCharacter = character;
 
   if(!selectedUser){
-
-    const {
-      data:user
-    } =
+    const {data:user} =
       await supabaseClient
         .from("profiles")
         .select("*")
         .eq("id",character.user_id)
         .single();
 
-    selectedUser =
-      user;
-
+    selectedUser = user;
   }
 
   const name =
@@ -1445,384 +648,352 @@ async function selectCharacter(
     character.character_type ||
     "Character";
 
-  document.getElementById(
-    "headerName"
-  ).textContent =
-    name;
-
-  document.getElementById(
-    "headerUser"
-  ).textContent =
+  document.getElementById("headerName").textContent = name;
+  document.getElementById("headerUser").textContent =
     selectedUser
-      ? (
-          selectedUser.name ||
-          selectedUser.email ||
-          "User"
-        )
+      ? (selectedUser.name || selectedUser.email || "User")
       : "User";
 
-  document.getElementById(
-    "headerMood"
-  ).textContent =
+  document.getElementById("headerMood").textContent =
     character.chat_experience
       ? `Mood: ${character.chat_experience}`
       : "";
 
   const headerAvatar =
-    document.getElementById(
-      "headerAvatar"
-    );
+    document.getElementById("headerAvatar");
 
-  headerAvatar.src =
-    getDefaultAvatar();
-
-  headerAvatar.style.display =
-    "block";
+  headerAvatar.src = getDefaultAvatar();
+  headerAvatar.style.display = "block";
 
   if(character.avatar_url){
-
     const url =
-      await createSignedUrl(
-        "character-avatars",
-        character.avatar_url
-      );
-
-    if(url){
-
-      headerAvatar.src =
-        url;
-
-    }
-
+      await createSignedUrl("character-avatars",character.avatar_url);
+    if(url) headerAvatar.src = url;
   }
 
+  updateSleepModeUI();
   cancelReply();
 
-  await loadConversation(
-    character
-  );
+  await loadConversation(character);
 
+  startCharacterRealtime();
 }
 
+/* =========================
+   SLEEP MODE UI
+========================= */
+
+function updateSleepModeUI(){
+  const button =
+    document.getElementById("sleepToggle");
+
+  if(!button) return;
+
+  if(!selectedCharacter){
+    button.disabled = true;
+    button.className = "sleep-toggle off";
+    button.textContent = "🟢 OFF";
+    return;
+  }
+
+  button.disabled = false;
+
+  const sleeping =
+    selectedCharacter.sleep_mode === true;
+
+  if(sleeping){
+    button.className = "sleep-toggle on";
+    button.textContent = "💤 ON";
+  }else{
+    button.className = "sleep-toggle off";
+    button.textContent = "🟢 OFF";
+  }
+}
+
+/* =========================
+   TOGGLE SLEEP MODE
+========================= */
+
+async function toggleSleepMode(){
+  if(!selectedCharacter || !selectedCharacter.id){
+    alert("Please select a character first.");
+    return;
+  }
+
+  const button =
+    document.getElementById("sleepToggle");
+
+  const newValue =
+    selectedCharacter.sleep_mode !== true;
+
+  if(button){
+    button.disabled = true;
+    button.textContent =
+      newValue ? "Turning ON..." : "Turning OFF...";
+  }
+
+  try{
+    const {data,error} =
+      await supabaseClient
+        .from("characters")
+        .update({sleep_mode:newValue})
+        .eq("id",selectedCharacter.id)
+        .select("*")
+        .single();
+
+    if(error) throw error;
+
+    selectedCharacter = data;
+    updateSleepModeUI();
+
+    console.log("Sleep Mode changed:",newValue);
+
+  }catch(error){
+    console.error("SLEEP MODE ERROR:",error);
+    alert(
+      "Could not change Sleep Mode.\n\n" +
+      (error.message || "Unknown error")
+    );
+    updateSleepModeUI();
+  }
+}
+
+/* =========================
+   CHARACTER REALTIME
+========================= */
+
+function startCharacterRealtime(){
+  stopCharacterRealtime();
+
+  if(!selectedCharacter || !selectedCharacter.id) return;
+
+  characterRealtimeChannel =
+    supabaseClient
+      .channel(
+        "admin-character-" +
+        selectedCharacter.id +
+        "-" +
+        Date.now()
+      )
+      .on(
+        "postgres_changes",
+        {
+          event:"UPDATE",
+          schema:"public",
+          table:"characters",
+          filter:`id=eq.${selectedCharacter.id}`
+        },
+        payload=>{
+          console.log("CHARACTER UPDATE:",payload.new);
+
+          if(
+            payload.new &&
+            payload.new.id === selectedCharacter.id
+          ){
+            selectedCharacter = {
+              ...selectedCharacter,
+              ...payload.new
+            };
+
+            updateSleepModeUI();
+          }
+        }
+      )
+      .subscribe(status=>{
+        console.log("CHARACTER REALTIME:",status);
+      });
+}
+
+function stopCharacterRealtime(){
+  if(characterRealtimeChannel){
+    supabaseClient.removeChannel(characterRealtimeChannel);
+    characterRealtimeChannel = null;
+  }
+}
 
 /* =========================
    LOAD CONVERSATION
 ========================= */
 
-async function loadConversation(
-  character
-){
-
+async function loadConversation(character){
   stopRealtime();
+  conversationId = null;
 
-  conversationId =
-    null;
-
-  const {
-    data,
-    error
-  } =
+  const {data,error} =
     await supabaseClient
       .from("conversations")
       .select("*")
       .eq("user_id",character.user_id)
       .eq("character_id",character.id)
-      .order("created_at",{
-        ascending:false
-      })
+      .order("created_at",{ascending:false})
       .limit(1);
 
   if(error){
-
     console.error(error);
-
-    showEmpty(
-      "Could not load conversation."
-    );
-
+    showEmpty("Could not load conversation.");
     return;
   }
 
   if(!data || data.length === 0){
-
-    showEmpty(
-      "No conversation yet."
-    );
-
+    showEmpty("No conversation yet.");
     return;
   }
 
-  conversationId =
-    data[0].id;
+  conversationId = data[0].id;
 
   await loadMessages();
-
   startRealtime();
-
 }
-
 
 /* =========================
    LOAD MESSAGES
 ========================= */
 
 async function loadMessages(){
-
   if(!conversationId){
-
-    showEmpty(
-      "No conversation yet."
-    );
-
+    showEmpty("No conversation yet.");
     return;
   }
 
   const messages =
-    document.getElementById(
-      "messages"
-    );
+    document.getElementById("messages");
 
   messages.innerHTML = "";
 
-  const {
-    data,
-    error
-  } =
+  const {data,error} =
     await supabaseClient
       .from("messages")
       .select("*")
-      .eq(
-        "conversation_id",
-        conversationId
-      )
-      .order("created_at",{
-        ascending:true
-      });
+      .eq("conversation_id",conversationId)
+      .order("created_at",{ascending:true});
 
   if(error){
-
     console.error(error);
-
-    showEmpty(
-      "Could not load messages."
-    );
-
+    showEmpty("Could not load messages.");
     return;
   }
 
   if(!data || data.length === 0){
-
-    showEmpty(
-      "No messages yet."
-    );
-
+    showEmpty("No messages yet.");
     return;
   }
 
   for(const message of data){
-
-    await addMessage(
-      message,
-      data
-    );
-
+    await addMessage(message,data);
   }
 
   scrollBottom();
-
 }
-
 
 /* =========================
    ADD MESSAGE
 ========================= */
 
-async function addMessage(
-  message,
-  allMessages = []
-){
-
-  if(!message || !message.id){
-
-    return;
-
-  }
+async function addMessage(message,allMessages=[]){
+  if(!message || !message.id) return;
 
   const messages =
-    document.getElementById(
-      "messages"
-    );
-
-  /* PREVENT DUPLICATE */
+    document.getElementById("messages");
 
   const existing =
     messages.querySelector(
       `[data-message-id="${message.id}"]`
     );
 
-  if(existing){
-
-    return;
-
-  }
+  if(existing) return;
 
   const empty =
-    messages.querySelector(
-      ".empty-chat"
-    );
+    messages.querySelector(".empty-chat");
 
-  if(empty){
-
-    empty.remove();
-
-  }
+  if(empty) empty.remove();
 
   const isAdmin =
-    message.sender_id ===
-    currentUser.id;
+    message.sender_id === currentUser.id;
 
   const row =
     document.createElement("div");
 
   row.className =
-    "message-row " +
-    (
-      isAdmin
-        ? "admin"
-        : "user"
-    );
+    "message-row " + (isAdmin ? "admin" : "user");
 
-  row.dataset.messageId =
-    message.id;
+  row.dataset.messageId = message.id;
 
   const bubble =
     document.createElement("div");
 
-  bubble.className =
-    "message";
+  bubble.className = "message";
 
-
-  /* REPLIED MESSAGE */
-
+  /* REPLY PREVIEW */
   if(message.reply_to){
-
     let repliedMessage = null;
 
     if(allMessages.length){
-
       repliedMessage =
-        allMessages.find(
-          m =>
-            m.id ===
-            message.reply_to
-        );
-
+        allMessages.find(m=>m.id === message.reply_to);
     }
 
     if(!repliedMessage){
-
-      const {
-        data
-      } =
+      const {data} =
         await supabaseClient
           .from("messages")
           .select("*")
-          .eq(
-            "id",
-            message.reply_to
-          )
+          .eq("id",message.reply_to)
           .maybeSingle();
 
-      repliedMessage =
-        data;
-
+      repliedMessage = data;
     }
 
     if(repliedMessage){
-
       const replyBox =
         document.createElement("div");
 
-      replyBox.className =
-        "reply-preview";
+      replyBox.className = "reply-preview";
 
       const replyLabel =
         document.createElement("div");
 
-      replyLabel.className =
-        "reply-label";
-
+      replyLabel.className = "reply-label";
       replyLabel.textContent =
-        repliedMessage.sender_id ===
-        currentUser.id
+        repliedMessage.sender_id === currentUser.id
           ? "You"
           : "User";
 
       const replyText =
         document.createElement("div");
 
-      replyText.className =
-        "reply-text";
+      replyText.className = "reply-text";
 
       if(repliedMessage.content){
-
-        replyText.textContent =
-          repliedMessage.content;
-
-      }else if(
-        repliedMessage.image_path
-      ){
-
-        replyText.textContent =
-          "📷 Image";
-
+        replyText.textContent = repliedMessage.content;
+      }else if(repliedMessage.image_path){
+        replyText.textContent = "📷 Image";
       }else{
-
-        replyText.textContent =
-          "Message";
-
+        replyText.textContent = "Message";
       }
 
-      replyBox.appendChild(
-        replyLabel
-      );
+      replyBox.appendChild(replyLabel);
+      replyBox.appendChild(replyText);
 
-      replyBox.appendChild(
-        replyText
-      );
+      replyBox.onclick = ()=>{
+        const target =
+          document.querySelector(
+            `[data-message-id="${repliedMessage.id}"]`
+          );
 
-      replyBox.onclick =
-        () => {
+        if(target){
+          target.scrollIntoView({
+            behavior:"smooth",
+            block:"center"
+          });
+        }
+      };
 
-          const target =
-            document.querySelector(
-              `[data-message-id="${repliedMessage.id}"]`
-            );
-
-          if(target){
-
-            target.scrollIntoView({
-              behavior:"smooth",
-              block:"center"
-            });
-
-          }
-
-        };
-
-      bubble.appendChild(
-        replyBox
-      );
-
+      bubble.appendChild(replyBox);
     }
-
   }
 
-
   /* IMAGE */
-
   if(message.image_path){
-
     const imageUrl =
       await createSignedUrl(
         "chat-images",
@@ -1830,469 +1001,239 @@ async function addMessage(
       );
 
     if(imageUrl){
-
       const img =
         document.createElement("img");
 
-      img.className =
-        "message-image";
+      img.className = "message-image";
+      img.src = imageUrl;
+      img.alt = message.image_name || "Image";
 
-      img.src =
-        imageUrl;
-
-      img.alt =
-        message.image_name ||
-        "Image";
-
-      img.onclick =
-        () => {
-
-          window.open(
-            imageUrl,
-            "_blank"
-          );
-
-        };
+      img.onclick = ()=>{
+        window.open(imageUrl,"_blank");
+      };
 
       bubble.appendChild(img);
-
     }
-
   }
 
-
   /* TEXT */
-
   if(message.content){
-
     const text =
       document.createElement("div");
 
-    text.className =
-      "message-text";
-
-    text.textContent =
-      message.content;
+    text.className = "message-text";
+    text.textContent = message.content;
 
     bubble.appendChild(text);
-
   }
 
-
-  /* MESSAGE ACTIONS */
-
+  /* ACTIONS */
   const actions =
     document.createElement("div");
 
-  actions.className =
-    "message-actions";
-
-
-  /* REPLY BUTTON */
+  actions.className = "message-actions";
 
   const replyButton =
     document.createElement("button");
 
-  replyButton.className =
-    "reply-button";
+  replyButton.className = "reply-button";
+  replyButton.type = "button";
+  replyButton.textContent = "↩ Reply";
 
-  replyButton.type =
-    "button";
+  replyButton.onclick = ()=>{
+    startReply(message);
+  };
 
-  replyButton.textContent =
-    "↩ Reply";
-
-  replyButton.onclick =
-    () => {
-
-      startReply(
-        message
-      );
-
-    };
-
-  actions.appendChild(
-    replyButton
-  );
-
-
-  /* DELETE BUTTON */
+  actions.appendChild(replyButton);
 
   const deleteButton =
     document.createElement("button");
 
-  deleteButton.className =
-    "delete-button";
+  deleteButton.className = "delete-button";
+  deleteButton.type = "button";
+  deleteButton.textContent = "🗑 Delete";
 
-  deleteButton.type =
-    "button";
+  deleteButton.onclick = ()=>{
+    deleteMessage(message.id,deleteButton);
+  };
 
-  deleteButton.textContent =
-    "🗑 Delete";
-
-  deleteButton.onclick =
-    () => {
-
-      deleteMessage(
-        message.id,
-        deleteButton
-      );
-
-    };
-
-  actions.appendChild(
-    deleteButton
-  );
-
-
-  bubble.appendChild(
-    actions
-  );
-
+  actions.appendChild(deleteButton);
+  bubble.appendChild(actions);
 
   /* TIME */
-
   const time =
     document.createElement("div");
 
-  time.className =
-    "message-time";
+  time.className = "message-time";
+  time.textContent = formatTime(message.created_at);
 
-  time.textContent =
-    formatTime(
-      message.created_at
-    );
+  bubble.appendChild(time);
+  row.appendChild(bubble);
+  messages.appendChild(row);
 
-  bubble.appendChild(
-    time
-  );
-
-  row.appendChild(
-    bubble
-  );
-
-  messages.appendChild(
-    row
-  );
-
-
-  /* AUTO SCROLL */
-
-  setTimeout(() => {
-
+  setTimeout(()=>{
     const container =
-      document.getElementById(
-        "messages"
-      );
+      document.getElementById("messages");
 
     if(container){
-
-      container.scrollTop =
-        container.scrollHeight;
-
+      container.scrollTop = container.scrollHeight;
     }
-
   },50);
-
 }
-
 
 /* =========================
    DELETE MESSAGE
 ========================= */
 
-async function deleteMessage(
-  messageId,
-  button
-){
-
-  if(!messageId){
-
-    return;
-
-  }
+async function deleteMessage(messageId,button){
+  if(!messageId) return;
 
   const confirmed =
-    confirm(
-      "Delete this message for everyone?"
-    );
+    confirm("Delete this message for everyone?");
 
-  if(!confirmed){
-
-    return;
-
-  }
+  if(!confirmed) return;
 
   if(button){
-
-    button.disabled =
-      true;
-
-    button.textContent =
-      "Deleting...";
-
+    button.disabled = true;
+    button.textContent = "Deleting...";
   }
 
   try{
-
-    const {
-      error
-    } =
+    const {error} =
       await supabaseClient
         .from("messages")
         .delete()
-        .eq(
-          "id",
-          messageId
-        )
-        .eq(
-          "conversation_id",
-          conversationId
-        );
+        .eq("id",messageId)
+        .eq("conversation_id",conversationId);
 
-    if(error){
+    if(error) throw error;
 
-      throw error;
-
-    }
-
-    /* REMOVE IMMEDIATELY FROM ADMIN UI */
-
-    removeMessageFromUI(
-      messageId
-    );
-
-    /* IF THIS MESSAGE WAS BEING REPLIED TO */
+    removeMessageFromUI(messageId);
 
     if(
       replyingToMessage &&
       replyingToMessage.id === messageId
     ){
-
       cancelReply();
-
     }
 
   }catch(error){
-
-    console.error(
-      "DELETE MESSAGE ERROR:",
-      error
-    );
-
-    alert(
-      "Could not delete message."
-    );
+    console.error("DELETE MESSAGE ERROR:",error);
+    alert("Could not delete message.");
 
     if(button){
-
-      button.disabled =
-        false;
-
-      button.textContent =
-        "🗑 Delete";
-
+      button.disabled = false;
+      button.textContent = "🗑 Delete";
     }
-
   }
-
 }
-
 
 /* =========================
    REMOVE MESSAGE FROM UI
 ========================= */
 
-function removeMessageFromUI(
-  messageId
-){
-
-  if(!messageId){
-
-    return;
-
-  }
+function removeMessageFromUI(messageId){
+  if(!messageId) return;
 
   const target =
     document.querySelector(
       `[data-message-id="${messageId}"]`
     );
 
-  if(target){
-
-    target.remove();
-
-  }
+  if(target) target.remove();
 
   const messages =
-    document.getElementById(
-      "messages"
-    );
+    document.getElementById("messages");
 
   if(
     messages &&
-    !messages.querySelector(
-      ".message-row"
-    )
+    !messages.querySelector(".message-row")
   ){
-
-    showEmpty(
-      "No messages yet."
-    );
-
+    showEmpty("No messages yet.");
   }
-
 }
-
 
 /* =========================
    START REPLY
 ========================= */
 
-function startReply(
-  message
-){
-
-  replyingToMessage =
-    message;
+function startReply(message){
+  replyingToMessage = message;
 
   const replyComposer =
-    document.getElementById(
-      "replyComposer"
-    );
+    document.getElementById("replyComposer");
 
   const replyText =
-    document.getElementById(
-      "replyComposerText"
-    );
+    document.getElementById("replyComposerText");
 
-  let preview =
-    "";
+  let preview = "";
 
   if(message.content){
-
-    preview =
-      message.content;
-
-  }else if(
-    message.image_path
-  ){
-
-    preview =
-      "📷 Image";
-
+    preview = message.content;
+  }else if(message.image_path){
+    preview = "📷 Image";
   }else{
-
-    preview =
-      "Message";
-
+    preview = "Message";
   }
 
-  replyText.textContent =
-    preview;
+  replyText.textContent = preview;
+  replyComposer.classList.add("show");
 
-  replyComposer.classList.add(
-    "show"
-  );
-
-  const input =
-    document.getElementById(
-      "messageInput"
-    );
-
-  input.focus();
-
+  document.getElementById("messageInput").focus();
 }
-
 
 /* =========================
    CANCEL REPLY
 ========================= */
 
 function cancelReply(){
+  replyingToMessage = null;
 
-  replyingToMessage =
-    null;
+  document
+    .getElementById("replyComposer")
+    .classList.remove("show");
 
-  const replyComposer =
-    document.getElementById(
-      "replyComposer"
-    );
-
-  replyComposer.classList.remove(
-    "show"
-  );
-
-  const replyText =
-    document.getElementById(
-      "replyComposerText"
-    );
-
-  replyText.textContent =
-    "";
-
+  document
+    .getElementById("replyComposerText")
+    .textContent = "";
 }
-
 
 /* =========================
    SEND MESSAGE
 ========================= */
 
 async function sendMessage(){
-
   if(
     !selectedUser ||
     !selectedCharacter ||
     !conversationId
   ){
-
-    alert(
-      "Please select a character first."
-    );
-
+    alert("Please select a character first.");
     return;
   }
 
   const input =
-    document.getElementById(
-      "messageInput"
-    );
+    document.getElementById("messageInput");
 
-  const content =
-    input.value.trim();
+  const content = input.value.trim();
 
-  if(
-    !content &&
-    !selectedImage
-  ){
-
-    return;
-  }
+  if(!content && !selectedImage) return;
 
   const sendButton =
-    document.getElementById(
-      "sendButton"
-    );
+    document.getElementById("sendButton");
 
   const imageButton =
-    document.getElementById(
-      "imageButton"
-    );
+    document.getElementById("imageButton");
 
-  sendButton.disabled =
-    true;
-
-  imageButton.disabled =
-    true;
+  sendButton.disabled = true;
+  imageButton.disabled = true;
 
   try{
-
     let imagePath = null;
     let imageType = null;
     let imageName = null;
 
     if(selectedImage){
-
       const extension =
         selectedImage.name
           .split(".")
@@ -2302,9 +1243,7 @@ async function sendMessage(){
       const fileName =
         `${selectedUser.id}/${conversationId}/${Date.now()}-${crypto.randomUUID()}.${extension}`;
 
-      const {
-        error
-      } =
+      const {error} =
         await supabaseClient
           .storage
           .from("chat-images")
@@ -2312,259 +1251,119 @@ async function sendMessage(){
             fileName,
             selectedImage,
             {
-              contentType:
-                selectedImage.type,
+              contentType:selectedImage.type,
               upsert:false
             }
           );
 
-      if(error){
+      if(error) throw error;
 
-        throw error;
-
-      }
-
-      imagePath =
-        fileName;
-
-      imageType =
-        selectedImage.type;
-
-      imageName =
-        selectedImage.name;
-
+      imagePath = fileName;
+      imageType = selectedImage.type;
+      imageName = selectedImage.name;
     }
 
     const messageData = {
-
-      conversation_id:
-        conversationId,
-
-      sender_id:
-        currentUser.id,
-
-      content:
-        content,
-
-      image_path:
-        imagePath,
-
-      image_type:
-        imageType,
-
-      image_name:
-        imageName
-
+      conversation_id:conversationId,
+      sender_id:currentUser.id,
+      content:content,
+      image_path:imagePath,
+      image_type:imageType,
+      image_name:imageName
     };
 
     if(replyingToMessage){
-
-      messageData.reply_to =
-        replyingToMessage.id;
-
+      messageData.reply_to = replyingToMessage.id;
     }
 
-    const {
-      error
-    } =
+    const {error} =
       await supabaseClient
         .from("messages")
-        .insert(
-          messageData
-        );
+        .insert(messageData);
 
-    if(error){
+    if(error) throw error;
 
-      throw error;
-
-    }
-
-    input.value =
-      "";
-
-    input.style.height =
-      "42px";
-
+    input.value = "";
+    input.style.height = "42px";
     removeImage();
-
     cancelReply();
 
   }catch(error){
-
-    console.error(
-      "SEND MESSAGE ERROR:",
-      error
-    );
-
-    alert(
-      "Could not send message."
-    );
-
+    console.error("SEND MESSAGE ERROR:",error);
+    alert("Could not send message.");
   }finally{
-
-    sendButton.disabled =
-      false;
-
-    imageButton.disabled =
-      false;
-
+    sendButton.disabled = false;
+    imageButton.disabled = false;
     input.focus();
-
   }
-
 }
-
 
 /* =========================
    ENTER TO SEND
 ========================= */
 
 document
-  .getElementById(
-    "messageInput"
-  )
-  .addEventListener(
-    "keydown",
-    function(event){
-
-      if(
-        event.key === "Enter" &&
-        !event.shiftKey
-      ){
-
-        event.preventDefault();
-
-        sendMessage();
-
-      }
-
+  .getElementById("messageInput")
+  .addEventListener("keydown",function(event){
+    if(event.key === "Enter" && !event.shiftKey){
+      event.preventDefault();
+      sendMessage();
     }
-  );
-
+  });
 
 /* =========================
    IMAGE INPUT
 ========================= */
 
 document
-  .getElementById(
-    "imageInput"
-  )
-  .addEventListener(
-    "change",
-    function(event){
+  .getElementById("imageInput")
+  .addEventListener("change",function(event){
+    const file = event.target.files[0];
 
-      const file =
-        event.target.files[0];
+    if(!file) return;
 
-      if(!file){
-
-        return;
-
-      }
-
-      if(
-        !file.type.startsWith(
-          "image/"
-        )
-      ){
-
-        alert(
-          "Please select an image."
-        );
-
-        event.target.value =
-          "";
-
-        return;
-
-      }
-
-      if(
-        file.size >
-        5 * 1024 * 1024
-      ){
-
-        alert(
-          "Image must be smaller than 5 MB."
-        );
-
-        event.target.value =
-          "";
-
-        return;
-
-      }
-
-      selectedImage =
-        file;
-
-      const reader =
-        new FileReader();
-
-      reader.onload =
-        function(e){
-
-          document.getElementById(
-            "previewImage"
-          ).src =
-            e.target.result;
-
-          document.getElementById(
-            "imagePreview"
-          ).classList.add(
-            "show"
-          );
-
-        };
-
-      reader.readAsDataURL(
-        file
-      );
-
+    if(!file.type.startsWith("image/")){
+      alert("Please select an image.");
+      event.target.value = "";
+      return;
     }
-  );
 
+    if(file.size > 5 * 1024 * 1024){
+      alert("Image must be smaller than 5 MB.");
+      event.target.value = "";
+      return;
+    }
+
+    selectedImage = file;
+
+    const reader = new FileReader();
+
+    reader.onload = function(e){
+      document.getElementById("previewImage").src = e.target.result;
+      document.getElementById("imagePreview").classList.add("show");
+    };
+
+    reader.readAsDataURL(file);
+  });
 
 /* =========================
    REMOVE IMAGE
 ========================= */
 
 function removeImage(){
+  selectedImage = null;
 
-  selectedImage =
-    null;
-
-  document.getElementById(
-    "imageInput"
-  ).value =
-    "";
-
-  document.getElementById(
-    "previewImage"
-  ).src =
-    "";
-
-  document.getElementById(
-    "imagePreview"
-  ).classList.remove(
-    "show"
-  );
-
+  document.getElementById("imageInput").value = "";
+  document.getElementById("previewImage").src = "";
+  document.getElementById("imagePreview").classList.remove("show");
 }
 
-
 /* =========================
-   REALTIME
+   REALTIME MESSAGES
 ========================= */
 
 function startRealtime(){
-
-  if(!conversationId){
-
-    return;
-
-  }
+  if(!conversationId) return;
 
   stopRealtime();
 
@@ -2577,35 +1376,20 @@ function startRealtime(){
         Date.now()
       )
 
-      /* NEW MESSAGE */
-
       .on(
         "postgres_changes",
         {
           event:"INSERT",
           schema:"public",
           table:"messages",
-          filter:
-            `conversation_id=eq.${conversationId}`
+          filter:`conversation_id=eq.${conversationId}`
         },
-        async payload => {
-
-          console.log(
-            "REALTIME MESSAGE:",
-            payload.new
-          );
-
-          await addMessage(
-            payload.new,
-            []
-          );
-
+        async payload=>{
+          console.log("REALTIME MESSAGE:",payload.new);
+          await addMessage(payload.new,[]);
           scrollBottom();
-
         }
       )
-
-      /* DELETED MESSAGE */
 
       .on(
         "postgres_changes",
@@ -2613,294 +1397,155 @@ function startRealtime(){
           event:"DELETE",
           schema:"public",
           table:"messages",
-          filter:
-            `conversation_id=eq.${conversationId}`
+          filter:`conversation_id=eq.${conversationId}`
         },
-        payload => {
+        payload=>{
+          console.log("REALTIME DELETE:",payload.old);
 
-          console.log(
-            "REALTIME DELETE:",
-            payload.old
-          );
-
-          if(
-            payload.old &&
-            payload.old.id
-          ){
-
-            removeMessageFromUI(
-              payload.old.id
-            );
-
+          if(payload.old && payload.old.id){
+            removeMessageFromUI(payload.old.id);
           }
-
         }
       )
 
-      .subscribe(
-        status => {
-
-          console.log(
-            "ADMIN REALTIME:",
-            status
-          );
-
-        }
-      );
-
+      .subscribe(status=>{
+        console.log("ADMIN REALTIME:",status);
+      });
 }
-
 
 /* =========================
    STOP REALTIME
 ========================= */
 
 function stopRealtime(){
-
   if(realtimeChannel){
-
-    supabaseClient
-      .removeChannel(
-        realtimeChannel
-      );
-
-    realtimeChannel =
-      null;
-
+    supabaseClient.removeChannel(realtimeChannel);
+    realtimeChannel = null;
   }
-
 }
-
 
 /* =========================
    SIGNED URL
 ========================= */
 
-async function createSignedUrl(
-  bucket,
-  path
-){
-
-  if(!path){
-
-    return null;
-
-  }
+async function createSignedUrl(bucket,path){
+  if(!path) return null;
 
   try{
-
-    const {
-      data,
-      error
-    } =
+    const {data,error} =
       await supabaseClient
         .storage
         .from(bucket)
-        .createSignedUrl(
-          path,
-          60 * 60
-        );
+        .createSignedUrl(path,60 * 60);
 
     if(error){
-
-      console.error(
-        "SIGNED URL ERROR:",
-        error
-      );
-
+      console.error("SIGNED URL ERROR:",error);
       return null;
-
     }
 
-    return data?.signedUrl ||
-      null;
+    return data?.signedUrl || null;
 
   }catch(error){
-
     console.error(error);
-
     return null;
-
   }
-
 }
-
 
 /* =========================
    DEFAULT AVATAR
 ========================= */
 
 function getDefaultAvatar(){
-
   return `
     data:image/svg+xml;charset=UTF-8,
     ${encodeURIComponent(`
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="100"
-        height="100"
-        viewBox="0 0 100 100"
-      >
-        <rect
-          width="100"
-          height="100"
-          rx="50"
-          fill="#202637"
-        />
-        <circle
-          cx="50"
-          cy="38"
-          r="17"
-          fill="#8b93a5"
-        />
-        <path
-          d="M20 85c4-20 16-29 30-29s26 9 30 29"
-          fill="#8b93a5"
-        />
+      <svg xmlns="http://www.w3.org/2000/svg"
+           width="100" height="100" viewBox="0 0 100 100">
+        <rect width="100" height="100" rx="50" fill="#202637"/>
+        <circle cx="50" cy="38" r="17" fill="#8b93a5"/>
+        <path d="M20 85c4-20 16-29 30-29s26 9 30 29"
+              fill="#8b93a5"/>
       </svg>
     `)}
   `;
-
 }
-
 
 /* =========================
    EMPTY
 ========================= */
 
 function showEmpty(text){
-
-  document.getElementById(
-    "messages"
-  ).innerHTML = `
-
+  document.getElementById("messages").innerHTML = `
     <div class="empty-chat">
-
-      <h3>
-        ${escapeHtml(text)}
-      </h3>
-
+      <h3>${escapeHtml(text)}</h3>
     </div>
-
   `;
-
 }
-
 
 /* =========================
    SCROLL
 ========================= */
 
 function scrollBottom(){
-
-  setTimeout(() => {
-
+  setTimeout(()=>{
     const messages =
-      document.getElementById(
-        "messages"
-      );
+      document.getElementById("messages");
 
     if(messages){
-
-      messages.scrollTop =
-        messages.scrollHeight;
-
+      messages.scrollTop = messages.scrollHeight;
     }
-
   },50);
-
 }
-
 
 /* =========================
    FORMAT TIME
 ========================= */
 
 function formatTime(value){
+  if(!value) return "";
 
-  if(!value){
-
-    return "";
-
-  }
-
-  return new Date(value)
-    .toLocaleString(
-      [],
-      {
-        hour:"2-digit",
-        minute:"2-digit"
-      }
-    );
-
+  return new Date(value).toLocaleString([],{
+    hour:"2-digit",
+    minute:"2-digit"
+  });
 }
-
 
 /* =========================
    ESCAPE HTML
 ========================= */
 
 function escapeHtml(text){
-
-  const div =
-    document.createElement(
-      "div"
-    );
-
-  div.textContent =
-    text ?? "";
-
+  const div = document.createElement("div");
+  div.textContent = text ?? "";
   return div.innerHTML;
-
 }
-
 
 /* =========================
    AUTO RESIZE
 ========================= */
 
 document
-  .getElementById(
-    "messageInput"
-  )
-  .addEventListener(
-    "input",
-    function(){
-
-      this.style.height =
-        "42px";
-
-      this.style.height =
-        Math.min(
-          this.scrollHeight,
-          130
-        ) + "px";
-
-    }
-  );
-
+  .getElementById("messageInput")
+  .addEventListener("input",function(){
+    this.style.height = "42px";
+    this.style.height =
+      Math.min(this.scrollHeight,130) + "px";
+  });
 
 /* =========================
    BEFORE UNLOAD
 ========================= */
 
-window.addEventListener(
-  "beforeunload",
-  () => {
-
-    stopRealtime();
-
-  }
-);
-
+window.addEventListener("beforeunload",()=>{
+  stopRealtime();
+  stopCharacterRealtime();
+});
 
 /* =========================
    START
 ========================= */
 
 init();
-
 </script>
-
 </body>
 </html>
