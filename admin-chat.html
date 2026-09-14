@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Admin Chat</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -17,178 +19,304 @@
     body {
       font-family: Inter, Arial, sans-serif;
       min-height: 100vh;
+
       background:
-        radial-gradient(circle at top left, rgba(91,33,182,.35), transparent 35%),
-        radial-gradient(circle at bottom right, rgba(6,182,212,.25), transparent 35%),
+        radial-gradient(
+          circle at top left,
+          rgba(124,58,237,0.30),
+          transparent 35%
+        ),
+        radial-gradient(
+          circle at bottom right,
+          rgba(6,182,212,0.20),
+          transparent 35%
+        ),
         #070b14;
-      color: #fff;
+
+      color: white;
+
       padding: 16px;
     }
 
     .app {
       width: 100%;
-      max-width: 1250px;
+      max-width: 1200px;
+
       height: calc(100vh - 32px);
-      min-height: 600px;
+
       margin: auto;
+
       display: flex;
+
       overflow: hidden;
-      border-radius: 24px;
-      background: rgba(15,23,42,.78);
-      border: 1px solid rgba(255,255,255,.1);
-      backdrop-filter: blur(22px);
-      box-shadow: 0 25px 80px rgba(0,0,0,.45);
+
+      border-radius: 22px;
+
+      background:
+        rgba(15,23,42,0.78);
+
+      border:
+        1px solid rgba(255,255,255,0.10);
+
+      backdrop-filter: blur(20px);
+
+      box-shadow:
+        0 25px 80px rgba(0,0,0,0.45);
     }
 
-    .users {
-      width: 300px;
+    /* =========================
+       SIDEBAR
+    ========================= */
+
+    .sidebar {
+      width: 290px;
+
       flex-shrink: 0;
-      border-right: 1px solid rgba(255,255,255,.08);
+
+      border-right:
+        1px solid rgba(255,255,255,0.08);
+
       display: flex;
+
       flex-direction: column;
     }
 
-    .users-header {
+    .sidebar-header {
       padding: 20px;
-      border-bottom: 1px solid rgba(255,255,255,.08);
+
+      border-bottom:
+        1px solid rgba(255,255,255,0.08);
     }
 
-    .users-header h2 {
-      font-size: 20px;
+    .sidebar-title {
+      font-size: 19px;
+
+      font-weight: 800;
     }
 
-    .users-header p {
+    .sidebar-subtitle {
       margin-top: 5px;
+
       font-size: 12px;
-      opacity: .5;
+
+      color:
+        rgba(255,255,255,0.45);
     }
 
-    .user-list {
+    .users {
       flex: 1;
+
       overflow-y: auto;
-      padding: 10px;
     }
 
     .user-item {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 6px;
-      border: none;
-      border-radius: 14px;
-      background: transparent;
-      color: #fff;
-      text-align: left;
-      cursor: pointer;
       display: flex;
+
       align-items: center;
+
       gap: 11px;
+
+      padding: 13px 15px;
+
+      cursor: pointer;
+
+      border-bottom:
+        1px solid rgba(255,255,255,0.04);
+
+      transition: 0.2s;
     }
 
-    .user-item:hover,
+    .user-item:hover {
+      background:
+        rgba(255,255,255,0.05);
+    }
+
     .user-item.active {
-      background: rgba(124,58,237,.18);
+      background:
+        rgba(124,58,237,0.18);
+
+      border-left:
+        3px solid #8b5cf6;
     }
 
     .user-avatar {
-      width: 40px;
-      height: 40px;
-      flex-shrink: 0;
+      width: 42px;
+      height: 42px;
+
       border-radius: 50%;
+
+      flex-shrink: 0;
+
       display: flex;
+
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg,#7c3aed,#06b6d4);
-      font-size: 18px;
+
+      background:
+        linear-gradient(
+          135deg,
+          #7c3aed,
+          #06b6d4
+        );
+
+      overflow: hidden;
+
+      font-size: 19px;
     }
 
-    .user-details {
+    .user-avatar img {
+      width: 100%;
+      height: 100%;
+
+      object-fit: cover;
+    }
+
+    .user-info {
       min-width: 0;
+
+      flex: 1;
     }
 
     .user-name {
-      font-size: 14px;
+      font-size: 13px;
+
       font-weight: 700;
-      overflow: hidden;
+
       white-space: nowrap;
+
+      overflow: hidden;
+
       text-overflow: ellipsis;
     }
 
     .user-email {
-      font-size: 11px;
-      opacity: .45;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
       margin-top: 3px;
+
+      font-size: 10px;
+
+      color:
+        rgba(255,255,255,0.40);
+
+      white-space: nowrap;
+
+      overflow: hidden;
+
+      text-overflow: ellipsis;
     }
 
-    .chat-area {
+    /* =========================
+       CHAT
+    ========================= */
+
+    .chat {
       flex: 1;
+
       min-width: 0;
+
       display: flex;
+
       flex-direction: column;
     }
 
     .chat-header {
-      min-height: 76px;
-      padding: 14px 18px;
-      border-bottom: 1px solid rgba(255,255,255,.08);
+      min-height: 74px;
+
       display: flex;
+
       align-items: center;
+
       gap: 12px;
+
+      padding: 13px 18px;
+
+      border-bottom:
+        1px solid rgba(255,255,255,0.08);
+    }
+
+    .back-button {
+      display: none;
+
+      width: 40px;
+      height: 40px;
+
+      border: none;
+
+      border-radius: 12px;
+
+      background:
+        rgba(255,255,255,0.08);
+
+      color: white;
+
+      font-size: 22px;
+
+      cursor: pointer;
     }
 
     .chat-avatar {
-      width: 44px;
-      height: 44px;
+      width: 45px;
+      height: 45px;
+
       border-radius: 50%;
+
+      background:
+        linear-gradient(
+          135deg,
+          #7c3aed,
+          #06b6d4
+        );
+
       display: flex;
+
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg,#7c3aed,#2563eb);
-      font-size: 20px;
-    }
 
-    .chat-title {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .chat-title h3 {
-      font-size: 16px;
       overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
 
-    .chat-title p {
-      font-size: 11px;
-      color: #4ade80;
-      margin-top: 4px;
-    }
-
-    .back-users {
-      display: none;
-      width: 40px;
-      height: 40px;
-      border: none;
-      border-radius: 12px;
-      background: rgba(255,255,255,.08);
-      color: #fff;
       font-size: 21px;
+
+      flex-shrink: 0;
+    }
+
+    .chat-avatar img {
+      width: 100%;
+      height: 100%;
+
+      object-fit: cover;
+    }
+
+    .chat-user-name {
+      font-size: 16px;
+
+      font-weight: 800;
+    }
+
+    .chat-character {
+      margin-top: 3px;
+
+      font-size: 11px;
+
+      color:
+        rgba(255,255,255,0.45);
     }
 
     .messages {
       flex: 1;
+
       overflow-y: auto;
+
       padding: 22px 18px;
+
       display: flex;
+
       flex-direction: column;
-      gap: 11px;
+
+      gap: 12px;
     }
 
     .message-row {
       display: flex;
+
       width: 100%;
     }
 
@@ -201,38 +329,63 @@
     }
 
     .bubble {
-      max-width: min(72%,560px);
+      max-width:
+        min(72%, 560px);
+
       padding: 11px 14px;
+
       border-radius: 18px;
+
       font-size: 14px;
+
       line-height: 1.5;
+
       overflow-wrap: anywhere;
     }
 
     .message-row.admin .bubble {
-      background: linear-gradient(135deg,#7c3aed,#2563eb);
+      background:
+        linear-gradient(
+          135deg,
+          #7c3aed,
+          #2563eb
+        );
+
       border-bottom-right-radius: 5px;
     }
 
     .message-row.user .bubble {
-      background: rgba(255,255,255,.09);
-      border: 1px solid rgba(255,255,255,.08);
+      background:
+        rgba(255,255,255,0.10);
+
+      border:
+        1px solid rgba(255,255,255,0.08);
+
       border-bottom-left-radius: 5px;
     }
 
     .message-image {
       display: block;
+
       max-width: 330px;
+
       max-height: 420px;
+
       width: 100%;
+
       object-fit: contain;
+
       border-radius: 13px;
+
+      background:
+        rgba(0,0,0,0.15);
+
       cursor: pointer;
-      background: rgba(0,0,0,.15);
     }
 
     .message-text {
       margin-top: 8px;
+
       white-space: pre-wrap;
     }
 
@@ -241,163 +394,212 @@
     }
 
     .time {
-      font-size: 10px;
-      opacity: .5;
-      text-align: right;
       margin-top: 5px;
+
+      font-size: 10px;
+
+      opacity: 0.55;
+
+      text-align: right;
     }
 
     .empty {
       margin: auto;
+
       text-align: center;
-      opacity: .5;
-      padding: 30px;
+
+      color:
+        rgba(255,255,255,0.45);
     }
 
-    .empty-icon {
-      font-size: 42px;
-      margin-bottom: 10px;
-    }
+    /* =========================
+       PREVIEW
+    ========================= */
 
-    .preview-container {
+    .preview {
       display: none;
-      padding: 9px 14px;
-      border-top: 1px solid rgba(255,255,255,.07);
-      background: rgba(15,23,42,.8);
+
       align-items: center;
+
       gap: 10px;
+
+      padding: 9px 14px;
+
+      border-top:
+        1px solid rgba(255,255,255,0.07);
     }
 
-    .preview-container.show {
+    .preview.show {
       display: flex;
     }
 
-    .preview-image {
-      width: 60px;
-      height: 60px;
-      border-radius: 11px;
+    .preview img {
+      width: 55px;
+      height: 55px;
+
+      border-radius: 10px;
+
       object-fit: cover;
     }
 
     .preview-info {
       flex: 1;
+
       min-width: 0;
     }
 
     .preview-name {
       font-size: 12px;
+
       overflow: hidden;
-      text-overflow: ellipsis;
+
       white-space: nowrap;
+
+      text-overflow: ellipsis;
     }
 
     .preview-size {
       font-size: 10px;
-      opacity: .5;
+
+      opacity: 0.45;
+
       margin-top: 3px;
     }
 
-    .remove-image {
-      width: 34px;
-      height: 34px;
+    .remove-preview {
+      width: 32px;
+      height: 32px;
+
       border: none;
-      border-radius: 10px;
-      background: rgba(239,68,68,.15);
+
+      border-radius: 9px;
+
+      background:
+        rgba(239,68,68,0.15);
+
       color: #f87171;
-      font-size: 18px;
+
       cursor: pointer;
     }
 
+    /* =========================
+       COMPOSER
+    ========================= */
+
     .composer {
-      padding: 11px 14px 14px;
-      border-top: 1px solid rgba(255,255,255,.08);
+      padding: 11px 13px 13px;
+
+      border-top:
+        1px solid rgba(255,255,255,0.08);
     }
 
     .composer-inner {
       display: flex;
+
       align-items: flex-end;
+
       gap: 8px;
     }
 
-    .image-button,
-    .send-button {
-      width: 46px;
-      height: 46px;
-      flex-shrink: 0;
-      border: none;
-      border-radius: 14px;
-      cursor: pointer;
-    }
-
     .image-button {
-      background: rgba(255,255,255,.08);
+      width: 45px;
+      height: 45px;
+
+      border:
+        1px solid rgba(255,255,255,0.10);
+
+      border-radius: 13px;
+
+      background:
+        rgba(255,255,255,0.07);
+
       color: #c4b5fd;
+
+      cursor: pointer;
+
       font-size: 20px;
-    }
 
-    .send-button {
-      background: linear-gradient(135deg,#7c3aed,#2563eb);
-      color: #fff;
-      font-size: 19px;
-    }
-
-    .image-button:disabled,
-    .send-button:disabled {
-      opacity: .4;
-      cursor: not-allowed;
-    }
-
-    #messageInput {
-      flex: 1;
-      min-height: 46px;
-      max-height: 130px;
-      resize: none;
-      border: 1px solid rgba(255,255,255,.1);
-      border-radius: 15px;
-      background: rgba(255,255,255,.07);
-      color: #fff;
-      outline: none;
-      padding: 13px 14px;
-      font-family: inherit;
-      font-size: 14px;
-      line-height: 20px;
-    }
-
-    #messageInput::placeholder {
-      color: rgba(255,255,255,.4);
-    }
-
-    #messageInput:focus {
-      border-color: rgba(124,58,237,.65);
+      flex-shrink: 0;
     }
 
     #fileInput {
       display: none;
     }
 
+    #messageInput {
+      flex: 1;
+
+      min-height: 45px;
+
+      max-height: 130px;
+
+      resize: none;
+
+      border:
+        1px solid rgba(255,255,255,0.10);
+
+      border-radius: 14px;
+
+      background:
+        rgba(255,255,255,0.07);
+
+      color: white;
+
+      outline: none;
+
+      padding: 12px 13px;
+
+      font-family: inherit;
+
+      font-size: 14px;
+    }
+
+    #messageInput::placeholder {
+      color:
+        rgba(255,255,255,0.40);
+    }
+
+    .send-button {
+      width: 45px;
+      height: 45px;
+
+      border: none;
+
+      border-radius: 13px;
+
+      background:
+        linear-gradient(
+          135deg,
+          #7c3aed,
+          #2563eb
+        );
+
+      color: white;
+
+      font-size: 18px;
+
+      cursor: pointer;
+
+      flex-shrink: 0;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+
+      cursor: not-allowed;
+    }
+
     .notice {
       text-align: center;
-      font-size: 10px;
-      opacity: .35;
+
+      font-size: 9px;
+
+      opacity: 0.35;
+
       margin-top: 6px;
     }
 
-    .top-button {
-      margin-top: 12px;
-      width: 100%;
-      padding: 10px;
-      border: none;
-      border-radius: 12px;
-      background: rgba(255,255,255,.07);
-      color: #fff;
-      cursor: pointer;
-    }
-
-    .top-button:hover {
-      background: rgba(255,255,255,.12);
-    }
-
-    @media (max-width: 750px) {
+    @media (max-width: 700px) {
 
       body {
         padding: 0;
@@ -405,34 +607,44 @@
 
       .app {
         height: 100vh;
-        min-height: 0;
+
         border-radius: 0;
-        border: none;
       }
 
-      .users {
-        width: 100%;
-        border-right: none;
+      .sidebar {
+        width: 85px;
       }
 
-      .chat-area {
+      .sidebar-header {
+        padding: 14px 8px;
+
+        text-align: center;
+      }
+
+      .sidebar-title {
+        font-size: 12px;
+      }
+
+      .sidebar-subtitle {
         display: none;
       }
 
-      .app.chat-open .users {
+      .user-item {
+        justify-content: center;
+
+        padding: 12px 6px;
+      }
+
+      .user-info {
         display: none;
       }
 
-      .app.chat-open .chat-area {
-        display: flex;
-      }
-
-      .back-users {
+      .back-button {
         display: block;
       }
 
-      .messages {
-        padding: 15px 11px;
+      .chat-header {
+        padding: 10px;
       }
 
       .bubble {
@@ -441,99 +653,107 @@
 
       .message-image {
         max-width: 250px;
-        max-height: 330px;
-      }
-
-      .composer {
-        padding: 9px;
-      }
-
-      .image-button,
-      .send-button {
-        width: 43px;
-        height: 43px;
-      }
-
-      #messageInput {
-        min-height: 43px;
       }
     }
+
   </style>
 </head>
 
 <body>
 
-<div class="app" id="app">
+<div class="app">
 
-  <aside class="users">
+  <!-- SIDEBAR -->
 
-    <div class="users-header">
-      <h2>Admin Chat</h2>
-      <p>Approved users</p>
+  <div class="sidebar">
 
-      <button
-        class="top-button"
-        onclick="window.location.href='admin.html'">
-        ← Back to Admin Panel
-      </button>
+    <div class="sidebar-header">
 
-      <button
-        class="top-button"
-        onclick="logout()">
-        Logout
-      </button>
-    </div>
-
-    <div class="user-list" id="userList">
-      <div class="empty">Loading users...</div>
-    </div>
-
-  </aside>
-
-
-  <main class="chat-area">
-
-    <div class="chat-header">
-
-      <button
-        class="back-users"
-        onclick="showUsers()">
-        ‹
-      </button>
-
-      <div class="chat-avatar" id="chatAvatar">
-        💬
+      <div class="sidebar-title">
+        Admin Chat
       </div>
 
-      <div class="chat-title">
-        <h3 id="selectedUserName">
-          Select a user
-        </h3>
-
-        <p id="selectedStatus">
-          Choose a user to start chatting
-        </p>
-      </div>
-
-    </div>
-
-
-    <div class="messages" id="messages">
-
-      <div class="empty">
-        <div class="empty-icon">💬</div>
-        <div>Select a user</div>
+      <div class="sidebar-subtitle">
+        Approved users
       </div>
 
     </div>
 
 
     <div
-      class="preview-container"
-      id="previewContainer">
+      class="users"
+      id="users">
+
+      <div class="empty">
+        Loading...
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- CHAT -->
+
+  <div class="chat">
+
+    <div class="chat-header">
+
+      <button
+        class="back-button"
+        onclick="backToAdmin()">
+        ‹
+      </button>
+
+
+      <div
+        class="chat-avatar"
+        id="chatAvatar">
+
+        💬
+
+      </div>
+
+
+      <div>
+
+        <div
+          class="chat-user-name"
+          id="chatUserName">
+
+          Select a user
+
+        </div>
+
+        <div
+          class="chat-character"
+          id="chatCharacter">
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div
+      class="messages"
+      id="messages">
+
+      <div class="empty">
+        Select a user to start chatting.
+      </div>
+
+    </div>
+
+
+    <!-- PREVIEW -->
+
+    <div
+      class="preview"
+      id="preview">
 
       <img
-        class="preview-image"
         id="previewImage">
 
       <div class="preview-info">
@@ -551,13 +771,17 @@
       </div>
 
       <button
-        class="remove-image"
-        onclick="removeSelectedImage()">
+        class="remove-preview"
+        onclick="removeImage()">
+
         ×
+
       </button>
 
     </div>
 
+
+    <!-- COMPOSER -->
 
     <div class="composer">
 
@@ -567,40 +791,44 @@
           class="image-button"
           id="imageButton"
           onclick="document.getElementById('fileInput').click()">
+
           🖼️
+
         </button>
+
 
         <input
           type="file"
           id="fileInput"
-          accept="image/jpeg,image/png,image/webp,image/gif"
-          onchange="handleImageSelect(event)"
-        >
+          accept="image/jpeg,image/png,image/webp,image/gif">
+
 
         <textarea
           id="messageInput"
-          placeholder="Write a reply..."
           rows="1"
-          disabled>
+          placeholder="Reply to user...">
         </textarea>
+
 
         <button
           class="send-button"
           id="sendButton"
-          onclick="sendMessage()"
-          disabled>
+          onclick="sendMessage()">
+
           ➤
+
         </button>
 
       </div>
 
+
       <div class="notice">
-        Enter to send • Shift + Enter for new line
+        Press Enter to send • Shift + Enter for new line
       </div>
 
     </div>
 
-  </main>
+  </div>
 
 </div>
 
@@ -613,6 +841,7 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
   "sb_publishable_CEOgfj8n1K6CeIqizGVhTw_8oPlWuKk";
 
+
 const supabaseClient =
   window.supabase.createClient(
     SUPABASE_URL,
@@ -621,42 +850,64 @@ const supabaseClient =
 
 
 let currentUser = null;
+
 let selectedUser = null;
+
+let selectedCharacter = null;
+
 let conversationId = null;
+
 let realtimeChannel = null;
+
 let selectedImage = null;
 
 
 /* =========================
-   AUTH
+   INIT
 ========================= */
 
-async function checkAdmin() {
+async function init() {
 
   const {
-    data: { session }
+    data: {
+      session
+    }
   } =
-    await supabaseClient.auth.getSession();
+    await supabaseClient
+      .auth
+      .getSession();
+
 
   if (!session) {
-    window.location.replace("index.html");
-    return false;
+
+    window.location.replace(
+      "index.html"
+    );
+
+    return;
   }
 
-  currentUser = session.user;
+
+  currentUser =
+    session.user;
+
 
   const {
-    data: profile,
-    error
+    data: profile
   } =
     await supabaseClient
       .from("profiles")
-      .select("*")
-      .eq("id", currentUser.id)
+      .select(
+        "role,status"
+      )
+      .eq(
+        "id",
+        currentUser.id
+      )
       .single();
 
+
   if (
-    error ||
     !profile ||
     profile.role !== "admin" ||
     profile.status !== "approved"
@@ -664,12 +915,34 @@ async function checkAdmin() {
 
     await supabaseClient.auth.signOut();
 
-    window.location.replace("index.html");
+    window.location.replace(
+      "index.html"
+    );
 
-    return false;
+    return;
   }
 
-  return true;
+
+  await loadUsers();
+
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+
+  const userId =
+    params.get("user");
+
+
+  if (userId) {
+
+    await selectUser(
+      userId
+    );
+  }
+
 }
 
 
@@ -679,92 +952,215 @@ async function checkAdmin() {
 
 async function loadUsers() {
 
+  const container =
+    document.getElementById(
+      "users"
+    );
+
+
   const {
     data,
     error
   } =
     await supabaseClient
       .from("profiles")
-      .select("*")
-      .eq("role", "user")
-      .eq("status", "approved")
-      .order("created_at", {
-        ascending: false
-      });
+      .select(
+        "id,name,email"
+      )
+      .eq(
+        "role",
+        "user"
+      )
+      .eq(
+        "status",
+        "approved"
+      )
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
+      );
+
 
   if (error) {
 
     console.error(error);
 
-    document.getElementById("userList").innerHTML =
-      `<div class="empty">Could not load users.</div>`;
+    container.innerHTML =
+      `<div class="empty">
+        Could not load users.
+      </div>`;
 
     return;
   }
 
-  const list =
-    document.getElementById("userList");
 
-  list.innerHTML = "";
+  container.innerHTML =
+    "";
+
 
   if (!data || data.length === 0) {
 
-    list.innerHTML =
-      `<div class="empty">No approved users.</div>`;
+    container.innerHTML =
+      `<div class="empty">
+        No approved users.
+      </div>`;
 
     return;
   }
 
-  data.forEach(user => {
 
-    const button =
-      document.createElement("button");
+  for (
+    const user of data
+  ) {
 
-    button.className = "user-item";
+    const item =
+      document.createElement(
+        "div"
+      );
 
-    button.dataset.userId = user.id;
 
-    button.innerHTML = `
-      <div class="user-avatar">👤</div>
+    item.className =
+      "user-item";
 
-      <div class="user-details">
+
+    item.dataset.userId =
+      user.id;
+
+
+    item.innerHTML = `
+
+      <div class="user-avatar">
+        👤
+      </div>
+
+      <div class="user-info">
+
         <div class="user-name">
-          ${escapeHtml(user.name || "User")}
+          ${escapeHtml(
+            user.name || "User"
+          )}
         </div>
 
         <div class="user-email">
-          ${escapeHtml(user.email || "")}
+          ${escapeHtml(
+            user.email || ""
+          )}
         </div>
+
       </div>
+
     `;
 
-    button.onclick = () =>
-      selectUser(user);
 
-    list.appendChild(button);
-
-  });
-
-
-  const params =
-    new URLSearchParams(
-      window.location.search
-    );
-
-  const userId =
-    params.get("user");
-
-  if (userId) {
-
-    const user =
-      data.find(
-        item => item.id === userId
+    item.onclick =
+      () => selectUser(
+        user.id
       );
 
-    if (user) {
-      await selectUser(user);
-    }
+
+    container.appendChild(
+      item
+    );
+
+
+    await loadUserAvatar(
+      item
+        .querySelector(
+          ".user-avatar"
+        ),
+      user.id
+    );
+
   }
+
+}
+
+
+/* =========================
+   USER AVATAR
+========================= */
+
+async function loadUserAvatar(
+  avatarElement,
+  userId
+) {
+
+  const {
+    data: character
+  } =
+    await supabaseClient
+      .from("characters")
+      .select(
+        "avatar_url,character_type"
+      )
+      .eq(
+        "user_id",
+        userId
+      )
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
+      )
+      .limit(1)
+      .maybeSingle();
+
+
+  if (
+    !character
+  ) {
+
+    return;
+  }
+
+
+  if (
+    !character.avatar_url
+  ) {
+
+    avatarElement.textContent =
+      getAvatar(
+        character.character_type
+      );
+
+    return;
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .storage
+      .from(
+        "character-avatars"
+      )
+      .createSignedUrl(
+        character.avatar_url,
+        3600
+      );
+
+
+  if (
+    !error &&
+    data &&
+    data.signedUrl
+  ) {
+
+    avatarElement.innerHTML = `
+
+      <img
+        src="${data.signedUrl}"
+        alt="Character">
+
+    `;
+
+  }
+
 }
 
 
@@ -772,58 +1168,221 @@ async function loadUsers() {
    SELECT USER
 ========================= */
 
-async function selectUser(user) {
-
-  selectedUser = user;
+async function selectUser(
+  userId
+) {
 
   document
-    .querySelectorAll(".user-item")
-    .forEach(item => {
+    .querySelectorAll(
+      ".user-item"
+    )
+    .forEach(
+      item => {
 
-      item.classList.toggle(
-        "active",
-        item.dataset.userId === user.id
+        item.classList.toggle(
+          "active",
+          item.dataset.userId === userId
+        );
+
+      }
+    );
+
+
+  selectedUser =
+    userId;
+
+
+  const {
+    data: profile
+  } =
+    await supabaseClient
+      .from("profiles")
+      .select(
+        "name,email"
+      )
+      .eq(
+        "id",
+        userId
+      )
+      .single();
+
+
+  if (!profile) {
+    return;
+  }
+
+
+  document
+    .getElementById(
+      "chatUserName"
+    )
+    .textContent =
+      profile.name ||
+      "User";
+
+
+  await loadCharacter(
+    userId
+  );
+
+
+  await loadConversation(
+    userId
+  );
+
+}
+
+
+/* =========================
+   LOAD CHARACTER
+========================= */
+
+async function loadCharacter(
+  userId
+) {
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("characters")
+      .select("*")
+      .eq(
+        "user_id",
+        userId
+      )
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
+      )
+      .limit(1)
+      .maybeSingle();
+
+
+  if (error) {
+
+    console.error(error);
+
+    return;
+  }
+
+
+  selectedCharacter =
+    data;
+
+
+  const avatar =
+    document.getElementById(
+      "chatAvatar"
+    );
+
+
+  const characterText =
+    document.getElementById(
+      "chatCharacter"
+    );
+
+
+  if (!data) {
+
+    avatar.textContent =
+      "💬";
+
+    characterText.textContent =
+      "";
+
+    return;
+  }
+
+
+  characterText.textContent =
+    data.custom_character ||
+    data.character_type ||
+    "Character";
+
+
+  if (
+    data.avatar_url
+  ) {
+
+    const {
+      data: signed,
+      error: avatarError
+    } =
+      await supabaseClient
+        .storage
+        .from(
+          "character-avatars"
+        )
+        .createSignedUrl(
+          data.avatar_url,
+          3600
+        );
+
+
+    if (
+      !avatarError &&
+      signed &&
+      signed.signedUrl
+    ) {
+
+      avatar.innerHTML = `
+
+        <img
+          src="${signed.signedUrl}"
+          alt="Character picture">
+
+      `;
+
+    } else {
+
+      avatar.textContent =
+        getAvatar(
+          data.character_type
+        );
+
+    }
+
+  } else {
+
+    avatar.textContent =
+      getAvatar(
+        data.character_type
       );
 
-    });
+  }
+
+}
 
 
-  document
-    .getElementById("selectedUserName")
-    .textContent =
-      user.name || "User";
+function getAvatar(
+  type
+) {
+
+  const avatars = {
+
+    Father: "👨",
+
+    Mother: "👩",
+
+    Boyfriend: "🧑",
+
+    Girlfriend: "👩",
+
+    "Male Teacher": "👨‍🏫",
+
+    "Female Teacher": "👩‍🏫",
+
+    Other: "💬"
+
+  };
 
 
-  document
-    .getElementById("selectedStatus")
-    .textContent =
-      "● Approved";
-
-
-  document
-    .getElementById("chatAvatar")
-    .textContent = "👤";
-
-
-  document
-    .getElementById("app")
-    .classList.add("chat-open");
-
-
-  document
-    .getElementById("messageInput")
-    .disabled = false;
-
-  document
-    .getElementById("sendButton")
-    .disabled = false;
-
-  document
-    .getElementById("imageButton")
-    .disabled = false;
-
-
-  await loadConversation();
+  return avatars[type] ||
+    "💬";
 }
 
 
@@ -831,22 +1390,38 @@ async function selectUser(user) {
    CONVERSATION
 ========================= */
 
-async function loadConversation() {
+async function loadConversation(
+  userId
+) {
 
-  stopRealtime();
+  if (realtimeChannel) {
 
-  conversationId = null;
+    await supabaseClient
+      .removeChannel(
+        realtimeChannel
+      );
+
+    realtimeChannel =
+      null;
+  }
+
 
   const {
     data: character
   } =
     await supabaseClient
       .from("characters")
-      .select("*")
-      .eq("user_id", selectedUser.id)
-      .order("created_at", {
-        ascending: false
-      })
+      .select("id")
+      .eq(
+        "user_id",
+        userId
+      )
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
+      )
       .limit(1)
       .maybeSingle();
 
@@ -854,22 +1429,28 @@ async function loadConversation() {
   if (!character) {
 
     showEmpty(
-      "This user has not created a character yet."
+      "This user has no character yet."
     );
 
     return;
   }
 
 
-  let {
-    data: conversation,
+  const {
+    data,
     error
   } =
     await supabaseClient
       .from("conversations")
       .select("*")
-      .eq("user_id", selectedUser.id)
-      .eq("character_id", character.id)
+      .eq(
+        "user_id",
+        userId
+      )
+      .eq(
+        "character_id",
+        character.id
+      )
       .maybeSingle();
 
 
@@ -885,41 +1466,25 @@ async function loadConversation() {
   }
 
 
-  if (!conversation) {
+  if (!data) {
 
-    const result =
-      await supabaseClient
-        .from("conversations")
-        .insert({
-          user_id: selectedUser.id,
-          character_id: character.id
-        })
-        .select()
-        .single();
+    showEmpty(
+      "No conversation yet."
+    );
 
-    if (result.error) {
-
-      console.error(result.error);
-
-      showEmpty(
-        "Could not create conversation."
-      );
-
-      return;
-    }
-
-    conversation =
-      result.data;
+    return;
   }
 
 
   conversationId =
-    conversation.id;
+    data.id;
 
 
   await loadMessages();
 
+
   startRealtime();
+
 }
 
 
@@ -930,9 +1495,13 @@ async function loadConversation() {
 async function loadMessages() {
 
   const container =
-    document.getElementById("messages");
+    document.getElementById(
+      "messages"
+    );
 
-  container.innerHTML = "";
+
+  container.innerHTML =
+    "";
 
 
   const {
@@ -946,9 +1515,12 @@ async function loadMessages() {
         "conversation_id",
         conversationId
       )
-      .order("created_at", {
-        ascending: true
-      });
+      .order(
+        "created_at",
+        {
+          ascending: true
+        }
+      );
 
 
   if (error) {
@@ -963,7 +1535,10 @@ async function loadMessages() {
   }
 
 
-  if (!data || data.length === 0) {
+  if (
+    !data ||
+    data.length === 0
+  ) {
 
     showEmpty(
       "No messages yet."
@@ -973,26 +1548,29 @@ async function loadMessages() {
   }
 
 
-  for (const message of data) {
+  for (
+    const message of data
+  ) {
 
-    await addMessageToUI(message);
+    await addMessage(
+      message
+    );
 
   }
 
 
-  scrollToBottom();
+  scrollBottom();
+
 }
 
 
 /* =========================
-   MESSAGE UI
+   ADD MESSAGE
 ========================= */
 
-async function addMessageToUI(message) {
-
-  const container =
-    document.getElementById("messages");
-
+async function addMessage(
+  message
+) {
 
   if (message.id) {
 
@@ -1001,118 +1579,155 @@ async function addMessageToUI(message) {
         `[data-message-id="${message.id}"]`
       );
 
+
     if (existing) {
       return;
     }
+
   }
 
 
   const isAdmin =
-    message.sender_id === currentUser.id;
+    message.sender_id ===
+    currentUser.id;
 
 
   const row =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
+
 
   row.className =
-    `message-row ${isAdmin ? "admin" : "user"}`;
+    `message-row ${
+      isAdmin
+        ? "admin"
+        : "user"
+    }`;
 
 
   const bubble =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
+
 
   bubble.className =
     "bubble";
 
 
   if (message.id) {
+
     bubble.dataset.messageId =
       message.id;
+
   }
 
 
-  if (message.image_path) {
+  /* IMAGE */
+
+  if (
+    message.image_path
+  ) {
 
     const image =
-      document.createElement("img");
+      document.createElement(
+        "img"
+      );
+
 
     image.className =
       "message-image";
+
 
     image.alt =
       message.image_name ||
       "Chat image";
 
 
-    try {
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .storage
+        .from(
+          "chat-images"
+        )
+        .createSignedUrl(
+          message.image_path,
+          3600
+        );
 
-      const {
-        data,
-        error
-      } =
-        await supabaseClient
-          .storage
-          .from("chat-images")
-          .createSignedUrl(
-            message.image_path,
-            3600
-          );
+
+    if (
+      !error &&
+      data &&
+      data.signedUrl
+    ) {
+
+      image.src =
+        data.signedUrl;
 
 
-      if (!error && data?.signedUrl) {
+      image.onclick =
+        () => {
 
-        image.src =
-          data.signedUrl;
-
-        image.onclick = () =>
           window.open(
             data.signedUrl,
             "_blank"
           );
 
-      } else {
-
-        image.alt =
-          "Image unavailable";
-
-      }
-
-    } catch (error) {
-
-      console.error(
-        "Image URL error:",
-        error
-      );
+        };
 
     }
 
 
-    bubble.appendChild(image);
+    bubble.appendChild(
+      image
+    );
+
   }
 
 
-  if (message.content) {
+  /* TEXT */
+
+  if (
+    message.content
+  ) {
 
     const text =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
+
 
     text.className =
       message.image_path
         ? "message-text"
         : "message-text only";
 
+
     text.textContent =
       message.content;
 
-    bubble.appendChild(text);
+
+    bubble.appendChild(
+      text
+    );
+
   }
 
 
   const time =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
+
 
   time.className =
     "time";
+
 
   time.textContent =
     formatTime(
@@ -1120,126 +1735,45 @@ async function addMessageToUI(message) {
     );
 
 
-  bubble.appendChild(time);
-
-  row.appendChild(bubble);
-
-  container.appendChild(row);
-
-  scrollToBottom();
-}
+  bubble.appendChild(
+    time
+  );
 
 
-/* =========================
-   IMAGE SELECT
-========================= */
-
-function handleImageSelect(event) {
-
-  const file =
-    event.target.files[0];
-
-  if (!file) {
-    return;
-  }
-
-
-  if (!file.type.startsWith("image/")) {
-
-    alert(
-      "Please select an image."
-    );
-
-    event.target.value = "";
-
-    return;
-  }
-
-
-  if (file.size > 10 * 1024 * 1024) {
-
-    alert(
-      "Image must be smaller than 10 MB."
-    );
-
-    event.target.value = "";
-
-    return;
-  }
-
-
-  selectedImage =
-    file;
-
-
-  const reader =
-    new FileReader();
-
-
-  reader.onload =
-    function(e) {
-
-      document
-        .getElementById("previewImage")
-        .src =
-          e.target.result;
-
-
-      document
-        .getElementById("previewName")
-        .textContent =
-          file.name;
-
-
-      document
-        .getElementById("previewSize")
-        .textContent =
-          formatFileSize(
-            file.size
-          );
-
-
-      document
-        .getElementById(
-          "previewContainer"
-        )
-        .classList.add("show");
-
-    };
-
-
-  reader.readAsDataURL(file);
-}
-
-
-/* =========================
-   REMOVE IMAGE
-========================= */
-
-function removeSelectedImage() {
-
-  selectedImage = null;
-
-  document.getElementById(
-    "fileInput"
-  ).value = "";
+  row.appendChild(
+    bubble
+  );
 
 
   document
     .getElementById(
-      "previewContainer"
+      "messages"
     )
-    .classList.remove("show");
+    .appendChild(
+      row
+    );
+
+
+  scrollBottom();
+
 }
 
 
 /* =========================
-   SEND
+   SEND MESSAGE
 ========================= */
 
 async function sendMessage() {
 
-  if (!selectedUser || !conversationId) {
+  if (
+    !selectedUser ||
+    !conversationId
+  ) {
+
+    alert(
+      "Please select a user first."
+    );
+
     return;
   }
 
@@ -1254,7 +1788,11 @@ async function sendMessage() {
     input.value.trim();
 
 
-  if (!content && !selectedImage) {
+  if (
+    !content &&
+    !selectedImage
+  ) {
+
     return;
   }
 
@@ -1264,24 +1802,31 @@ async function sendMessage() {
       "sendButton"
     );
 
+
   const imageButton =
     document.getElementById(
       "imageButton"
     );
 
 
-  sendButton.disabled = true;
-  imageButton.disabled = true;
+  sendButton.disabled =
+    true;
+
+  imageButton.disabled =
+    true;
 
 
   try {
 
-    let imagePath = null;
-    let imageType = null;
-    let imageName = null;
+    let imagePath =
+      null;
 
+    let imageType =
+      null;
 
-    /* IMAGE UPLOAD */
+    let imageName =
+      null;
+
 
     if (selectedImage) {
 
@@ -1293,28 +1838,32 @@ async function sendMessage() {
 
 
       const fileName =
-        `${selectedUser.id}/${conversationId}/${Date.now()}-${crypto.randomUUID()}.${extension}`;
+        `${selectedUser}/${conversationId}/${Date.now()}-${crypto.randomUUID()}.${extension}`;
 
 
       const {
-        error: uploadError
+        error
       } =
         await supabaseClient
           .storage
-          .from("chat-images")
+          .from(
+            "chat-images"
+          )
           .upload(
             fileName,
             selectedImage,
             {
               contentType:
                 selectedImage.type,
-              upsert: false
+
+              upsert:
+                false
             }
           );
 
 
-      if (uploadError) {
-        throw uploadError;
+      if (error) {
+        throw error;
       }
 
 
@@ -1326,10 +1875,9 @@ async function sendMessage() {
 
       imageName =
         selectedImage.name;
+
     }
 
-
-    /* INSERT MESSAGE */
 
     const {
       error
@@ -1337,6 +1885,7 @@ async function sendMessage() {
       await supabaseClient
         .from("messages")
         .insert({
+
           conversation_id:
             conversationId,
 
@@ -1354,6 +1903,7 @@ async function sendMessage() {
 
           image_name:
             imageName
+
         });
 
 
@@ -1362,13 +1912,14 @@ async function sendMessage() {
     }
 
 
-    input.value = "";
+    input.value =
+      "";
 
     input.style.height =
-      "46px";
+      "45px";
 
 
-    removeSelectedImage();
+    removeImage();
 
 
   } catch (error) {
@@ -1376,9 +1927,8 @@ async function sendMessage() {
     console.error(error);
 
     alert(
-      "Could not send message. Please try again."
+      "Could not send message."
     );
-
 
   } finally {
 
@@ -1389,7 +1939,141 @@ async function sendMessage() {
       false;
 
     input.focus();
+
   }
+
+}
+
+
+/* =========================
+   IMAGE SELECT
+========================= */
+
+document
+  .getElementById(
+    "fileInput"
+  )
+  .addEventListener(
+    "change",
+    event => {
+
+      const file =
+        event.target.files[0];
+
+
+      if (!file) {
+        return;
+      }
+
+
+      if (
+        !file.type.startsWith(
+          "image/"
+        )
+      ) {
+
+        alert(
+          "Please select an image."
+        );
+
+        event.target.value =
+          "";
+
+        return;
+      }
+
+
+      if (
+        file.size >
+        10 * 1024 * 1024
+      ) {
+
+        alert(
+          "Image must be smaller than 10 MB."
+        );
+
+        event.target.value =
+          "";
+
+        return;
+      }
+
+
+      selectedImage =
+        file;
+
+
+      const reader =
+        new FileReader();
+
+
+      reader.onload =
+        e => {
+
+          document
+            .getElementById(
+              "previewImage"
+            )
+            .src =
+              e.target.result;
+
+
+          document
+            .getElementById(
+              "previewName"
+            )
+            .textContent =
+              file.name;
+
+
+          document
+            .getElementById(
+              "previewSize"
+            )
+            .textContent =
+              formatFileSize(
+                file.size
+              );
+
+
+          document
+            .getElementById(
+              "preview"
+            )
+            .classList.add(
+              "show"
+            );
+
+        };
+
+
+      reader.readAsDataURL(
+        file
+      );
+
+    });
+
+
+function removeImage() {
+
+  selectedImage =
+    null;
+
+
+  document.getElementById(
+    "fileInput"
+  ).value =
+    "";
+
+
+  document
+    .getElementById(
+      "preview"
+    )
+    .classList.remove(
+      "show"
+    );
+
 }
 
 
@@ -1398,9 +2082,6 @@ async function sendMessage() {
 ========================= */
 
 function startRealtime() {
-
-  stopRealtime();
-
 
   realtimeChannel =
     supabaseClient
@@ -1411,43 +2092,39 @@ function startRealtime() {
       .on(
         "postgres_changes",
         {
-          event: "INSERT",
-          schema: "public",
-          table: "messages",
+          event:
+            "INSERT",
+
+          schema:
+            "public",
+
+          table:
+            "messages",
+
           filter:
             `conversation_id=eq.${conversationId}`
+
         },
+
         async payload => {
 
-          await addMessageToUI(
+          await addMessage(
             payload.new
           );
 
         }
       )
-      .subscribe(status => {
+      .subscribe(
+        status => {
 
-        console.log(
-          "Admin realtime:",
-          status
-        );
+          console.log(
+            "Admin realtime:",
+            status
+          );
 
-      });
-}
-
-
-function stopRealtime() {
-
-  if (realtimeChannel) {
-
-    supabaseClient
-      .removeChannel(
-        realtimeChannel
+        }
       );
 
-    realtimeChannel =
-      null;
-  }
 }
 
 
@@ -1455,181 +2132,160 @@ function stopRealtime() {
    HELPERS
 ========================= */
 
-function showEmpty(text) {
+function showEmpty(
+  text
+) {
 
   document.getElementById(
     "messages"
   ).innerHTML = `
+
     <div class="empty">
-      <div class="empty-icon">💬</div>
-      <div>${text}</div>
+      ${text}
     </div>
+
   `;
+
 }
 
 
-function scrollToBottom() {
+function scrollBottom() {
 
-  const container =
+  const messages =
     document.getElementById(
       "messages"
     );
 
-  setTimeout(() => {
 
-    container.scrollTop =
-      container.scrollHeight;
+  setTimeout(
+    () => {
 
-  }, 30);
+      messages.scrollTop =
+        messages.scrollHeight;
+
+    },
+    30
+  );
+
 }
 
 
-function formatTime(dateString) {
+function formatTime(
+  value
+) {
 
   return new Date(
-    dateString
-  ).toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit"
-  });
+    value
+  ).toLocaleTimeString(
+    [],
+    {
+      hour:
+        "2-digit",
+
+      minute:
+        "2-digit"
+    }
+  );
+
 }
 
 
-function formatFileSize(bytes) {
+function formatFileSize(
+  bytes
+) {
 
-  if (bytes < 1024) {
+  if (
+    bytes <
+    1024
+  ) {
+
     return bytes + " B";
+
   }
 
-  if (bytes < 1024 * 1024) {
+
+  if (
+    bytes <
+    1024 * 1024
+  ) {
+
     return (
       bytes / 1024
-    ).toFixed(1) + " KB";
+    ).toFixed(1) +
+      " KB";
+
   }
+
 
   return (
-    bytes / (1024 * 1024)
-  ).toFixed(1) + " MB";
+    bytes /
+    (1024 * 1024)
+  ).toFixed(1) +
+    " MB";
+
 }
 
 
-function escapeHtml(text) {
+function escapeHtml(
+  value
+) {
 
-  const div =
-    document.createElement("div");
+  return String(
+    value
+  )
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
 
-  div.textContent =
-    text;
-
-  return div.innerHTML;
 }
 
 
-function showUsers() {
-
-  document
-    .getElementById("app")
-    .classList.remove("chat-open");
-
-  stopRealtime();
-}
-
-
-async function logout() {
-
-  stopRealtime();
-
-  await supabaseClient.auth.signOut();
+function backToAdmin() {
 
   window.location.replace(
-    "index.html"
+    "admin.html"
   );
+
 }
-
-
-/* =========================
-   TEXTAREA
-========================= */
-
-const messageInput =
-  document.getElementById(
-    "messageInput"
-  );
-
-
-messageInput.addEventListener(
-  "input",
-  function() {
-
-    this.style.height =
-      "46px";
-
-    this.style.height =
-      Math.min(
-        this.scrollHeight,
-        130
-      ) + "px";
-  }
-);
-
-
-messageInput.addEventListener(
-  "keydown",
-  function(event) {
-
-    if (
-      event.key === "Enter" &&
-      !event.shiftKey
-    ) {
-
-      event.preventDefault();
-
-      sendMessage();
-    }
-  }
-);
-
-
-/* =========================
-   AUTH STATE
-========================= */
-
-supabaseClient.auth.onAuthStateChange(
-  (event, session) => {
-
-    if (
-      event === "SIGNED_OUT" ||
-      !session
-    ) {
-
-      window.location.replace(
-        "index.html"
-      );
-    }
-  }
-);
 
 
 /* =========================
    START
 ========================= */
 
-(async function() {
-
-  const allowed =
-    await checkAdmin();
-
-  if (allowed) {
-    await loadUsers();
-  }
-
-})();
+init();
 
 
 window.addEventListener(
   "beforeunload",
   () => {
-    stopRealtime();
+
+    if (realtimeChannel) {
+
+      supabaseClient
+        .removeChannel(
+          realtimeChannel
+        );
+
+    }
+
   }
 );
 
