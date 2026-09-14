@@ -305,6 +305,52 @@
       text-align: right;
     }
 
+    /* =========================
+       MESSAGE ACTIONS
+    ========================= */
+
+    .message-actions {
+      display: flex;
+
+      justify-content: flex-end;
+
+      margin-top: 6px;
+    }
+
+    .delete-button {
+      border: none;
+
+      background:
+        rgba(239,68,68,0.12);
+
+      color: #f87171;
+
+      border-radius: 9px;
+
+      padding: 4px 8px;
+
+      font-size: 10px;
+
+      cursor: pointer;
+
+      transition: 0.2s;
+    }
+
+    .delete-button:hover {
+      background:
+        rgba(239,68,68,0.25);
+    }
+
+    .delete-button:active {
+      transform: scale(0.95);
+    }
+
+    .delete-button:disabled {
+      opacity: 0.5;
+
+      cursor: not-allowed;
+    }
+
     .empty {
       margin: auto;
 
@@ -549,6 +595,10 @@
       font-size: 13px;
     }
 
+    /* =========================
+       MOBILE
+    ========================= */
+
     @media (max-width: 600px) {
 
       body {
@@ -623,6 +673,13 @@
         padding:
           11px 12px;
       }
+
+      .delete-button {
+        padding: 5px 9px;
+
+        font-size: 10px;
+      }
+
     }
 
   </style>
@@ -642,26 +699,19 @@
       ‹
     </button>
 
-
     <div
       class="avatar"
       id="avatar">
-
       👤
-
     </div>
-
 
     <div class="character-info">
 
       <div
         class="character-name"
         id="characterName">
-
         Chat
-
       </div>
-
 
       <div class="status">
 
@@ -713,13 +763,10 @@
 
     </div>
 
-
     <button
       class="remove-image"
       onclick="removeSelectedImage()">
-
       ×
-
     </button>
 
   </div>
@@ -735,11 +782,8 @@
         class="image-button"
         id="imageButton"
         onclick="document.getElementById('fileInput').click()">
-
         🖼️
-
       </button>
-
 
       <input
         type="file"
@@ -747,30 +791,23 @@
         accept="image/jpeg,image/png,image/webp,image/gif"
       >
 
-
       <textarea
         id="messageInput"
         placeholder="Write a message..."
         rows="1">
       </textarea>
 
-
       <button
         class="send-button"
         id="sendButton"
         onclick="sendMessage()">
-
         ➤
-
       </button>
 
     </div>
 
-
     <div class="notice">
-
       Press Enter to send • Shift + Enter for new line
-
     </div>
 
   </div>
@@ -920,7 +957,6 @@ async function loadCharacter() {
 
   await loadCharacterAvatar();
 
-
   await loadConversation();
 
 }
@@ -996,7 +1032,6 @@ async function loadCharacterAvatar() {
       error
     );
 
-
     avatar.textContent =
       getAvatar(
         character.character_type
@@ -1030,6 +1065,7 @@ function getAvatar(type) {
 
   return avatars[type] ||
     "💬";
+
 }
 
 
@@ -1112,7 +1148,6 @@ async function loadConversation() {
 
 
   await loadMessages();
-
 
   startRealtime();
 
@@ -1390,6 +1425,63 @@ async function addMessageToUI(
   );
 
 
+  /* =========================
+     DELETE BUTTON
+     Only user's own messages
+  ========================= */
+
+  if (
+    isUser &&
+    message.id
+  ) {
+
+    const actions =
+      document.createElement(
+        "div"
+      );
+
+
+    actions.className =
+      "message-actions";
+
+
+    const deleteButton =
+      document.createElement(
+        "button"
+      );
+
+
+    deleteButton.className =
+      "delete-button";
+
+
+    deleteButton.type =
+      "button";
+
+
+    deleteButton.textContent =
+      "🗑 Delete";
+
+
+    deleteButton.onclick =
+      () => deleteMessage(
+        message.id,
+        deleteButton
+      );
+
+
+    actions.appendChild(
+      deleteButton
+    );
+
+
+    bubble.appendChild(
+      actions
+    );
+
+  }
+
+
   row.appendChild(
     bubble
   );
@@ -1401,6 +1493,156 @@ async function addMessageToUI(
 
 
   scrollToBottom();
+
+}
+
+
+/* =========================
+   DELETE MESSAGE
+========================= */
+
+async function deleteMessage(
+  messageId,
+  button
+) {
+
+  if (!messageId) {
+    return;
+  }
+
+
+  const confirmed =
+    confirm(
+      "Delete this message for everyone?"
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  if (button) {
+
+    button.disabled =
+      true;
+
+    button.textContent =
+      "Deleting...";
+
+  }
+
+
+  try {
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .from("messages")
+        .delete()
+        .eq(
+          "id",
+          messageId
+        )
+        .eq(
+          "conversation_id",
+          conversationId
+        );
+
+
+    if (error) {
+
+      throw error;
+
+    }
+
+
+    removeMessageFromUI(
+      messageId
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "Delete error:",
+      error
+    );
+
+
+    alert(
+      "Could not delete message."
+    );
+
+
+    if (button) {
+
+      button.disabled =
+        false;
+
+      button.textContent =
+        "🗑 Delete";
+
+    }
+
+  }
+
+}
+
+
+/* =========================
+   REMOVE MESSAGE FROM UI
+========================= */
+
+function removeMessageFromUI(
+  messageId
+) {
+
+  const message =
+    document.querySelector(
+      `[data-message-id="${messageId}"]`
+    );
+
+
+  if (!message) {
+    return;
+  }
+
+
+  const row =
+    message.closest(
+      ".message-row"
+    );
+
+
+  if (row) {
+
+    row.remove();
+
+  } else {
+
+    message.remove();
+
+  }
+
+
+  const container =
+    document.getElementById(
+      "messages"
+    );
+
+
+  if (
+    container &&
+    !container.querySelector(
+      ".message-row"
+    )
+  ) {
+
+    showEmpty();
+
+  }
 
 }
 
@@ -1752,8 +1994,15 @@ function startRealtime() {
     supabaseClient
       .channel(
         "chat-" +
-        conversationId
+        conversationId +
+        "-" +
+        Date.now()
       )
+
+      /* =====================
+         NEW MESSAGE
+      ===================== */
+
       .on(
         "postgres_changes",
         {
@@ -1773,6 +2022,12 @@ function startRealtime() {
 
         async payload => {
 
+          console.log(
+            "New realtime message:",
+            payload.new
+          );
+
+
           await addMessageToUI(
             payload.new
           );
@@ -1780,6 +2035,51 @@ function startRealtime() {
         }
 
       )
+
+      /* =====================
+         DELETED MESSAGE
+      ===================== */
+
+      .on(
+        "postgres_changes",
+        {
+          event:
+            "DELETE",
+
+          schema:
+            "public",
+
+          table:
+            "messages",
+
+          filter:
+            `conversation_id=eq.${conversationId}`
+
+        },
+
+        payload => {
+
+          console.log(
+            "Deleted realtime message:",
+            payload.old
+          );
+
+
+          if (
+            payload.old &&
+            payload.old.id
+          ) {
+
+            removeMessageFromUI(
+              payload.old.id
+            );
+
+          }
+
+        }
+
+      )
+
       .subscribe(
         status => {
 
@@ -1905,6 +2205,11 @@ function scrollToBottom() {
     document.getElementById(
       "messages"
     );
+
+
+  if (!container) {
+    return;
+  }
 
 
   setTimeout(
