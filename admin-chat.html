@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -602,8 +601,6 @@ textarea::placeholder{
 
 <div class="app">
 
-  <!-- SIDEBAR -->
-
   <aside class="sidebar">
 
     <div class="sidebar-header">
@@ -618,9 +615,6 @@ textarea::placeholder{
     </div>
 
   </aside>
-
-
-  <!-- CHAT -->
 
   <main class="chat-area">
 
@@ -650,7 +644,6 @@ textarea::placeholder{
 
     </header>
 
-
     <div id="messages" class="messages">
 
       <div class="empty-chat">
@@ -659,9 +652,6 @@ textarea::placeholder{
       </div>
 
     </div>
-
-
-    <!-- IMAGE PREVIEW -->
 
     <div id="imagePreview" class="image-preview">
 
@@ -681,12 +671,7 @@ textarea::placeholder{
 
     </div>
 
-
-    <!-- COMPOSER -->
-
     <div class="composer">
-
-      <!-- REPLY PREVIEW -->
 
       <div id="replyComposer" class="reply-composer">
 
@@ -712,7 +697,6 @@ textarea::placeholder{
         </button>
 
       </div>
-
 
       <div class="composer-box">
 
@@ -760,7 +744,6 @@ textarea::placeholder{
 
 </div>
 
-
 <script>
 
 /* =========================
@@ -790,8 +773,6 @@ let selectedCharacter = null;
 let conversationId = null;
 let realtimeChannel = null;
 let selectedImage = null;
-
-/* NEW: selected message for reply */
 let replyingToMessage = null;
 
 
@@ -820,7 +801,6 @@ async function init(){
 
     currentUser = user;
 
-
     const {
       data:profile,
       error
@@ -830,7 +810,6 @@ async function init(){
         .select("*")
         .eq("id",currentUser.id)
         .single();
-
 
     if(error){
 
@@ -842,7 +821,6 @@ async function init(){
 
       return;
     }
-
 
     if(
       profile.role !== "admin" ||
@@ -857,9 +835,7 @@ async function init(){
       return;
     }
 
-
     await loadUsers();
-
 
     const params =
       new URLSearchParams(
@@ -871,7 +847,6 @@ async function init(){
 
     const characterId =
       params.get("character");
-
 
     if(userId){
 
@@ -906,7 +881,6 @@ async function loadUsers(){
 
   container.innerHTML = "";
 
-
   const {
     data,
     error
@@ -919,7 +893,6 @@ async function loadUsers(){
       .order("created_at",{
         ascending:false
       });
-
 
   if(error){
 
@@ -934,7 +907,6 @@ async function loadUsers(){
     return;
   }
 
-
   if(!data || data.length === 0){
 
     container.innerHTML = `
@@ -945,7 +917,6 @@ async function loadUsers(){
 
     return;
   }
-
 
   for(const user of data){
 
@@ -974,13 +945,11 @@ async function createUserSection(
   section.className =
     "user-section";
 
-
   const header =
     document.createElement("div");
 
   header.className =
     "user-header";
-
 
   const firstLetter =
     (
@@ -990,7 +959,6 @@ async function createUserSection(
     )
       .charAt(0)
       .toUpperCase();
-
 
   header.innerHTML = `
 
@@ -1021,13 +989,11 @@ async function createUserSection(
 
   `;
 
-
   const characters =
     document.createElement("div");
 
   characters.className =
     "characters";
-
 
   header.addEventListener(
     "click",
@@ -1037,7 +1003,6 @@ async function createUserSection(
         characters.classList.contains(
           "open"
         );
-
 
       document
         .querySelectorAll(
@@ -1054,7 +1019,6 @@ async function createUserSection(
           }
 
         });
-
 
       document
         .querySelectorAll(
@@ -1077,7 +1041,6 @@ async function createUserSection(
 
         });
 
-
       characters.classList.toggle(
         "open"
       );
@@ -1087,7 +1050,6 @@ async function createUserSection(
         .classList.toggle(
           "open"
         );
-
 
       if(
         characters.dataset.loaded !==
@@ -1106,7 +1068,6 @@ async function createUserSection(
 
     }
   );
-
 
   section.appendChild(header);
 
@@ -1132,7 +1093,6 @@ async function loadCharacters(
     </div>
   `;
 
-
   const {
     data,
     error
@@ -1144,7 +1104,6 @@ async function loadCharacters(
       .order("created_at",{
         ascending:false
       });
-
 
   if(error){
 
@@ -1159,9 +1118,7 @@ async function loadCharacters(
     return;
   }
 
-
   container.innerHTML = "";
-
 
   if(!data || data.length === 0){
 
@@ -1173,7 +1130,6 @@ async function loadCharacters(
 
     return;
   }
-
 
   data.forEach(character => {
 
@@ -1202,7 +1158,6 @@ function createCharacterItem(
   item.className =
     "character-item";
 
-
   const avatar =
     document.createElement("img");
 
@@ -1216,7 +1171,6 @@ function createCharacterItem(
 
   avatar.src =
     getDefaultAvatar();
-
 
   if(character.avatar_url){
 
@@ -1235,19 +1189,16 @@ function createCharacterItem(
 
   }
 
-
   const info =
     document.createElement("div");
 
   info.className =
     "character-info";
 
-
   const name =
     character.custom_character ||
     character.character_type ||
     "Character";
-
 
   info.innerHTML = `
 
@@ -1269,18 +1220,15 @@ function createCharacterItem(
 
   `;
 
-
   item.appendChild(avatar);
 
   item.appendChild(info);
-
 
   item.addEventListener(
     "click",
     async event => {
 
       event.stopPropagation();
-
 
       document
         .querySelectorAll(
@@ -1294,9 +1242,7 @@ function createCharacterItem(
 
         });
 
-
       item.classList.add("active");
-
 
       await selectCharacter(
         character
@@ -1304,7 +1250,6 @@ function createCharacterItem(
 
     }
   );
-
 
   return item;
 
@@ -1330,7 +1275,6 @@ async function selectUser(
       .eq("id",userId)
       .single();
 
-
   if(error){
 
     console.error(error);
@@ -1338,15 +1282,12 @@ async function selectUser(
     return;
   }
 
-
   selectedUser = user;
-
 
   const sections =
     document.querySelectorAll(
       ".user-section"
     );
-
 
   for(const section of sections){
 
@@ -1355,7 +1296,6 @@ async function selectUser(
         .querySelector(".user-email")
         ?.textContent
         ?.trim();
-
 
     if(email === user.email){
 
@@ -1369,7 +1309,6 @@ async function selectUser(
           ".user-header"
         );
 
-
       characters.classList.add(
         "open"
       );
@@ -1377,7 +1316,6 @@ async function selectUser(
       header
         .querySelector(".arrow")
         ?.classList.add("open");
-
 
       if(
         characters.dataset.loaded !==
@@ -1394,7 +1332,6 @@ async function selectUser(
 
       }
 
-
       if(characterId){
 
         const {
@@ -1407,7 +1344,6 @@ async function selectUser(
             .eq("user_id",userId)
             .maybeSingle();
 
-
         if(character){
 
           await selectCharacter(
@@ -1418,7 +1354,6 @@ async function selectUser(
         }
 
       }
-
 
       const {
         data:charactersData
@@ -1431,7 +1366,6 @@ async function selectUser(
             ascending:false
           })
           .limit(1);
-
 
       if(
         charactersData &&
@@ -1463,7 +1397,6 @@ async function selectCharacter(
   selectedCharacter =
     character;
 
-
   if(!selectedUser){
 
     const {
@@ -1480,18 +1413,15 @@ async function selectCharacter(
 
   }
 
-
   const name =
     character.custom_character ||
     character.character_type ||
     "Character";
 
-
   document.getElementById(
     "headerName"
   ).textContent =
     name;
-
 
   document.getElementById(
     "headerUser"
@@ -1504,7 +1434,6 @@ async function selectCharacter(
         )
       : "User";
 
-
   document.getElementById(
     "headerMood"
   ).textContent =
@@ -1512,19 +1441,16 @@ async function selectCharacter(
       ? `Mood: ${character.chat_experience}`
       : "";
 
-
   const headerAvatar =
     document.getElementById(
       "headerAvatar"
     );
-
 
   headerAvatar.src =
     getDefaultAvatar();
 
   headerAvatar.style.display =
     "block";
-
 
   if(character.avatar_url){
 
@@ -1542,7 +1468,6 @@ async function selectCharacter(
     }
 
   }
-
 
   cancelReply();
 
@@ -1566,7 +1491,6 @@ async function loadConversation(
   conversationId =
     null;
 
-
   const {
     data,
     error
@@ -1581,7 +1505,6 @@ async function loadConversation(
       })
       .limit(1);
 
-
   if(error){
 
     console.error(error);
@@ -1593,7 +1516,6 @@ async function loadConversation(
     return;
   }
 
-
   if(!data || data.length === 0){
 
     showEmpty(
@@ -1603,10 +1525,8 @@ async function loadConversation(
     return;
   }
 
-
   conversationId =
     data[0].id;
-
 
   await loadMessages();
 
@@ -1630,14 +1550,12 @@ async function loadMessages(){
     return;
   }
 
-
   const messages =
     document.getElementById(
       "messages"
     );
 
   messages.innerHTML = "";
-
 
   const {
     data,
@@ -1654,7 +1572,6 @@ async function loadMessages(){
         ascending:true
       });
 
-
   if(error){
 
     console.error(error);
@@ -1666,7 +1583,6 @@ async function loadMessages(){
     return;
   }
 
-
   if(!data || data.length === 0){
 
     showEmpty(
@@ -1676,7 +1592,6 @@ async function loadMessages(){
     return;
   }
 
-
   for(const message of data){
 
     await addMessage(
@@ -1685,7 +1600,6 @@ async function loadMessages(){
     );
 
   }
-
 
   scrollBottom();
 
@@ -1706,7 +1620,6 @@ async function addMessage(
       "messages"
     );
 
-
   const empty =
     messages.querySelector(
       ".empty-chat"
@@ -1718,11 +1631,9 @@ async function addMessage(
 
   }
 
-
   const isAdmin =
     message.sender_id ===
     currentUser.id;
-
 
   const row =
     document.createElement("div");
@@ -1735,10 +1646,8 @@ async function addMessage(
         : "user"
     );
 
-
   row.dataset.messageId =
     message.id;
-
 
   const bubble =
     document.createElement("div");
@@ -1747,14 +1656,11 @@ async function addMessage(
     "message";
 
 
-  /* =========================
-     REPLIED MESSAGE
-  ========================= */
+  /* REPLIED MESSAGE */
 
   if(message.reply_to){
 
     let repliedMessage = null;
-
 
     if(allMessages.length){
 
@@ -1766,7 +1672,6 @@ async function addMessage(
         );
 
     }
-
 
     if(!repliedMessage){
 
@@ -1787,7 +1692,6 @@ async function addMessage(
 
     }
 
-
     if(repliedMessage){
 
       const replyBox =
@@ -1795,7 +1699,6 @@ async function addMessage(
 
       replyBox.className =
         "reply-preview";
-
 
       const replyLabel =
         document.createElement("div");
@@ -1809,13 +1712,11 @@ async function addMessage(
           ? "You"
           : "User";
 
-
       const replyText =
         document.createElement("div");
 
       replyText.className =
         "reply-text";
-
 
       if(repliedMessage.content){
 
@@ -1836,7 +1737,6 @@ async function addMessage(
 
       }
 
-
       replyBox.appendChild(
         replyLabel
       );
@@ -1845,7 +1745,6 @@ async function addMessage(
         replyText
       );
 
-
       replyBox.onclick =
         () => {
 
@@ -1853,7 +1752,6 @@ async function addMessage(
             document.querySelector(
               `[data-message-id="${repliedMessage.id}"]`
             );
-
 
           if(target){
 
@@ -1865,7 +1763,6 @@ async function addMessage(
           }
 
         };
-
 
       bubble.appendChild(
         replyBox
@@ -1886,7 +1783,6 @@ async function addMessage(
         message.image_path
       );
 
-
     if(imageUrl){
 
       const img =
@@ -1902,7 +1798,6 @@ async function addMessage(
         message.image_name ||
         "Image";
 
-
       img.onclick =
         () => {
 
@@ -1912,7 +1807,6 @@ async function addMessage(
           );
 
         };
-
 
       bubble.appendChild(img);
 
@@ -1939,16 +1833,13 @@ async function addMessage(
   }
 
 
-  /* =========================
-     REPLY BUTTON
-  ========================= */
+  /* REPLY BUTTON */
 
   const actions =
     document.createElement("div");
 
   actions.className =
     "message-actions";
-
 
   const replyButton =
     document.createElement("button");
@@ -1962,7 +1853,6 @@ async function addMessage(
   replyButton.textContent =
     "↩ Reply";
 
-
   replyButton.onclick =
     () => {
 
@@ -1971,7 +1861,6 @@ async function addMessage(
       );
 
     };
-
 
   actions.appendChild(
     replyButton
@@ -1995,11 +1884,9 @@ async function addMessage(
       message.created_at
     );
 
-
   bubble.appendChild(
     time
   );
-
 
   row.appendChild(
     bubble
@@ -2008,6 +1895,27 @@ async function addMessage(
   messages.appendChild(
     row
   );
+
+
+  /* =========================
+     AUTO SCROLL NEW MESSAGE
+  ========================= */
+
+  setTimeout(() => {
+
+    const container =
+      document.getElementById(
+        "messages"
+      );
+
+    if(container){
+
+      container.scrollTop =
+        container.scrollHeight;
+
+    }
+
+  },50);
 
 }
 
@@ -2023,22 +1931,18 @@ function startReply(
   replyingToMessage =
     message;
 
-
   const replyComposer =
     document.getElementById(
       "replyComposer"
     );
-
 
   const replyText =
     document.getElementById(
       "replyComposerText"
     );
 
-
   let preview =
     "";
-
 
   if(message.content){
 
@@ -2059,21 +1963,17 @@ function startReply(
 
   }
 
-
   replyText.textContent =
     preview;
-
 
   replyComposer.classList.add(
     "show"
   );
 
-
   const input =
     document.getElementById(
       "messageInput"
     );
-
 
   input.focus();
 
@@ -2089,23 +1989,19 @@ function cancelReply(){
   replyingToMessage =
     null;
 
-
   const replyComposer =
     document.getElementById(
       "replyComposer"
     );
 
-
   replyComposer.classList.remove(
     "show"
   );
-
 
   const replyText =
     document.getElementById(
       "replyComposerText"
     );
-
 
   replyText.textContent =
     "";
@@ -2132,16 +2028,13 @@ async function sendMessage(){
     return;
   }
 
-
   const input =
     document.getElementById(
       "messageInput"
     );
 
-
   const content =
     input.value.trim();
-
 
   if(
     !content &&
@@ -2151,18 +2044,15 @@ async function sendMessage(){
     return;
   }
 
-
   const sendButton =
     document.getElementById(
       "sendButton"
     );
 
-
   const imageButton =
     document.getElementById(
       "imageButton"
     );
-
 
   sendButton.disabled =
     true;
@@ -2170,15 +2060,11 @@ async function sendMessage(){
   imageButton.disabled =
     true;
 
-
   try{
 
     let imagePath = null;
     let imageType = null;
     let imageName = null;
-
-
-    /* IMAGE */
 
     if(selectedImage){
 
@@ -2188,10 +2074,8 @@ async function sendMessage(){
           .pop()
           .toLowerCase();
 
-
       const fileName =
         `${selectedUser.id}/${conversationId}/${Date.now()}-${crypto.randomUUID()}.${extension}`;
-
 
       const {
         error
@@ -2209,13 +2093,11 @@ async function sendMessage(){
             }
           );
 
-
       if(error){
 
         throw error;
 
       }
-
 
       imagePath =
         fileName;
@@ -2227,11 +2109,6 @@ async function sendMessage(){
         selectedImage.name;
 
     }
-
-
-    /* =========================
-       MESSAGE DATA
-    ========================= */
 
     const messageData = {
 
@@ -2255,18 +2132,12 @@ async function sendMessage(){
 
     };
 
-
-    /* ADD REPLY */
-
     if(replyingToMessage){
 
       messageData.reply_to =
         replyingToMessage.id;
 
     }
-
-
-    /* INSERT */
 
     const {
       error
@@ -2277,15 +2148,11 @@ async function sendMessage(){
           messageData
         );
 
-
     if(error){
 
       throw error;
 
     }
-
-
-    /* CLEAR */
 
     input.value =
       "";
@@ -2293,11 +2160,9 @@ async function sendMessage(){
     input.style.height =
       "42px";
 
-
     removeImage();
 
     cancelReply();
-
 
   }catch(error){
 
@@ -2367,13 +2232,11 @@ document
       const file =
         event.target.files[0];
 
-
       if(!file){
 
         return;
 
       }
-
 
       if(
         !file.type.startsWith(
@@ -2392,7 +2255,6 @@ document
 
       }
 
-
       if(
         file.size >
         5 * 1024 * 1024
@@ -2409,14 +2271,11 @@ document
 
       }
 
-
       selectedImage =
         file;
 
-
       const reader =
         new FileReader();
-
 
       reader.onload =
         function(e){
@@ -2426,7 +2285,6 @@ document
           ).src =
             e.target.result;
 
-
           document.getElementById(
             "imagePreview"
           ).classList.add(
@@ -2434,7 +2292,6 @@ document
           );
 
         };
-
 
       reader.readAsDataURL(
         file
@@ -2453,18 +2310,15 @@ function removeImage(){
   selectedImage =
     null;
 
-
   document.getElementById(
     "imageInput"
   ).value =
     "";
 
-
   document.getElementById(
     "previewImage"
   ).src =
     "";
-
 
   document.getElementById(
     "imagePreview"
@@ -2487,9 +2341,7 @@ function startRealtime(){
 
   }
 
-
   stopRealtime();
-
 
   realtimeChannel =
     supabaseClient
@@ -2515,11 +2367,13 @@ function startRealtime(){
             payload.new
           );
 
-
           await addMessage(
             payload.new,
             []
           );
+
+          /* EXTRA AUTO SCROLL */
+          scrollBottom();
 
         }
       )
@@ -2573,7 +2427,6 @@ async function createSignedUrl(
 
   }
 
-
   try{
 
     const {
@@ -2588,7 +2441,6 @@ async function createSignedUrl(
           60 * 60
         );
 
-
     if(error){
 
       console.error(
@@ -2599,7 +2451,6 @@ async function createSignedUrl(
       return null;
 
     }
-
 
     return data?.signedUrl ||
       null;
@@ -2689,8 +2540,12 @@ function scrollBottom(){
         "messages"
       );
 
-    messages.scrollTop =
-      messages.scrollHeight;
+    if(messages){
+
+      messages.scrollTop =
+        messages.scrollHeight;
+
+    }
 
   },50);
 
@@ -2708,7 +2563,6 @@ function formatTime(value){
     return "";
 
   }
-
 
   return new Date(value)
     .toLocaleString(
@@ -2790,4 +2644,3 @@ init();
 
 </body>
 </html>
-```
